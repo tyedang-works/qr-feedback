@@ -6,10 +6,12 @@ import {
     Container,
     FormGroup,
     Paper,
+    Stack,
     TextField,
     Typography
 } from "@mui/material";
 import { useState } from "react";
+import FeedbackSuccess from "./FeedbackSuccess";
 
 const surveyOptions = [
     {
@@ -98,10 +100,10 @@ export default function SurveyForm({
         return !nextErrors.feedback && !nextErrors.phone;
     };
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const handleSubmit = async () => {
+        const isValid = validate();
 
-        if (!validate()) {
+        if (!isValid) {
             return;
         }
 
@@ -126,97 +128,29 @@ export default function SurveyForm({
             const data = await response.json();
 
             if (!response.ok) {
-                setSubmitError(data.message || "Không thể gửi phản hồi.");
+                setSubmitError(
+                    data.message || "Không thể gửi phản hồi.",
+                );
                 return;
             }
 
             setIsSuccess(true);
         } catch (error) {
-            console.error("Failed to submit feedback:", error);
-            setSubmitError("Không thể kết nối đến hệ thống. Vui lòng thử lại.");
+            console.error(
+                "Failed to submit feedback:",
+                error,
+            );
+
+            setSubmitError(
+                "Không thể kết nối đến hệ thống. Vui lòng thử lại.",
+            );
         } finally {
             setIsSubmitting(false);
         }
     };
 
     if (isSuccess) {
-        return (
-            <Box
-                sx={{
-                    minHeight: "100vh",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#f7f8fa",
-                    px: 2,
-                    py: 4,
-                }}
-            >
-                <Container
-                    maxWidth="sm"
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            width: "100%",
-                            maxWidth: 480,
-                            borderRadius: 4,
-                            p: {
-                                xs: 3,
-                                sm: 5,
-                            },
-                            textAlign: "center",
-                            border: "1px solid",
-                            borderColor: "divider",
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                width: 64,
-                                height: 64,
-                                mx: "auto",
-                                mb: 3,
-                                borderRadius: "50%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "success.light",
-                                color: "success.main",
-                                fontSize: 30,
-                                fontWeight: 700,
-                            }}
-                        >
-                            ✓
-                        </Box>
-
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                fontWeight: 700,
-                                mb: 1.5,
-                            }}
-                        >
-                            Cảm ơn bạn!
-                        </Typography>
-
-                        <Typography
-                            variant="body1"
-                            color="text.secondary"
-                            sx={{
-                                lineHeight: 1.7,
-                            }}
-                        >
-                            Phản hồi của bạn đã được ghi nhận. Chúng tôi sẽ tiếp nhận và xử
-                            lý trong thời gian sớm nhất.
-                        </Typography>
-                    </Paper>
-                </Container>
-            </Box>
-        );
+        return <FeedbackSuccess />;
     }
 
     return (
@@ -607,10 +541,11 @@ export default function SurveyForm({
                     {/* Submit */}
                     <Button
                         fullWidth
-                        type="submit"
+                        type="button"
                         variant="contained"
                         size="small"
                         disabled={isSubmitting}
+                        onClick={handleSubmit}
                         sx={{
                             minHeight: 40,
                             borderRadius: 2,
@@ -618,12 +553,50 @@ export default function SurveyForm({
                             fontSize: 14,
                             fontWeight: 700,
                             boxShadow: "none",
+                            transition: "transform 150ms ease, box-shadow 150ms ease",
                             "&:hover": {
                                 boxShadow: "none",
+                                transform: "translateY(-1px)",
+                            },
+                            "&:active": {
+                                transform: "translateY(0)",
+                            },
+                            "&.Mui-disabled": {
+                                opacity: 0.75,
                             },
                         }}
                     >
-                        {isSubmitting ? "Đang gửi..." : "Gửi phản hồi"}
+                        {isSubmitting ? (
+                            <Stack
+                                sx={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: 1,
+                                }}
+                            >
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        width: 15,
+                                        height: 15,
+                                        border: "2px solid rgba(255,255,255,0.45)",
+                                        borderTopColor: "#fff",
+                                        borderRadius: "50%",
+                                        animation: "submitSpinner 700ms linear infinite",
+                                        "@keyframes submitSpinner": {
+                                            to: {
+                                                transform: "rotate(360deg)",
+                                            },
+                                        },
+                                    }}
+                                />
+
+                                <span>Đang gửi...</span>
+                            </Stack>
+                        ) : (
+                            "Gửi phản hồi"
+                        )}
                     </Button>
                 </Paper>
             </Container>

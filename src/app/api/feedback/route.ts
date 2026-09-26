@@ -180,7 +180,7 @@ export async function POST(request: Request) {
             await resend.emails.send({
                 from: "QR Feedback <onboarding@resend.dev>",
                 to: process.env.FEEDBACK_EMAIL!,
-                subject: `🔔 [QR Feedback] Phản hồi mới • ${table.name}`,
+                subject: `[QR Feedback] Phản hồi mới • ${table.name}`,
                 html: emailHtml,
             });
 

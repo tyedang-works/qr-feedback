@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { resend } from "@/lib/email/resend";
 import { createFeedbackEmailHtml } from "@/lib/email/templates/feedback-email";
+import { feedbackRateLimit } from "@/lib/rate-limit/feedback";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { NextResponse } from "next/server";
 
 const ALLOWED_OPTIONS = new Set([
     "food_quality",
@@ -22,6 +23,7 @@ type FeedbackPayload = {
 
 export async function POST(request: Request) {
     try {
+        // Parse request body
         const body = (await request.json()) as FeedbackPayload;
 
         const tableToken =
@@ -45,6 +47,7 @@ export async function POST(request: Request) {
                 ? body.phone.replace(/\s/g, "")
                 : "";
 
+        // Validate table token
         if (!tableToken) {
             return NextResponse.json(
                 { message: "Thiếu thông tin bàn." },
@@ -52,6 +55,7 @@ export async function POST(request: Request) {
             );
         }
 
+        // Validate selected options
         if (
             selectedOptions.some(
                 (option) => !ALLOWED_OPTIONS.has(option),
@@ -63,6 +67,7 @@ export async function POST(request: Request) {
             );
         }
 
+        // Validate feedback
         if (
             selectedOptions.length === 0 &&
             !feedback
@@ -76,6 +81,7 @@ export async function POST(request: Request) {
             );
         }
 
+        // Validate phone
         if (!phone) {
             return NextResponse.json(
                 { message: "Vui lòng nhập số điện thoại." },
@@ -90,6 +96,7 @@ export async function POST(request: Request) {
             );
         }
 
+        // Validate feedback length
         if (feedback.length > 1000) {
             return NextResponse.json(
                 {
@@ -100,15 +107,60 @@ export async function POST(request: Request) {
             );
         }
 
+        // Get client IP
+        const forwardedFor =
+            request.headers.get("x-forwarded-for");
+
+        const ip =
+            forwardedFor?.split(",")[0]?.trim() ||
+            "unknown";
+
+        // Rate limit by IP + table
+        const identifier = `${ip}:${tableToken}`;
+
+        const {
+            success,
+            limit,
+            remaining,
+            reset,
+        } = await feedbackRateLimit.limit(identifier);
+
+        if (!success) {
+            return NextResponse.json(
+                {
+                    message:
+                        "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+                },
+                {
+                    status: 429,
+                    headers: {
+                        "X-RateLimit-Limit": String(limit),
+                        "X-RateLimit-Remaining": String(remaining),
+                        "X-RateLimit-Reset": String(reset),
+                        "Retry-After": String(
+                            Math.max(
+                                1,
+                                Math.ceil(
+                                    (reset - Date.now()) / 1000,
+                                ),
+                            ),
+                        ),
+                    },
+                },
+            );
+        }
+
         const supabase = createAdminClient();
 
         // Find table
-        const { data: table, error: tableError } =
-            await supabase
-                .from("tables")
-                .select("id, restaurant_id, name")
-                .eq("token", tableToken)
-                .single();
+        const {
+            data: table,
+            error: tableError,
+        } = await supabase
+            .from("tables")
+            .select("id, restaurant_id, name")
+            .eq("token", tableToken)
+            .single();
 
         if (tableError || !table) {
             return NextResponse.json(
@@ -118,12 +170,14 @@ export async function POST(request: Request) {
         }
 
         // Find restaurant
-        const { data: restaurant, error: restaurantError } =
-            await supabase
-                .from("restaurants")
-                .select("name")
-                .eq("id", table.restaurant_id)
-                .single();
+        const {
+            data: restaurant,
+            error: restaurantError,
+        } = await supabase
+            .from("restaurants")
+            .select("name")
+            .eq("id", table.restaurant_id)
+            .single();
 
         if (restaurantError) {
             console.error(

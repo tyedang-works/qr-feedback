@@ -11,6 +11,7 @@ import {
     Typography
 } from "@mui/material";
 import { useState } from "react";
+import Logo from "../common/Logo";
 import FeedbackSuccess from "./FeedbackSuccess";
 
 const surveyOptions = [
@@ -200,25 +201,10 @@ export default function SurveyForm({
                         sx={{
                             display: "flex",
                             justifyContent: "center",
-                            mb: 3,
+                            mb: 2,
                         }}
                     >
-                        <Box
-                            sx={{
-                                width: 52,
-                                height: 52,
-                                borderRadius: 2.5,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "primary.main",
-                                color: "primary.contrastText",
-                                fontWeight: 800,
-                                fontSize: 18,
-                            }}
-                        >
-                            LOGO
-                        </Box>
+                        <Logo />
                     </Box>
 
                     {/* Header */}

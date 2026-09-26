@@ -1,35 +1,23 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
 type LogoProps = {
     size?: number;
 };
 
 export default function Logo({
-    size = 52,
+    size = 68,
 }: LogoProps) {
     return (
         <Box
+            component="img"
+            src="/main-logo.svg"
+            alt="QR Feedback"
             sx={{
                 width: size,
                 height: size,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 2,
-                backgroundColor: "#1976d2",
-                flexShrink: 0,
+                objectFit: "contain",
+                display: "block",
             }}
-        >
-            <Typography
-                sx={{
-                    color: "#fff",
-                    fontSize: size * 0.27,
-                    fontWeight: 700,
-                    lineHeight: 1,
-                }}
-            >
-                LOGO
-            </Typography>
-        </Box>
+        />
     );
 }

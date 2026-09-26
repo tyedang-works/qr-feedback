@@ -215,7 +215,7 @@ export default function SurveyForm({
                         }}
                     >
                         <Typography
-                            variant="h5"
+                            variant="h6"
                             sx={{
                                 fontWeight: 700,
                                 mb: 1.5,

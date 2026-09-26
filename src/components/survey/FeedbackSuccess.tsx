@@ -42,7 +42,7 @@ export default function FeedbackSuccess() {
                         },
                     }}
                 >
-                    <Logo />
+                    <Logo size={90} />
                 </Box>
 
                 {/* Success card */}
@@ -75,8 +75,8 @@ export default function FeedbackSuccess() {
                     {/* Success icon */}
                     <Box
                         sx={{
-                            width: 64,
-                            height: 64,
+                            width: 52,
+                            height: 52,
                             mx: "auto",
                             mb: 2.5,
                             borderRadius: "50%",
@@ -134,8 +134,8 @@ export default function FeedbackSuccess() {
                         sx={{
                             fontWeight: 700,
                             fontSize: {
-                                xs: 22,
-                                sm: 24,
+                                xs: 20,
+                                sm: 22,
                             },
                             lineHeight: 1.3,
                             mb: 1,

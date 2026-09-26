@@ -67,6 +67,7 @@ export default async function QRPage({
             >
                 <Typography
                     variant="h5"
+                    className="qr-print-note"
                     sx={{
                         fontWeight: 700,
                         mb: 1,
@@ -77,9 +78,11 @@ export default async function QRPage({
 
                 <Typography
                     variant="body2"
+                    className="qr-print-note"
                     sx={{
                         color: "text.secondary",
-                        mb: 0.5,
+                        fontSize: 14,
+                        lineHeight: 1.4,
                     }}
                 >
                     {restaurant?.name ?? "Nhà hàng"}
@@ -88,31 +91,35 @@ export default async function QRPage({
                 <Typography
                     variant="body1"
                     sx={{
-                        fontWeight: 600,
+                        fontWeight: 700,
+                        fontSize: 18,
+                        lineHeight: 1.3,
                         mb: 1,
                     }}
                 >
                     {table.name}
                 </Typography>
 
-                <TableQRCode token={token} />
-
                 <Typography
                     variant="body2"
                     sx={{
-                        mt: 2,
+                        mb: 0,
                         color: "text.secondary",
+                        fontSize: 13,
+                        lineHeight: 1.4,
                     }}
                 >
                     Quét mã để gửi phản hồi
                 </Typography>
 
+                <TableQRCode token={token} />
+
                 <Typography
-                    variant="caption"
+                    className="qr-print-note"
+                    variant="body2"
                     sx={{
-                        display: "block",
-                        mt: 0.5,
-                        color: "text.disabled",
+                        mt: 1,
+                        color: "text.secondary",
                     }}
                 >
                     Có thể tải xuống hoặc in mã QR này để đặt trên bàn.

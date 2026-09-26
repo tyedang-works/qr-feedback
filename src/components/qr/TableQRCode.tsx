@@ -142,7 +142,7 @@ export default function TableQRCode({
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    p: 2,
+                    p: 0,
                     backgroundColor: "#fff",
                     borderRadius: 2,
                 }}
@@ -175,6 +175,7 @@ export default function TableQRCode({
                     justifyContent: "center",
                     gap: 1,
                     mt: 2,
+                    mb: 2,
                 }}
             >
                 <Button

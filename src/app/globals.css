@@ -1,0 +1,43 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: 12mm;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  .qr-page {
+    max-width: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .qr-page .qr-print-area {
+    break-inside: avoid;
+  }
+
+  .qr-page button {
+    display: none !important;
+  }
+
+  .qr-page .qr-print-url {
+    display: none !important;
+  }
+}

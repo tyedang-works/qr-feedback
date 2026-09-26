@@ -99,7 +99,7 @@ export function createFeedbackEmailHtml({
                   ">
 
                     <div style="
-                      font-size: 30px;
+                      font-size: 26px;
                       line-height: 1.2;
                       font-weight: 700;
                       letter-spacing: -0.8px;
@@ -125,7 +125,7 @@ export function createFeedbackEmailHtml({
 
             <!-- Basic information -->
             <div style="
-              padding: 20px 0;
+              padding: 14px 0;
               border-bottom: 1px solid #e8ebef;
             ">
 
@@ -232,11 +232,11 @@ export function createFeedbackEmailHtml({
             ">
 
               <div style="
-                font-size: 19px;
+                font-size: 18px;
                 line-height: 1.4;
                 font-weight: 650;
                 color: #172033;
-                margin-bottom: 16px;
+                margin-bottom: 14px;
               ">
                 Vấn đề khách hàng gặp phải
               </div>
@@ -258,7 +258,7 @@ export function createFeedbackEmailHtml({
 
             <!-- Feedback -->
             <div style="
-              padding-top: 28px;
+              padding-top: 26px;
             ">
 
               <div style="
@@ -266,7 +266,7 @@ export function createFeedbackEmailHtml({
                 line-height: 1.4;
                 font-weight: 650;
                 color: #172033;
-                margin-bottom: 16px;
+                margin-bottom: 14px;
               ">
                 Chi tiết phản hồi
               </div>
@@ -289,7 +289,7 @@ export function createFeedbackEmailHtml({
 
             <!-- Contact -->
             <div style="
-              padding-top: 32px;
+              padding-top: 26px;
             ">
 
               <div style="

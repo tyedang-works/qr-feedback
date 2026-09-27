@@ -1,7 +1,7 @@
+import type { RecentFeedbackItem } from "@/lib/dashboard/types";
 import {
     FEEDBACK_ISSUE_LABEL_MAP,
-} from "@/lib/dashboard/constants";
-import type { RecentFeedbackItem } from "@/lib/dashboard/types";
+} from "@/lib/feedback/constants";
 import {
     Box,
     Card,

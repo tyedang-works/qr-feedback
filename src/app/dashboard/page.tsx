@@ -1,9 +1,10 @@
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import FeedbackTrend from "@/components/dashboard/FeedbackTrend";
 import SummaryCards from "@/components/dashboard/SummaryCards";
 import { getUserContext } from "@/lib/auth/queries";
 
+import IssueDistribution from "@/components/dashboard/IssueDistribution";
+import RecentFeedback from "@/components/dashboard/RecentFeedback";
 import {
     getDashboardSummary,
     getFeedbackTrend,
@@ -11,8 +12,6 @@ import {
     getRecentFeedback,
 } from "@/lib/dashboard/queries";
 import { Box, Stack } from "@mui/material";
-import IssueDistribution from "@/components/dashboard/IssueDistribution";
-import RecentFeedback from "@/components/dashboard/RecentFeedback";
 
 export default async function DashboardPage() {
     const userContext = await getUserContext();
@@ -45,44 +44,42 @@ export default async function DashboardPage() {
         )
         : [];
     return (
-        <DashboardLayout>
-            <Stack
+        <Stack
+            sx={{
+                gap: 3,
+            }}
+        >
+            <DashboardHeader
+                fullName={userContext?.fullName}
+                restaurantName={userContext?.restaurantName}
+            />
+
+            <SummaryCards
+                totalFeedback={summary.totalFeedback}
+                todayFeedback={summary.todayFeedback}
+                activeTables={summary.activeTables}
+            />
+
+            <Box
                 sx={{
-                    gap: 3,
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "1fr",
+                        lg: "minmax(0, 1.5fr) minmax(0, 1fr)",
+                    },
+                    gap: 2,
                 }}
             >
-                <DashboardHeader
-                    fullName={userContext?.fullName}
-                    restaurantName={userContext?.restaurantName}
+                <FeedbackTrend data={feedbackTrend} />
+
+                <IssueDistribution
+                    data={issueDistribution}
                 />
+            </Box>
 
-                <SummaryCards
-                    totalFeedback={summary.totalFeedback}
-                    todayFeedback={summary.todayFeedback}
-                    activeTables={summary.activeTables}
-                />
+            <RecentFeedback data={recentFeedback} />
 
-                <Box
-                    sx={{
-                        display: "grid",
-                        gridTemplateColumns: {
-                            xs: "1fr",
-                            lg: "minmax(0, 1.5fr) minmax(0, 1fr)",
-                        },
-                        gap: 2,
-                    }}
-                >
-                    <FeedbackTrend data={feedbackTrend} />
-
-                    <IssueDistribution
-                        data={issueDistribution}
-                    />
-                </Box>
-
-                <RecentFeedback data={recentFeedback} />
-
-                <RecentFeedback data={recentFeedback} />
-            </Stack>
-        </DashboardLayout>
+            <RecentFeedback data={recentFeedback} />
+        </Stack>
     );
 }

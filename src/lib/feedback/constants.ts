@@ -2,23 +2,31 @@ export const FEEDBACK_PAGE_SIZE = 10;
 
 export const FEEDBACK_ISSUES = [
     {
-        value: "food_quality",
+        option: "food_quality",
         label: "Món ăn chưa đạt yêu cầu",
     },
     {
-        value: "food_presentation",
+        option: "food_presentation",
         label: "Món ăn trình bày chưa đẹp",
     },
     {
-        value: "service",
+        option: "service",
         label: "Phục vụ chưa tốt",
     },
     {
-        value: "space_cleanliness",
+        option: "space_cleanliness",
         label: "Không gian / vệ sinh chưa tốt",
     },
     {
-        value: "service_time",
+        option: "service_time",
         label: "Thời gian phục vụ quá lâu",
     },
 ] as const;
+
+export const FEEDBACK_ISSUE_LABEL_MAP =
+    Object.fromEntries(
+        FEEDBACK_ISSUES.map((issue) => [
+            issue.option,
+            issue.label,
+        ]),
+    ) as Record<string, string>;

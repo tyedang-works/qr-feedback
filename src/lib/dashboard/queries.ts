@@ -1,12 +1,12 @@
+import {
+    FEEDBACK_ISSUES,
+} from "@/lib/feedback/constants";
 import { createClient } from "@/lib/supabase/server";
 import type {
     FeedbackTrendItem,
     IssueDistributionItem,
     RecentFeedbackItem,
 } from "./types";
-import {
-    FEEDBACK_ISSUES,
-} from "./constants";
 
 export type DashboardSummary = {
     totalFeedback: number;

@@ -18,39 +18,135 @@ export async function getFeedbackList(
         tableId,
     } = filters;
 
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
-
-    let query = supabase
+    /*
+     * Build the filtered query first.
+     * We use this query to get the total count.
+     */
+    let countQuery = supabase
         .from("feedback")
-        .select(
-            `
-        id,
-        table_id,
-        selected_options,
-        feedback,
-        phone,
-        created_at
-      `,
-            {
-                count: "exact",
-            },
-        )
+        .select("id", {
+            count: "exact",
+            head: true,
+        })
         .eq("restaurant_id", restaurantId);
 
     if (keyword.trim()) {
-        query = query.ilike(
+        countQuery = countQuery.ilike(
             "feedback",
             `%${keyword.trim()}%`,
         );
     }
 
-    if (tableId) {
-        query = query.eq("table_id", tableId);
+    if (tableId && tableId !== "all") {
+        countQuery = countQuery.eq(
+            "table_id",
+            tableId,
+        );
     }
 
-    if (issue) {
-        query = query.contains(
+    if (issue && issue !== "all") {
+        countQuery = countQuery.contains(
+            "selected_options",
+            [issue],
+        );
+    }
+
+    const {
+        count,
+        error: countError,
+    } = await countQuery;
+
+    if (countError) {
+        console.error(
+            "Failed to get feedback count:",
+            JSON.stringify(
+                countError,
+                null,
+                2,
+            ),
+        );
+
+        return {
+            data: [],
+            total: 0,
+            page: 1,
+            pageSize,
+            totalPages: 0,
+        };
+    }
+
+    const total = count ?? 0;
+    const totalPages = Math.ceil(
+        total / pageSize,
+    );
+
+    if (total === 0) {
+        return {
+            data: [],
+            total: 0,
+            page: 1,
+            pageSize,
+            totalPages: 0,
+        };
+    }
+
+    /*
+     * Make sure the requested page is valid.
+     *
+     * Example:
+     * total = 5
+     * pageSize = 10
+     * totalPages = 1
+     *
+     * /dashboard/feedback?page=2
+     * -> safePage = 1
+     */
+    const safePage = Math.min(
+        Math.max(page, 1),
+        totalPages,
+    );
+
+    const from =
+        (safePage - 1) * pageSize;
+
+    const to = Math.min(
+        from + pageSize - 1,
+        total - 1,
+    );
+
+    /*
+     * Get feedback data for the current page.
+     */
+    let feedbackQuery = supabase
+        .from("feedback")
+        .select(
+            `
+                id,
+                table_id,
+                selected_options,
+                feedback,
+                phone,
+                created_at
+            `,
+        )
+        .eq("restaurant_id", restaurantId);
+
+    if (keyword.trim()) {
+        feedbackQuery = feedbackQuery.ilike(
+            "feedback",
+            `%${keyword.trim()}%`,
+        );
+    }
+
+    if (tableId && tableId !== "all") {
+        feedbackQuery = feedbackQuery.eq(
+            "table_id",
+            tableId,
+        );
+    }
+
+    if (issue && issue !== "all") {
+        feedbackQuery = feedbackQuery.contains(
             "selected_options",
             [issue],
         );
@@ -58,41 +154,46 @@ export async function getFeedbackList(
 
     const {
         data: feedbackData,
-        count,
-        error,
-    } = await query
+        error: feedbackError,
+    } = await feedbackQuery
         .order("created_at", {
             ascending: false,
         })
         .range(from, to);
 
-    if (error) {
+    if (feedbackError) {
         console.error(
             "Failed to get feedback list:",
-            error,
+            JSON.stringify(
+                feedbackError,
+                null,
+                2,
+            ),
         );
 
         return {
             data: [],
-            total: 0,
-            page,
+            total,
+            page: safePage,
             pageSize,
-            totalPages: 0,
+            totalPages,
         };
     }
 
     if (!feedbackData?.length) {
         return {
             data: [],
-            total: count ?? 0,
-            page,
+            total,
+            page: safePage,
             pageSize,
-            totalPages: Math.ceil(
-                (count ?? 0) / pageSize,
-            ),
+            totalPages,
         };
     }
 
+    /*
+     * Get table names separately because the
+     * Supabase relationship response is typed as an array.
+     */
     const tableIds = [
         ...new Set(
             feedbackData.map(
@@ -138,11 +239,9 @@ export async function getFeedbackList(
 
     return {
         data,
-        total: count ?? 0,
-        page,
+        total,
+        page: safePage,
         pageSize,
-        totalPages: Math.ceil(
-            (count ?? 0) / pageSize,
-        ),
+        totalPages,
     };
 }

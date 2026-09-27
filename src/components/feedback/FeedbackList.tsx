@@ -10,6 +10,7 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import Link from "next/link";
 
 type FeedbackListProps = {
     data: FeedbackListItem[];
@@ -81,59 +82,117 @@ export default function FeedbackList({
             }}
         >
             {data.map((item, index) => (
-                <Box key={item.id}>
-                    {index > 0 && <Divider />}
+                <Link
+                    key={item.id}
+                    href={`/dashboard/feedback/${item.publicId}`}
+                    style={{
+                        display: "block",
+                        textDecoration: "none",
+                        color: "inherit",
+                    }}
+                >
+                    <Box>
+                        {index > 0 && <Divider />}
 
-                    <Box
-                        sx={{
-                            p: {
-                                xs: 2,
-                                sm: 2.5,
-                            },
-                        }}
-                    >
-                        <Stack sx={{ gap: 2 }}>
-                            {/* Header */}
-                            <Stack
-                                sx={{
-                                    flexDirection: {
-                                        xs: "column",
-                                        sm: "row",
-                                    },
-                                    alignItems: {
-                                        xs: "flex-start",
-                                        sm: "center",
-                                    },
-                                    justifyContent:
-                                        "space-between",
-                                    gap: 1,
-                                }}
-                            >
-                                <Typography
+                        <Box
+                            sx={{
+                                p: {
+                                    xs: 2,
+                                    sm: 2.5,
+                                },
+                                transition:
+                                    "background-color 150ms ease",
+                                "&:hover": {
+                                    backgroundColor: "#f8fafc",
+                                },
+                            }}
+                        >
+                            <Stack sx={{ gap: 2 }}>
+                                {/* Header */}
+                                <Stack
                                     sx={{
-                                        fontSize: 15,
-                                        fontWeight: 700,
-                                        color: "#193B56",
+                                        flexDirection: {
+                                            xs: "column",
+                                            sm: "row",
+                                        },
+                                        alignItems: {
+                                            xs: "flex-start",
+                                            sm: "center",
+                                        },
+                                        justifyContent:
+                                            "space-between",
+                                        gap: 1,
                                     }}
                                 >
-                                    {item.tableName}
-                                </Typography>
+                                    <Typography
+                                        sx={{
+                                            fontSize: 15,
+                                            fontWeight: 700,
+                                            color: "#193B56",
+                                        }}
+                                    >
+                                        {item.tableName}
+                                    </Typography>
 
-                                <Typography
-                                    sx={{
-                                        fontSize: 12,
-                                        color: "#98A2B3",
-                                    }}
-                                >
-                                    {formatDateTime(
-                                        item.createdAt,
+                                    <Typography
+                                        sx={{
+                                            fontSize: 12,
+                                            color: "#98A2B3",
+                                        }}
+                                    >
+                                        {formatDateTime(
+                                            item.createdAt,
+                                        )}
+                                    </Typography>
+                                </Stack>
+
+                                {/* Issues */}
+                                {item.selectedOptions.length >
+                                    0 && (
+                                        <Stack sx={{ gap: 1 }}>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: 12,
+                                                    fontWeight: 600,
+                                                    color: "#667085",
+                                                }}
+                                            >
+                                                Vấn đề khách hàng chọn
+                                            </Typography>
+
+                                            <Stack
+                                                sx={{
+                                                    flexDirection: "row",
+                                                    flexWrap: "wrap",
+                                                    gap: 0.75,
+                                                }}
+                                            >
+                                                {item.selectedOptions.map(
+                                                    (option) => (
+                                                        <Chip
+                                                            key={option}
+                                                            label={getIssueLabel(
+                                                                option,
+                                                            )}
+                                                            size="small"
+                                                            sx={{
+                                                                height: 28,
+                                                                borderRadius: 1,
+                                                                backgroundColor:
+                                                                    "#eef4f8",
+                                                                color: "#193B56",
+                                                                fontSize: 11,
+                                                                fontWeight: 500,
+                                                            }}
+                                                        />
+                                                    ),
+                                                )}
+                                            </Stack>
+                                        </Stack>
                                     )}
-                                </Typography>
-                            </Stack>
 
-                            {/* Issues */}
-                            {item.selectedOptions.length >
-                                0 && (
+                                {/* Feedback */}
+                                {item.feedback && (
                                     <Stack sx={{ gap: 1 }}>
                                         <Typography
                                             sx={{
@@ -142,43 +201,45 @@ export default function FeedbackList({
                                                 color: "#667085",
                                             }}
                                         >
-                                            Vấn đề khách hàng chọn
+                                            Góp ý của khách hàng
                                         </Typography>
 
-                                        <Stack
+                                        <Box
                                             sx={{
-                                                flexDirection: "row",
-                                                flexWrap: "wrap",
-                                                gap: 0.75,
+                                                px: 2,
+                                                py: 1.5,
+                                                borderRadius: 1.5,
+                                                backgroundColor:
+                                                    "#f8fafc",
+                                                border:
+                                                    "1px solid #eef2f5",
                                             }}
                                         >
-                                            {item.selectedOptions.map(
-                                                (option) => (
-                                                    <Chip
-                                                        key={option}
-                                                        label={getIssueLabel(
-                                                            option,
-                                                        )}
-                                                        size="small"
-                                                        sx={{
-                                                            height: 28,
-                                                            borderRadius: 1,
-                                                            backgroundColor:
-                                                                "#eef4f8",
-                                                            color: "#193B56",
-                                                            fontSize: 11,
-                                                            fontWeight: 500,
-                                                        }}
-                                                    />
-                                                ),
-                                            )}
-                                        </Stack>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: 13,
+                                                    lineHeight: 1.6,
+                                                    color: "#344054",
+                                                    whiteSpace:
+                                                        "pre-wrap",
+                                                    wordBreak:
+                                                        "break-word",
+                                                }}
+                                            >
+                                                {item.feedback}
+                                            </Typography>
+                                        </Box>
                                     </Stack>
                                 )}
 
-                            {/* Feedback */}
-                            {item.feedback && (
-                                <Stack sx={{ gap: 1 }}>
+                                {/* Phone */}
+                                <Stack
+                                    sx={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
                                     <Typography
                                         sx={{
                                             fontSize: 12,
@@ -186,64 +247,22 @@ export default function FeedbackList({
                                             color: "#667085",
                                         }}
                                     >
-                                        Góp ý của khách hàng
+                                        Số điện thoại:
                                     </Typography>
 
-                                    <Box
+                                    <Typography
                                         sx={{
-                                            px: 2,
-                                            py: 1.5,
-                                            borderRadius: 1.5,
-                                            backgroundColor: "#f8fafc",
-                                            border:
-                                                "1px solid #eef2f5",
+                                            fontSize: 13,
+                                            color: "#344054",
                                         }}
                                     >
-                                        <Typography
-                                            sx={{
-                                                fontSize: 13,
-                                                lineHeight: 1.6,
-                                                color: "#344054",
-                                                whiteSpace: "pre-wrap",
-                                                wordBreak: "break-word",
-                                            }}
-                                        >
-                                            {item.feedback}
-                                        </Typography>
-                                    </Box>
+                                        {item.phone}
+                                    </Typography>
                                 </Stack>
-                            )}
-
-                            {/* Phone */}
-                            <Stack
-                                sx={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    gap: 1,
-                                }}
-                            >
-                                <Typography
-                                    sx={{
-                                        fontSize: 12,
-                                        fontWeight: 600,
-                                        color: "#667085",
-                                    }}
-                                >
-                                    Số điện thoại:
-                                </Typography>
-
-                                <Typography
-                                    sx={{
-                                        fontSize: 13,
-                                        color: "#344054",
-                                    }}
-                                >
-                                    {item.phone}
-                                </Typography>
                             </Stack>
-                        </Stack>
+                        </Box>
                     </Box>
-                </Box>
+                </Link>
             ))}
         </Card>
     );

@@ -1,5 +1,6 @@
 export type FeedbackListItem = {
     id: string;
+    publicId: string;
     tableId: string;
     tableName: string;
     selectedOptions: string[];
@@ -22,4 +23,14 @@ export type FeedbackListResult = {
     page: number;
     pageSize: number;
     totalPages: number;
+};
+
+export type FeedbackDetail = {
+    id: string;
+    tableId: string;
+    tableName: string;
+    selectedOptions: string[];
+    feedback: string;
+    phone: string;
+    createdAt: string;
 };

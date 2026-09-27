@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
+    FeedbackDetail,
     FeedbackFilters,
     FeedbackListResult,
 } from "./types";
@@ -121,13 +122,14 @@ export async function getFeedbackList(
         .from("feedback")
         .select(
             `
-                id,
-                table_id,
-                selected_options,
-                feedback,
-                phone,
-                created_at
-            `,
+        id,
+        public_id,
+        table_id,
+        selected_options,
+        feedback,
+        phone,
+        created_at
+    `,
         )
         .eq("restaurant_id", restaurantId);
 
@@ -226,6 +228,7 @@ export async function getFeedbackList(
 
     const data = feedbackData.map((item) => ({
         id: item.id,
+        publicId: item.public_id,
         tableId: item.table_id,
         tableName:
             tableNameMap.get(item.table_id) ??
@@ -243,5 +246,82 @@ export async function getFeedbackList(
         page: safePage,
         pageSize,
         totalPages,
+    };
+}
+
+export async function getFeedbackDetail(
+    restaurantId: string,
+    feedbackPublicId: string,
+): Promise<FeedbackDetail | null> {
+    const supabase = await createClient();
+
+    const {
+        data: feedback,
+        error: feedbackError,
+    } = await supabase
+        .from("feedback")
+        .select(
+            `
+                id,
+                public_id,
+                table_id,
+                selected_options,
+                feedback,
+                phone,
+                created_at
+            `,
+        )
+        .eq("public_id", feedbackPublicId)
+        .eq("restaurant_id", restaurantId)
+        .maybeSingle();
+
+    if (feedbackError) {
+        console.error(
+            "Failed to get feedback detail:",
+            JSON.stringify(
+                feedbackError,
+                null,
+                2,
+            ),
+        );
+
+        return null;
+    }
+
+    if (!feedback) {
+        return null;
+    }
+
+    const {
+        data: table,
+        error: tableError,
+    } = await supabase
+        .from("tables")
+        .select("id, name")
+        .eq("id", feedback.table_id)
+        .eq("restaurant_id", restaurantId)
+        .maybeSingle();
+
+    if (tableError) {
+        console.error(
+            "Failed to get feedback table:",
+            JSON.stringify(
+                tableError,
+                null,
+                2,
+            ),
+        );
+    }
+
+    return {
+        id: feedback.id,
+        tableId: feedback.table_id,
+        tableName:
+            table?.name ?? "Không xác định",
+        selectedOptions:
+            feedback.selected_options ?? [],
+        feedback: feedback.feedback ?? "",
+        phone: feedback.phone,
+        createdAt: feedback.created_at,
     };
 }

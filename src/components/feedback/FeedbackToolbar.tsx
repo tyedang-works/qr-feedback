@@ -5,7 +5,10 @@ import type {
 import {
     Box,
     Button,
+    FormControl,
+    InputLabel,
     MenuItem,
+    Select,
     Stack,
     TextField,
 } from "@mui/material";
@@ -26,14 +29,17 @@ export default function FeedbackToolbar({
     return (
         <Box
             component="form"
-            method="GET"
+            method="get"
             sx={{
-                p: 1.5,
-                border: "1px solid #e4e7ec",
-                borderRadius: 2,
+                p: {
+                    xs: 1.5,
+                    sm: 1.5,
+                },
                 backgroundColor: "#ffffff",
+                border: "1px solid #eaecf0",
+                borderRadius: 2,
                 boxShadow:
-                    "0 1px 2px rgba(16, 24, 40, 0.03)",
+                    "0 1px 2px rgba(16, 24, 40, 0.04)",
             }}
         >
             <Stack
@@ -46,204 +52,179 @@ export default function FeedbackToolbar({
                         xs: "stretch",
                         md: "center",
                     },
-                    gap: 1.25,
+                    gap: {
+                        xs: 3,
+                        md: 1,
+                    },
                 }}
             >
                 {/* Search */}
                 <TextField
                     name="keyword"
-                    defaultValue={keyword}
                     placeholder="Tìm kiếm phản hồi..."
-                    size="small"
+                    defaultValue={keyword}
                     fullWidth
+                    size="small"
                     sx={{
-                        flex: 1,
-                        minWidth: 0,
-                        "& .MuiOutlinedInput-root": {
-                            height: 40,
-                            borderRadius: 1.5,
-                            backgroundColor: "#ffffff",
-                            "& fieldset": {
-                                borderColor: "#d0d5dd",
-                            },
-                            "&:hover fieldset": {
-                                borderColor: "#98a2b3",
-                            },
-                            "&.Mui-focused fieldset": {
-                                borderColor: "#1976d2",
-                                borderWidth: 1,
-                            },
+                        flex: {
+                            md: 1,
                         },
+                        minWidth: 0,
+
+                        "& .MuiInputBase-root": {
+                            height: 40,
+                            fontSize: 14,
+                        },
+
                         "& .MuiInputBase-input": {
                             fontSize: 14,
-                            lineHeight: 1.5,
-                            py: 1,
-                            px: 1.5,
-                            "&::placeholder": {
-                                fontSize: 14,
-                                color: "#98a2b3",
-                                opacity: 1,
-                            },
                         },
+
+                        "& .MuiInputBase-input::placeholder": {
+                            fontSize: 14,
+                            opacity: 1,
+                            color: "#98a2b3",
+                        },
+
                         "& .MuiInputBase-input:-webkit-autofill": {
-                            WebkitBoxShadow: "0 0 0 1000px #ffffff inset",
+                            WebkitBoxShadow:
+                                "0 0 0 1000px #ffffff inset",
                             WebkitTextFillColor: "#344054",
                             caretColor: "#344054",
-                            transition: "background-color 5000s ease-in-out 0s",
+                            transition:
+                                "background-color 5000s ease-in-out 0s",
                         },
                     }}
                 />
 
                 {/* Issue */}
-                <TextField
-                    select
-                    name="issue"
-                    defaultValue={issue || "all"}
+                <FormControl
                     size="small"
-                    label="Vấn đề"
+                    fullWidth
                     sx={{
                         width: {
                             xs: "100%",
                             md: 220,
                         },
-                        "& .MuiOutlinedInput-root": {
-                            height: 40,
-                            borderRadius: 1.5,
-                            backgroundColor: "#ffffff",
-                            "& fieldset": {
-                                borderColor: "#d0d5dd",
-                            },
-                            "&:hover fieldset": {
-                                borderColor: "#98a2b3",
-                            },
-                            "&.Mui-focused fieldset": {
-                                borderColor: "#1976d2",
-                                borderWidth: 1,
-                            },
-                        },
-
-                        "& .MuiInputLabel-root": {
-                            fontSize: 14,
-                        },
-                        "& .MuiInputLabel-shrink": {
-                            fontSize: 12,
-                        },
-                        "& .MuiSelect-select": {
-                            fontSize: 14,
-                            lineHeight: 1.5,
-                            display: "flex",
-                            alignItems: "center",
-                        },
-                        "& .MuiSelect-icon": {
-                            color: "#667085",
-                        },
                     }}
                 >
-                    <MenuItem
-                        value="all"
+                    <InputLabel
                         sx={{
                             fontSize: 14,
                         }}
                     >
-                        All
-                    </MenuItem>
+                        Vấn đề
+                    </InputLabel>
 
-                    {FEEDBACK_ISSUES.map((item) => (
+                    <Select
+                        name="issue"
+                        defaultValue={issue || "all"}
+                        label="Vấn đề"
+                        sx={{
+                            height: 40,
+                            fontSize: 14,
+                        }}
+                    >
                         <MenuItem
-                            key={item.option}
-                            value={item.option}
+                            value="all"
                             sx={{
                                 fontSize: 14,
                             }}
                         >
-                            {item.label}
+                            All
                         </MenuItem>
-                    ))}
-                </TextField>
+
+                        {FEEDBACK_ISSUES.map((item) => (
+                            <MenuItem
+                                key={item.option}
+                                value={item.option}
+                                sx={{
+                                    fontSize: 14,
+                                }}
+                            >
+                                {item.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
 
                 {/* Table */}
-                <TextField
-                    select
-                    name="tableId"
-                    defaultValue={tableId || "all"}
+                <FormControl
                     size="small"
-                    label="Bàn"
+                    fullWidth
                     sx={{
                         width: {
                             xs: "100%",
                             md: 170,
                         },
-                        "& .MuiOutlinedInput-root": {
-                            height: 40,
-                            borderRadius: 1.5,
-                            backgroundColor: "#ffffff",
-                            "& fieldset": {
-                                borderColor: "#d0d5dd",
-                            },
-                            "&:hover fieldset": {
-                                borderColor: "#98a2b3",
-                            },
-                            "&.Mui-focused fieldset": {
-                                borderColor: "#1976d2",
-                                borderWidth: 1,
-                            },
-                        },
-                        "& .MuiInputLabel-root": {
-                            fontSize: 14,
-                        },
-                        "& .MuiInputLabel-shrink": {
-                            fontSize: 12,
-                        },
-                        "& .MuiSelect-select": {
-                            fontSize: 14,
-                            lineHeight: 1.5,
-                            display: "flex",
-                            alignItems: "center",
-                        },
-                        "& .MuiSelect-icon": {
-                            color: "#667085",
-                        },
                     }}
                 >
-                    <MenuItem
-                        value="all"
+                    <InputLabel
                         sx={{
                             fontSize: 14,
                         }}
                     >
-                        All
-                    </MenuItem>
+                        Bàn
+                    </InputLabel>
 
-                    {tables.map((table) => (
+                    <Select
+                        name="tableId"
+                        defaultValue={tableId || "all"}
+                        label="Bàn"
+                        sx={{
+                            height: 40,
+                            fontSize: 14,
+                        }}
+                    >
                         <MenuItem
-                            key={table.id}
-                            value={table.id}
+                            value="all"
                             sx={{
                                 fontSize: 14,
                             }}
                         >
-                            {table.name}
+                            All
                         </MenuItem>
-                    ))}
-                </TextField>
 
-                {/* Submit */}
+                        {tables.map((table) => (
+                            <MenuItem
+                                key={table.id}
+                                value={table.id}
+                                sx={{
+                                    fontSize: 14,
+                                }}
+                            >
+                                {table.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                {/* Search button */}
                 <Button
                     type="submit"
                     variant="contained"
                     sx={{
-                        minWidth: {
+                        width: {
                             xs: "100%",
+                            md: "auto",
+                        },
+                        minWidth: {
                             md: 100,
                         },
                         height: 40,
-                        px: 2,
+                        px: 2.5,
                         borderRadius: 1.5,
-                        textTransform: "none",
+                        backgroundColor: "#1976d2",
                         fontSize: 14,
                         fontWeight: 600,
-                        boxShadow:
-                            "0 1px 2px rgba(16, 24, 40, 0.08)",
+                        textTransform: "none",
+                        boxShadow: "none",
+                        flexShrink: 0,
+
+                        "&:hover": {
+                            backgroundColor: "#1565c0",
+                            boxShadow: "none",
+                        },
                     }}
                 >
                     Tìm kiếm

@@ -10,10 +10,36 @@ import {
     Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {
+    usePathname,
+    useRouter,
+} from "next/navigation";
+
+type NavigationItem = {
+    label: string;
+    href?: string;
+};
+
+const navigationItems: NavigationItem[] = [
+    {
+        label: "Dashboard",
+        href: "/dashboard",
+    },
+    {
+        label: "Feedback",
+        href: "/dashboard/feedback",
+    },
+    {
+        label: "Tables",
+    },
+    {
+        label: "QR Codes",
+    },
+];
 
 export default function DashboardSidebar() {
     const router = useRouter();
+    const pathname = usePathname();
     const supabase = createClient();
 
     const handleLogout = async () => {
@@ -21,6 +47,18 @@ export default function DashboardSidebar() {
 
         router.push("/login");
         router.refresh();
+    };
+
+    const isActive = (href?: string) => {
+        if (!href) {
+            return false;
+        }
+
+        if (href === "/dashboard") {
+            return pathname === "/dashboard";
+        }
+
+        return pathname.startsWith(href);
     };
 
     return (
@@ -38,6 +76,7 @@ export default function DashboardSidebar() {
                 py: 2.5,
             }}
         >
+            {/* Logo */}
             <Stack
                 sx={{
                     flexDirection: "row",
@@ -61,94 +100,90 @@ export default function DashboardSidebar() {
 
             <Divider sx={{ my: 3 }} />
 
+            {/* Navigation */}
             <Stack
+                component="nav"
+                aria-label="Dashboard navigation"
                 sx={{
                     gap: 0.5,
                 }}
             >
-                <Button
-                    fullWidth
-                    sx={{
-                        justifyContent: "flex-start",
-                        px: 1.5,
-                        py: 1.25,
-                        borderRadius: 1.5,
-                        color: "#193B56",
-                        backgroundColor: "#eef4f8",
-                        fontWeight: 700,
-                        textTransform: "none",
-                    }}
-                >
-                    Dashboard
-                </Button>
+                {navigationItems.map((item) => {
+                    const active = isActive(item.href);
 
-                <Button
-                    fullWidth
-                    sx={{
+                    const buttonSx = {
                         justifyContent: "flex-start",
                         px: 1.5,
                         py: 1.25,
                         borderRadius: 1.5,
-                        color: "#667085",
-                        fontWeight: 500,
+                        color: active
+                            ? "#193B56"
+                            : "#667085",
+                        backgroundColor: active
+                            ? "#eef4f8"
+                            : "transparent",
+                        fontWeight: active
+                            ? 700
+                            : 500,
                         textTransform: "none",
-                    }}
-                >
-                    Feedback
-                </Button>
+                        "&:hover": {
+                            backgroundColor: active
+                                ? "#eef4f8"
+                                : "#f8fafc",
+                        },
+                    };
+                    if (item.href) {
+                        const isCurrentPage =
+                            item.href === "/dashboard" &&
+                            pathname === "/dashboard";
 
-                <Button
-                    fullWidth
-                    sx={{
-                        justifyContent: "flex-start",
-                        px: 1.5,
-                        py: 1.25,
-                        borderRadius: 1.5,
-                        color: "#667085",
-                        fontWeight: 500,
-                        textTransform: "none",
-                    }}
-                >
-                    Tables
-                </Button>
+                        if (isCurrentPage) {
+                            return (
+                                <Button
+                                    key={item.label}
+                                    fullWidth
+                                    sx={buttonSx}
+                                >
+                                    {item.label}
+                                </Button>
+                            );
+                        }
 
-                <Button
-                    fullWidth
-                    sx={{
-                        justifyContent: "flex-start",
-                        px: 1.5,
-                        py: 1.25,
-                        borderRadius: 1.5,
-                        color: "#667085",
-                        fontWeight: 500,
-                        textTransform: "none",
-                    }}
-                >
-                    QR Codes
-                </Button>
+                        return (
+                            <Button
+                                key={item.label}
+                                component={Link}
+                                href={item.href}
+                                fullWidth
+                                sx={buttonSx}
+                            >
+                                {item.label}
+                            </Button>
+                        );
+                    }
 
-                <Button
-                    component={Link}
-                    href="/dashboard/feedback"
-                    fullWidth
-                    sx={{
-                        justifyContent: "flex-start",
-                        px: 1.5,
-                        py: 1.25,
-                        borderRadius: 1.5,
-                        color: "#667085",
-                        fontWeight: 500,
-                        textTransform: "none",
-                    }}
-                >
-                    Feedback
-                </Button>
+                    return (
+                        <Button
+                            key={item.label}
+                            fullWidth
+                            disabled
+                            sx={{
+                                ...buttonSx,
+                                color: "#98a2b3",
+                            }}
+                        >
+                            {item.label}
+                        </Button>
+                    );
+                })}
             </Stack>
 
+            {/* Push Admin section to bottom */}
             <Box sx={{ flex: 1 }} />
 
             <Divider sx={{ mb: 2 }} />
 
+            {/* Admin */}
             <Stack sx={{ gap: 1 }}>
                 <Typography
                     sx={{
@@ -171,6 +206,10 @@ export default function DashboardSidebar() {
                         color: "#667085",
                         fontWeight: 500,
                         textTransform: "none",
+                        "&:hover": {
+                            backgroundColor: "#f8fafc",
+                            color: "#344054",
+                        },
                     }}
                 >
                     Logout

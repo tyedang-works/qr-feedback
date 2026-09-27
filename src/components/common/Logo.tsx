@@ -18,6 +18,7 @@ export default function Logo({
                 objectFit: "contain",
                 display: "block",
             }}
+            
         />
     );
 }

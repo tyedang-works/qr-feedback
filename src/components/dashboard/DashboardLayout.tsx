@@ -1,0 +1,171 @@
+"use client";
+
+import {
+    Box,
+    Drawer,
+    IconButton,
+    Stack,
+    Typography,
+} from "@mui/material";
+import { useState } from "react";
+import DashboardSidebar from "./DashboardSidebar";
+
+type DashboardLayoutProps = {
+    children: React.ReactNode;
+};
+
+export default function DashboardLayout({
+    children,
+}: DashboardLayoutProps) {
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] =
+        useState(false);
+
+    const handleOpenSidebar = () => {
+        setIsMobileSidebarOpen(true);
+    };
+
+    const handleCloseSidebar = () => {
+        setIsMobileSidebarOpen(false);
+    };
+
+    return (
+        <Box
+            sx={{
+                minHeight: "100dvh",
+                display: "flex",
+                backgroundColor: "#f8fafc",
+            }}
+        >
+            {/* Desktop Sidebar */}
+            <Box
+                sx={{
+                    display: {
+                        xs: "none",
+                        md: "block",
+                    },
+                    position: "sticky",
+                    top: 0,
+                    alignSelf: "flex-start",
+                    flexShrink: 0,
+                    height: "100dvh",
+                }}
+            >
+                <DashboardSidebar />
+            </Box>
+
+            {/* Mobile Header */}
+            <Box
+                sx={{
+                    display: {
+                        xs: "block",
+                        md: "none",
+                    },
+                }}
+            >
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 1100,
+                    }}
+                >
+                    <Stack
+                        sx={{
+                            height: 64,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 1,
+                            px: 1.5,
+                            backgroundColor: "#ffffff",
+                            borderBottom: "1px solid #e5e7eb",
+                        }}
+                    >
+                        <IconButton
+                            onClick={handleOpenSidebar}
+                            aria-label="Open menu"
+                            size="small"
+                        >
+                            <Box
+                                sx={{
+                                    width: 22,
+                                    height: 18,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                {[1, 2, 3].map((item) => (
+                                    <Box
+                                        key={item}
+                                        component="span"
+                                        sx={{
+                                            width: "100%",
+                                            height: 2,
+                                            borderRadius: 1,
+                                            backgroundColor: "#193B56",
+                                        }}
+                                    />
+                                ))}
+                            </Box>
+                        </IconButton>
+
+                        <Typography
+                            sx={{
+                                fontSize: 17,
+                                fontWeight: 700,
+                                color: "#193B56",
+                            }}
+                        >
+                            QR Feedback
+                        </Typography>
+                    </Stack>
+                </Box>
+
+                {/* Mobile Drawer */}
+                <Drawer
+                    anchor="left"
+                    open={isMobileSidebarOpen}
+                    onClose={handleCloseSidebar}
+                    transitionDuration={{
+                        enter: 220,
+                        exit: 180,
+                    }}
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                width: 240,
+                                height: "100dvh",
+                                backgroundColor: "#ffffff",
+                            },
+                        },
+                    }}
+                >
+                    <DashboardSidebar />
+                </Drawer>
+            </Box>
+
+            {/* Main Content */}
+            <Box
+                component="main"
+                sx={{
+                    flex: 1,
+                    width: "100%",
+                    minWidth: 0,
+                    px: {
+                        xs: 2,
+                        sm: 3,
+                    },
+                    pt: {
+                        xs: 10,
+                        sm: 3,
+                    },
+                    pb: 3,
+                }}
+            >
+                {children}
+            </Box>
+        </Box>
+    );
+}

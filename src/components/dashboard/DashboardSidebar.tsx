@@ -21,20 +21,10 @@ type NavigationItem = {
 };
 
 const navigationItems: NavigationItem[] = [
-    {
-        label: "Dashboard",
-        href: "/dashboard",
-    },
-    {
-        label: "Feedback",
-        href: "/dashboard/feedback",
-    },
-    {
-        label: "Tables",
-    },
-    {
-        label: "QR Codes",
-    },
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Feedback", href: "/dashboard/feedback" },
+    { label: "Tables", href: "/dashboard/tables" },
+    { label: "QR Codes" },
 ];
 
 export default function DashboardSidebar() {

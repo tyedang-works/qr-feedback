@@ -1,12 +1,13 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import { getUserContext } from "@/lib/auth/queries";
 import {
     createRestaurantTable,
+    deleteRestaurantTable,
+    hasRestaurantTableFeedback,
     updateRestaurantTable,
 } from "@/lib/tables/queries";
+import { revalidatePath } from "next/cache";
 
 export type TableActionState = {
     success: boolean;
@@ -200,6 +201,139 @@ export async function updateTableAction(
             success: false,
             message:
                 "Không thể cập nhật bàn. Vui lòng thử lại.",
+        };
+    }
+}
+
+export async function deleteTableAction(
+    _previousState: TableActionState,
+    formData: FormData,
+): Promise<TableActionState> {
+    const userContext = await getUserContext();
+
+    if (!userContext) {
+        return {
+            success: false,
+            message: "Bạn chưa đăng nhập.",
+        };
+    }
+
+    const tableId = String(
+        formData.get("tableId") ?? "",
+    ).trim();
+
+    if (!tableId) {
+        return {
+            success: false,
+            message: "Không xác định được bàn.",
+        };
+    }
+
+    try {
+        const hasFeedback =
+            await hasRestaurantTableFeedback(
+                userContext.restaurantId,
+                tableId,
+            );
+
+        if (hasFeedback) {
+            return {
+                success: false,
+                message:
+                    "Không thể xóa bàn đã có phản hồi. Vui lòng tắt bàn thay vì xóa.",
+            };
+        }
+
+        const deleted =
+            await deleteRestaurantTable(
+                userContext.restaurantId,
+                tableId,
+            );
+
+        if (!deleted) {
+            return {
+                success: false,
+                message:
+                    "Không thể xóa bàn. Vui lòng thử lại.",
+            };
+        }
+
+        revalidatePath("/dashboard/tables");
+
+        return {
+            success: true,
+            message: "Đã xóa bàn thành công.",
+        };
+    } catch (error) {
+        console.error(
+            "Failed to delete table:",
+            error,
+        );
+
+        return {
+            success: false,
+            message:
+                "Không thể xóa bàn. Vui lòng thử lại.",
+        };
+    }
+}
+
+export async function updateTableStatusAction(
+    tableId: string,
+    isActive: boolean,
+): Promise<TableActionState> {
+    const userContext = await getUserContext();
+
+    if (!userContext) {
+        return {
+            success: false,
+            message: "Bạn chưa đăng nhập.",
+        };
+    }
+
+    if (!tableId) {
+        return {
+            success: false,
+            message: "Không xác định được bàn.",
+        };
+    }
+
+    try {
+        const table =
+            await updateRestaurantTable(
+                userContext.restaurantId,
+                tableId,
+                {
+                    isActive,
+                },
+            );
+
+        if (!table) {
+            return {
+                success: false,
+                message:
+                    "Không thể cập nhật trạng thái bàn.",
+            };
+        }
+
+        revalidatePath(
+            "/dashboard/tables",
+        );
+
+        return {
+            success: true,
+            message: "",
+        };
+    } catch (error) {
+        console.error(
+            "Failed to update table status:",
+            error,
+        );
+
+        return {
+            success: false,
+            message:
+                "Không thể cập nhật trạng thái bàn.",
         };
     }
 }

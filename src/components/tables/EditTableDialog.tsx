@@ -1,14 +1,14 @@
 "use client";
 
+import {
+    Button
+} from "@mui/material";
 import { useMemo, useState } from "react";
 
-import {
-    Button,
-    FormControl,
-    FormControlLabel,
-    Switch,
-} from "@mui/material";
-
+import { updateTableAction } from "@/app/dashboard/tables/actions";
+import QRDialog from "@/components/common/dialog/QRDialog";
+import QRSnackbar from "@/components/common/feedback/QRSnackbar";
+import QRTextField from "@/components/common/input/QRTextField";
 import {
     Form,
     Formik,
@@ -16,20 +16,13 @@ import {
 } from "formik";
 import * as yup from "yup";
 
-import { updateTableAction } from "@/app/dashboard/tables/actions";
-import QRDialog from "@/components/common/dialog/QRDialog";
-import QRSnackbar from "@/components/common/feedback/QRSnackbar";
-import QRTextField from "@/components/common/input/QRTextField";
-
 type EditTableFormValues = {
     name: string;
-    isActive: boolean;
 };
 
 type EditTableDialogProps = {
     tableId: string;
     tableName: string;
-    isActive: boolean;
     tableNames: string[];
 };
 
@@ -80,7 +73,6 @@ function createValidationSchema(
 export default function EditTableDialog({
     tableId,
     tableName,
-    isActive,
     tableNames,
 }: EditTableDialogProps) {
     const [open, setOpen] = useState(false);
@@ -94,7 +86,6 @@ export default function EditTableDialog({
 
     const initialValues: EditTableFormValues = {
         name: tableName,
-        isActive,
     };
 
     const validationSchema = useMemo(
@@ -132,11 +123,6 @@ export default function EditTableDialog({
             formData.append(
                 "name",
                 values.name.trim(),
-            );
-
-            formData.append(
-                "isActive",
-                String(values.isActive),
             );
 
             const result = await updateTableAction(
@@ -236,7 +222,6 @@ export default function EditTableDialog({
                     handleChange,
                     handleBlur,
                     setFieldError,
-                    setFieldValue,
                     resetForm,
                 }) => {
                     const handleClose = () => {
@@ -336,48 +321,6 @@ export default function EditTableDialog({
                                             : undefined
                                     }
                                 />
-
-                                <FormControl
-                                    sx={{
-                                        mt: 4,
-                                    }}
-                                >
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={
-                                                    values.isActive
-                                                }
-                                                onChange={(
-                                                    event,
-                                                ) => {
-                                                    setFieldValue(
-                                                        "isActive",
-                                                        event
-                                                            .target
-                                                            .checked,
-                                                    );
-                                                }}
-                                                disabled={
-                                                    isSubmitting
-                                                }
-                                            />
-                                        }
-                                        label={
-                                            values.isActive
-                                                ? "Bàn đang hoạt động"
-                                                : "Bàn đang tạm ngưng"
-                                        }
-                                        sx={{
-                                            m: 0,
-                                            "& .MuiFormControlLabel-label":
-                                            {
-                                                fontSize: 14,
-                                                color: "#344054",
-                                            },
-                                        }}
-                                    />
-                                </FormControl>
                             </Form>
                         </QRDialog>
                     );

@@ -128,8 +128,13 @@ export default function QRDialog({
                 sx={{
                     position: "relative",
                     overflow: "visible",
+
                     px: 3,
                     py: 3,
+
+                    "&.MuiDialogContent-root": {
+                        paddingTop: 2,
+                    },
                 }}
             >
                 {children}

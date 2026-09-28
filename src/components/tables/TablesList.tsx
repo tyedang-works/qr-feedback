@@ -1,33 +1,18 @@
 import {
     Box,
-    Chip,
     Divider,
     Stack,
     Typography,
 } from "@mui/material";
 
+import DeleteTableDialog from "@/components/tables/DeleteTableDialog";
 import EditTableDialog from "@/components/tables/EditTableDialog";
+import TableStatusSwitch from "@/components/tables/TableStatusSwitch";
 import type { RestaurantTable } from "@/lib/tables/types";
 
 type TablesListProps = {
     data: RestaurantTable[];
 };
-
-function getStatusStyles(isActive: boolean) {
-    if (isActive) {
-        return {
-            backgroundColor: "#ecfdf3",
-            color: "#027a48",
-            label: "Đang hoạt động",
-        };
-    }
-
-    return {
-        backgroundColor: "#f2f4f7",
-        color: "#667085",
-        label: "Đã tắt",
-    };
-}
 
 export default function TablesList({
     data,
@@ -93,7 +78,7 @@ export default function TablesList({
                             sx={{
                                 display: "grid",
                                 gridTemplateColumns:
-                                    "1.5fr 1.5fr 1fr 110px",
+                                    "1.5fr 1.5fr 1fr 160px",
                                 alignItems: "center",
                                 px: 2.5,
                                 py: 1.5,
@@ -127,7 +112,7 @@ export default function TablesList({
                                     color: "#667085",
                                 }}
                             >
-                                Trạng thái
+                                Trạng thái hoạt động
                             </Typography>
 
                             <Typography
@@ -144,101 +129,88 @@ export default function TablesList({
 
                         <Divider />
 
-                        {data.map((table, index) => {
-                            const status =
-                                getStatusStyles(
-                                    table.isActive,
-                                );
+                        {data.map((table, index) => (
+                            <Box key={table.id}>
+                                {index > 0 && <Divider />}
 
-                            return (
-                                <Box key={table.id}>
-                                    {index > 0 && <Divider />}
+                                <Box
+                                    sx={{
+                                        display: "grid",
+                                        gridTemplateColumns:
+                                            "1.5fr 1.5fr 1fr 160px",
+                                        alignItems: "center",
+                                        px: 2.5,
+                                        py: 1.75,
+                                        transition:
+                                            "background-color 150ms ease",
+                                        "&:hover": {
+                                            backgroundColor:
+                                                "#f8fafc",
+                                        },
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            fontSize: 14,
+                                            fontWeight: 600,
+                                            color: "#193B56",
+                                        }}
+                                    >
+                                        {table.name}
+                                    </Typography>
+
+                                    <Typography
+                                        sx={{
+                                            fontSize: 12,
+                                            color: "#667085",
+                                            overflow: "hidden",
+                                            textOverflow:
+                                                "ellipsis",
+                                            whiteSpace:
+                                                "nowrap",
+                                            pr: 2,
+                                        }}
+                                    >
+                                        {table.token}
+                                    </Typography>
+
+                                    <TableStatusSwitch
+                                        tableId={table.id}
+                                        isActive={
+                                            table.isActive
+                                        }
+                                    />
 
                                     <Box
                                         sx={{
-                                            display: "grid",
-                                            gridTemplateColumns:
-                                                "1.5fr 1.5fr 1fr 110px",
+                                            display: "flex",
                                             alignItems: "center",
-                                            px: 2.5,
-                                            py: 1.75,
-                                            transition:
-                                                "background-color 150ms ease",
-                                            "&:hover": {
-                                                backgroundColor:
-                                                    "#f8fafc",
-                                            },
+                                            justifyContent:
+                                                "flex-end",
+                                            gap: 0.5,
                                         }}
                                     >
-                                        <Typography
-                                            sx={{
-                                                fontSize: 14,
-                                                fontWeight: 600,
-                                                color: "#193B56",
-                                            }}
-                                        >
-                                            {table.name}
-                                        </Typography>
+                                        <EditTableDialog
+                                            tableId={table.id}
+                                            tableName={table.name}
+                                            tableNames={tableNames}
+                                        />
 
-                                        <Typography
-                                            sx={{
-                                                fontSize: 12,
-                                                color: "#667085",
-                                                overflow: "hidden",
-                                                textOverflow:
-                                                    "ellipsis",
-                                                whiteSpace:
-                                                    "nowrap",
-                                                pr: 2,
-                                            }}
-                                        >
-                                            {table.token}
-                                        </Typography>
-
-                                        <Box>
-                                            <Chip
-                                                label={
-                                                    status.label
-                                                }
-                                                size="small"
-                                                sx={{
-                                                    height: 28,
-                                                    borderRadius: 1.5,
-                                                    backgroundColor:
-                                                        status.backgroundColor,
-                                                    color: status.color,
-                                                    fontSize: 12,
-                                                    fontWeight: 500,
-                                                }}
-                                            />
-                                        </Box>
-
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                justifyContent:
-                                                    "flex-end",
-                                            }}
-                                        >
-                                            <EditTableDialog
-                                                tableId={
-                                                    table.id
-                                                }
-                                                tableName={
-                                                    table.name
-                                                }
-                                                isActive={
-                                                    table.isActive
-                                                }
-                                                tableNames={
-                                                    tableNames
-                                                }
-                                            />
-                                        </Box>
+                                        <DeleteTableDialog
+                                            tableId={
+                                                table.id
+                                            }
+                                            tableName={
+                                                table.name
+                                            }
+                                            disabled={
+                                                table.hasFeedback
+                                            }
+                                        />
                                     </Box>
                                 </Box>
-                            );
-                        })}
+                            </Box>
+                        ))}
                     </Box>
 
                     {/* Mobile */}
@@ -250,105 +222,110 @@ export default function TablesList({
                             },
                         }}
                     >
-                        {data.map((table, index) => {
-                            const status =
-                                getStatusStyles(
-                                    table.isActive,
-                                );
+                        {data.map((table, index) => (
+                            <Box key={table.id}>
+                                {index > 0 && <Divider />}
 
-                            return (
-                                <Box key={table.id}>
-                                    {index > 0 && <Divider />}
-
-                                    <Box
+                                <Box
+                                    sx={{
+                                        px: 2,
+                                        py: 2,
+                                    }}
+                                >
+                                    <Stack
                                         sx={{
-                                            px: 2,
-                                            py: 2,
+                                            flexDirection:
+                                                "row",
+                                            alignItems:
+                                                "flex-start",
+                                            justifyContent:
+                                                "space-between",
+                                            gap: 1.5,
                                         }}
                                     >
+                                        <Box
+                                            sx={{
+                                                minWidth: 0,
+                                            }}
+                                        >
+                                            <Typography
+                                                sx={{
+                                                    fontSize: 15,
+                                                    fontWeight: 600,
+                                                    color: "#193B56",
+                                                }}
+                                            >
+                                                {
+                                                    table.name
+                                                }
+                                            </Typography>
+
+                                            <Typography
+                                                sx={{
+                                                    mt: 0.5,
+                                                    fontSize: 12,
+                                                    color: "#667085",
+                                                    overflow:
+                                                        "hidden",
+                                                    textOverflow:
+                                                        "ellipsis",
+                                                    whiteSpace:
+                                                        "nowrap",
+                                                }}
+                                            >
+                                                {
+                                                    table.token
+                                                }
+                                            </Typography>
+                                        </Box>
+
                                         <Stack
                                             sx={{
                                                 flexDirection:
                                                     "row",
                                                 alignItems:
-                                                    "flex-start",
-                                                justifyContent:
-                                                    "space-between",
-                                                gap: 1.5,
+                                                    "center",
+                                                gap: 0.5,
+                                                flexShrink: 0,
                                             }}
                                         >
-                                            <Box
-                                                sx={{
-                                                    minWidth: 0,
-                                                }}
-                                            >
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: 15,
-                                                        fontWeight: 600,
-                                                        color: "#193B56",
-                                                    }}
-                                                >
-                                                    {
-                                                        table.name
-                                                    }
-                                                </Typography>
-
-                                                <Typography
-                                                    sx={{
-                                                        mt: 0.5,
-                                                        fontSize: 12,
-                                                        color: "#667085",
-                                                        overflow:
-                                                            "hidden",
-                                                        textOverflow:
-                                                            "ellipsis",
-                                                        whiteSpace:
-                                                            "nowrap",
-                                                    }}
-                                                >
-                                                    {
-                                                        table.token
-                                                    }
-                                                </Typography>
-                                            </Box>
-
                                             <EditTableDialog
+                                                tableId={table.id}
+                                                tableName={table.name}
+                                                tableNames={tableNames}
+                                            />
+
+                                            <DeleteTableDialog
                                                 tableId={
                                                     table.id
                                                 }
                                                 tableName={
                                                     table.name
                                                 }
-                                                isActive={
-                                                    table.isActive
-                                                }
-                                                tableNames={
-                                                    tableNames
+                                                disabled={
+                                                    table.hasFeedback
                                                 }
                                             />
                                         </Stack>
+                                    </Stack>
 
-                                        <Chip
-                                            label={
-                                                status.label
+                                    <Box
+                                        sx={{
+                                            mt: 1.25,
+                                        }}
+                                    >
+                                        <TableStatusSwitch
+                                            tableId={
+                                                table.id
                                             }
-                                            size="small"
-                                            sx={{
-                                                mt: 1.25,
-                                                height: 28,
-                                                borderRadius: 1.5,
-                                                backgroundColor:
-                                                    status.backgroundColor,
-                                                color: status.color,
-                                                fontSize: 12,
-                                                fontWeight: 500,
-                                            }}
+                                            isActive={
+                                                table.isActive
+                                            }
                                         />
                                     </Box>
                                 </Box>
-                            );
-                        })}
+                            </Box>
+                        ))}
                     </Stack>
                 </>
             )}

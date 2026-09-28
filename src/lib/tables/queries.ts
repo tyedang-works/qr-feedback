@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type {
     CreateTableInput,
     RestaurantTable,
+    RestaurantTableMutationResult,
     UpdateTableInput,
 } from "./types";
 
@@ -41,42 +42,74 @@ export async function getRestaurantTableList(
 ): Promise<RestaurantTable[]> {
     const supabase = await createClient();
 
-    const { data, error } = await supabase
-        .from("tables")
-        .select(
-            `
-                id,
-                name,
-                token,
-                is_active
-            `,
-        )
-        .eq("restaurant_id", restaurantId)
-        .order("name", {
-            ascending: true,
-        });
+    const [tablesResult, feedbackResult] =
+        await Promise.all([
+            supabase
+                .from("tables")
+                .select(
+                    `
+                        id,
+                        name,
+                        token,
+                        is_active
+                    `,
+                )
+                .eq(
+                    "restaurant_id",
+                    restaurantId,
+                )
+                .order("name", {
+                    ascending: true,
+                }),
 
-    if (error) {
+            supabase
+                .from("feedback")
+                .select("table_id")
+                .eq(
+                    "restaurant_id",
+                    restaurantId,
+                ),
+        ]);
+
+    if (tablesResult.error) {
         console.error(
             "Failed to get restaurant table list:",
-            error,
+            tablesResult.error,
         );
 
         return [];
     }
 
-    return data.map((table) => ({
+    if (feedbackResult.error) {
+        console.error(
+            "Failed to get restaurant table feedback:",
+            feedbackResult.error,
+        );
+
+        return [];
+    }
+
+    const feedbackTableIds = new Set(
+        feedbackResult.data.map(
+            (feedback) => feedback.table_id,
+        ),
+    );
+
+    return tablesResult.data.map((table) => ({
         id: table.id,
         name: table.name,
         token: table.token,
         isActive: table.is_active,
+        hasFeedback: feedbackTableIds.has(
+            table.id,
+        ),
     }));
 }
 
 export async function createRestaurantTable(
     restaurantId: string,
     input: CreateTableInput,
-): Promise<RestaurantTable | null> {
+): Promise<RestaurantTableMutationResult | null> {
     const supabase = await createClient();
 
     const name = input.name.trim();
@@ -126,7 +159,7 @@ export async function updateRestaurantTable(
     restaurantId: string,
     tableId: string,
     input: UpdateTableInput,
-): Promise<RestaurantTable | null> {
+): Promise<RestaurantTableMutationResult | null> {
     const supabase = await createClient();
 
     const updateData: {
@@ -249,4 +282,57 @@ export async function getRestaurantTableSummary(
         active,
         inactive: Math.max(total - active, 0),
     };
+};
+
+export async function hasRestaurantTableFeedback(
+    restaurantId: string,
+    tableId: string,
+): Promise<boolean> {
+    const supabase = await createClient();
+
+    const { count, error } = await supabase
+        .from("feedback")
+        .select("id", {
+            count: "exact",
+            head: true,
+        })
+        .eq("restaurant_id", restaurantId)
+        .eq("table_id", tableId);
+
+    if (error) {
+        console.error(
+            "Failed to check restaurant table feedback:",
+            error,
+        );
+
+        throw error;
+    }
+
+    return (count ?? 0) > 0;
+}
+
+export async function deleteRestaurantTable(
+    restaurantId: string,
+    tableId: string,
+): Promise<boolean> {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from("tables")
+        .delete()
+        .eq("id", tableId)
+        .eq("restaurant_id", restaurantId)
+        .select("id")
+        .maybeSingle();
+
+    if (error) {
+        console.error(
+            "Failed to delete restaurant table:",
+            error,
+        );
+
+        throw error;
+    }
+
+    return Boolean(data);
 }

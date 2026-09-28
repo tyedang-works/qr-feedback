@@ -3,6 +3,14 @@ export type RestaurantTable = {
     name: string;
     token: string;
     isActive: boolean;
+    hasFeedback: boolean;
+};
+
+export type RestaurantTableMutationResult = {
+    id: string;
+    name: string;
+    token: string;
+    isActive: boolean;
 };
 
 export type CreateTableInput = {

@@ -159,11 +159,11 @@ export async function updateRestaurantTable(
         .eq("restaurant_id", restaurantId)
         .select(
             `
-                id,
-                name,
-                token,
-                is_active
-            `,
+            id,
+            name,
+            token,
+            is_active
+        `,
         )
         .maybeSingle();
 
@@ -177,6 +177,15 @@ export async function updateRestaurantTable(
     }
 
     if (!data) {
+        console.error(
+            "No table was updated:",
+            {
+                tableId,
+                restaurantId,
+                updateData,
+            },
+        );
+
         return null;
     }
 

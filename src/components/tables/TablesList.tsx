@@ -6,6 +6,7 @@ import {
     Typography,
 } from "@mui/material";
 
+import EditTableDialog from "@/components/tables/EditTableDialog";
 import type { RestaurantTable } from "@/lib/tables/types";
 
 type TablesListProps = {
@@ -31,6 +32,10 @@ function getStatusStyles(isActive: boolean) {
 export default function TablesList({
     data,
 }: TablesListProps) {
+    const tableNames = data.map(
+        (table) => table.name,
+    );
+
     return (
         <Box
             sx={{
@@ -69,7 +74,8 @@ export default function TablesList({
                             color: "#98a2b3",
                         }}
                     >
-                        Hãy thêm bàn đầu tiên cho nhà hàng của bạn.
+                        Hãy thêm bàn đầu tiên cho nhà hàng
+                        của bạn.
                     </Typography>
                 </Box>
             ) : (
@@ -87,7 +93,7 @@ export default function TablesList({
                             sx={{
                                 display: "grid",
                                 gridTemplateColumns:
-                                    "1.5fr 1.5fr 1fr 80px",
+                                    "1.5fr 1.5fr 1fr 110px",
                                 alignItems: "center",
                                 px: 2.5,
                                 py: 1.5,
@@ -152,7 +158,7 @@ export default function TablesList({
                                         sx={{
                                             display: "grid",
                                             gridTemplateColumns:
-                                                "1.5fr 1.5fr 1fr 80px",
+                                                "1.5fr 1.5fr 1fr 110px",
                                             alignItems: "center",
                                             px: 2.5,
                                             py: 1.75,
@@ -178,8 +184,7 @@ export default function TablesList({
                                             sx={{
                                                 fontSize: 12,
                                                 color: "#667085",
-                                                overflow:
-                                                    "hidden",
+                                                overflow: "hidden",
                                                 textOverflow:
                                                     "ellipsis",
                                                 whiteSpace:
@@ -208,17 +213,28 @@ export default function TablesList({
                                             />
                                         </Box>
 
-                                        <Typography
+                                        <Box
                                             sx={{
-                                                fontSize: 20,
-                                                lineHeight: 1,
-                                                color: "#98a2b3",
-                                                textAlign:
-                                                    "right",
+                                                display: "flex",
+                                                justifyContent:
+                                                    "flex-end",
                                             }}
                                         >
-                                            ⋮
-                                        </Typography>
+                                            <EditTableDialog
+                                                tableId={
+                                                    table.id
+                                                }
+                                                tableName={
+                                                    table.name
+                                                }
+                                                isActive={
+                                                    table.isActive
+                                                }
+                                                tableNames={
+                                                    tableNames
+                                                }
+                                            />
+                                        </Box>
                                     </Box>
                                 </Box>
                             );
@@ -297,16 +313,20 @@ export default function TablesList({
                                                 </Typography>
                                             </Box>
 
-                                            <Typography
-                                                sx={{
-                                                    flexShrink: 0,
-                                                    fontSize: 20,
-                                                    lineHeight: 1,
-                                                    color: "#98a2b3",
-                                                }}
-                                            >
-                                                ⋮
-                                            </Typography>
+                                            <EditTableDialog
+                                                tableId={
+                                                    table.id
+                                                }
+                                                tableName={
+                                                    table.name
+                                                }
+                                                isActive={
+                                                    table.isActive
+                                                }
+                                                tableNames={
+                                                    tableNames
+                                                }
+                                            />
                                         </Stack>
 
                                         <Chip

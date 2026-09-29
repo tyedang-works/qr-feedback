@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 
 import "./globals.css";
+import MuiThemeProvider from "@/components/common/providers/MuiThemeProvider";
 
 export const metadata: Metadata = {
   title: "QR Feedback",
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="vi">
       <body>
         <AppRouterCacheProvider>
-          {children}
+          <MuiThemeProvider>
+            {children}
+          </MuiThemeProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

@@ -1,16 +1,7 @@
 "use client";
 
-import {
-    Box,
-    Pagination,
-    Stack,
-    Typography,
-} from "@mui/material";
-import {
-    usePathname,
-    useRouter,
-    useSearchParams,
-} from "next/navigation";
+import { Box, Pagination, Stack, Typography } from "@mui/material";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type FeedbackPaginationProps = {
     page: number;
@@ -40,18 +31,13 @@ export default function FeedbackPagination({
         _event: React.ChangeEvent<unknown>,
         nextPage: number,
     ) => {
-        const params = new URLSearchParams(
-            searchParams.toString(),
-        );
+        const params = new URLSearchParams(searchParams.toString());
 
         params.set("page", String(nextPage));
 
-        router.push(
-            `${pathname}?${params.toString()}`,
-            {
-                scroll: false,
-            },
-        );
+        router.push(`${pathname}?${params.toString()}`, {
+            scroll: false,
+        });
     };
 
     return (
@@ -135,34 +121,25 @@ export default function FeedbackPagination({
                                 color: "#344054",
                             },
 
-                            "& .MuiPaginationItem-root:hover":
-                            {
-                                backgroundColor:
-                                    "#f2f4f7",
+                            "& .MuiPaginationItem-root:hover": {
+                                backgroundColor: "#f2f4f7",
                             },
 
-                            "& .MuiPaginationItem-root.Mui-selected":
-                            {
-                                backgroundColor:
-                                    "#193B56",
+                            "& .MuiPaginationItem-root.Mui-selected": {
+                                backgroundColor: "#193B56",
                                 color: "#ffffff",
                             },
 
-                            "& .MuiPaginationItem-root.Mui-selected:hover":
-                            {
-                                backgroundColor:
-                                    "#193B56",
+                            "& .MuiPaginationItem-root.Mui-selected:hover": {
+                                backgroundColor: "#193B56",
                             },
 
-                            "& .MuiPaginationItem-previousNext":
-                            {
+                            "& .MuiPaginationItem-previousNext": {
                                 border: "1px solid #d0d5dd",
                             },
 
-                            "& .MuiPaginationItem-previousNext.Mui-disabled":
-                            {
-                                borderColor:
-                                    "#eaecf0",
+                            "& .MuiPaginationItem-previousNext.Mui-disabled": {
+                                borderColor: "#eaecf0",
                                 color: "#d0d5dd",
                             },
                         }}

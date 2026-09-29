@@ -10,9 +10,7 @@ type QRPageProps = {
     }>;
 };
 
-export default async function QRPage({
-    params,
-}: QRPageProps) {
+export default async function QRPage({ params }: QRPageProps) {
     const { token } = await params;
 
     const supabase = createAdminClient();
@@ -28,18 +26,14 @@ export default async function QRPage({
         notFound();
     }
 
-    const { data: restaurant, error: restaurantError } =
-        await supabase
-            .from("restaurants")
-            .select("name")
-            .eq("id", table.restaurant_id)
-            .single();
+    const { data: restaurant, error: restaurantError } = await supabase
+        .from("restaurants")
+        .select("name")
+        .eq("id", table.restaurant_id)
+        .single();
 
     if (restaurantError) {
-        console.error(
-            "Failed to find restaurant:",
-            restaurantError,
-        );
+        console.error("Failed to find restaurant:", restaurantError);
     }
 
     return (

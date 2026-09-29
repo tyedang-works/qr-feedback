@@ -1,19 +1,13 @@
 "use client";
 
-import {
-    Button
-} from "@mui/material";
+import { Button } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import { updateTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
-import {
-    Form,
-    Formik,
-    type FormikHelpers,
-} from "formik";
+import { Form, Formik, type FormikHelpers } from "formik";
 import * as yup from "yup";
 
 type EditTableFormValues = {
@@ -32,40 +26,27 @@ type SnackbarState = {
     severity: "success" | "error";
 };
 
-function createValidationSchema(
-    tableName: string,
-    tableNames: string[],
-) {
-    const normalizedCurrentName =
-        tableName.trim().toLowerCase();
+function createValidationSchema(tableName: string, tableNames: string[]) {
+    const normalizedCurrentName = tableName.trim().toLowerCase();
 
     const normalizedTableNames = tableNames
         .map((name) => name.trim().toLowerCase())
-        .filter(
-            (name) => name !== normalizedCurrentName,
-        );
+        .filter((name) => name !== normalizedCurrentName);
 
     return yup.object({
         name: yup
             .string()
             .trim()
             .required("Vui lòng nhập tên bàn.")
-            .test(
-                "unique-table-name",
-                "Tên bàn này đã tồn tại.",
-                (value) => {
-                    if (!value) {
-                        return true;
-                    }
+            .test("unique-table-name", "Tên bàn này đã tồn tại.", (value) => {
+                if (!value) {
+                    return true;
+                }
 
-                    const normalizedName =
-                        value.trim().toLowerCase();
+                const normalizedName = value.trim().toLowerCase();
 
-                    return !normalizedTableNames.includes(
-                        normalizedName,
-                    );
-                },
-            ),
+                return !normalizedTableNames.includes(normalizedName);
+            }),
         isActive: yup.boolean().required(),
     });
 }
@@ -77,23 +58,18 @@ export default function EditTableDialog({
 }: EditTableDialogProps) {
     const [open, setOpen] = useState(false);
 
-    const [snackbar, setSnackbar] =
-        useState<SnackbarState>({
-            open: false,
-            message: "",
-            severity: "success",
-        });
+    const [snackbar, setSnackbar] = useState<SnackbarState>({
+        open: false,
+        message: "",
+        severity: "success",
+    });
 
     const initialValues: EditTableFormValues = {
         name: tableName,
     };
 
     const validationSchema = useMemo(
-        () =>
-            createValidationSchema(
-                tableName,
-                tableNames,
-            ),
+        () => createValidationSchema(tableName, tableNames),
         [tableName, tableNames],
     );
 
@@ -115,15 +91,9 @@ export default function EditTableDialog({
         try {
             const formData = new FormData();
 
-            formData.append(
-                "tableId",
-                tableId,
-            );
+            formData.append("tableId", tableId);
 
-            formData.append(
-                "name",
-                values.name.trim(),
-            );
+            formData.append("name", values.name.trim());
 
             const result = await updateTableAction(
                 {
@@ -136,10 +106,7 @@ export default function EditTableDialog({
 
             if (!result.success) {
                 if (result.fieldErrors?.name) {
-                    setFieldError(
-                        "name",
-                        result.fieldErrors.name,
-                    );
+                    setFieldError("name", result.fieldErrors.name);
 
                     return;
                 }
@@ -161,21 +128,15 @@ export default function EditTableDialog({
 
             setSnackbar({
                 open: true,
-                message:
-                    result.message ||
-                    "Đã cập nhật bàn thành công.",
+                message: result.message || "Đã cập nhật bàn thành công.",
                 severity: "success",
             });
         } catch (error) {
-            console.error(
-                "Failed to update table:",
-                error,
-            );
+            console.error("Failed to update table:", error);
 
             setSnackbar({
                 open: true,
-                message:
-                    "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
                 severity: "error",
             });
         } finally {
@@ -243,9 +204,7 @@ export default function EditTableDialog({
                                     <Button
                                         type="button"
                                         onClick={handleClose}
-                                        disabled={
-                                            isSubmitting
-                                        }
+                                        disabled={isSubmitting}
                                         sx={{
                                             minWidth: 80,
                                             height: 40,
@@ -253,8 +212,7 @@ export default function EditTableDialog({
                                             color: "#667085",
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            textTransform:
-                                                "none",
+                                            textTransform: "none",
                                         }}
                                     >
                                         Hủy
@@ -264,25 +222,19 @@ export default function EditTableDialog({
                                         type="submit"
                                         form="edit-table-form"
                                         variant="contained"
-                                        disabled={
-                                            isSubmitting
-                                        }
+                                        disabled={isSubmitting}
                                         sx={{
                                             minWidth: 120,
                                             height: 40,
                                             borderRadius: 1.5,
-                                            backgroundColor:
-                                                "#193B56",
+                                            backgroundColor: "#193B56",
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            textTransform:
-                                                "none",
+                                            textTransform: "none",
                                             boxShadow: "none",
                                             "&:hover": {
-                                                backgroundColor:
-                                                    "#142f45",
-                                                boxShadow:
-                                                    "none",
+                                                backgroundColor: "#142f45",
+                                                boxShadow: "none",
                                             },
                                         }}
                                     >
@@ -293,10 +245,7 @@ export default function EditTableDialog({
                                 </>
                             }
                         >
-                            <Form
-                                id="edit-table-form"
-                                noValidate
-                            >
+                            <Form id="edit-table-form" noValidate>
                                 <QRTextField
                                     name="name"
                                     label="Tên bàn"
@@ -307,18 +256,13 @@ export default function EditTableDialog({
                                         handleChange(event);
 
                                         if (errors.name) {
-                                            setFieldError(
-                                                "name",
-                                                undefined,
-                                            );
+                                            setFieldError("name", undefined);
                                         }
                                     }}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                     errorMessage={
-                                        touched.name
-                                            ? errors.name
-                                            : undefined
+                                        touched.name ? errors.name : undefined
                                     }
                                 />
                             </Form>

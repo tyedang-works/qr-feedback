@@ -1,10 +1,4 @@
-import {
-    Box,
-    Chip,
-    Divider,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
 import type { FeedbackDetail as FeedbackDetailData } from "@/lib/feedback/types";
@@ -24,27 +18,20 @@ function formatDateTime(dateString: string) {
         hour12: false,
     }).formatToParts(new Date(dateString));
 
-    const day =
-        parts.find((part) => part.type === "day")?.value ?? "";
+    const day = parts.find((part) => part.type === "day")?.value ?? "";
 
-    const month =
-        parts.find((part) => part.type === "month")?.value ?? "";
+    const month = parts.find((part) => part.type === "month")?.value ?? "";
 
-    const year =
-        parts.find((part) => part.type === "year")?.value ?? "";
+    const year = parts.find((part) => part.type === "year")?.value ?? "";
 
-    const hour =
-        parts.find((part) => part.type === "hour")?.value ?? "";
+    const hour = parts.find((part) => part.type === "hour")?.value ?? "";
 
-    const minute =
-        parts.find((part) => part.type === "minute")?.value ?? "";
+    const minute = parts.find((part) => part.type === "minute")?.value ?? "";
 
     return `${day}/${month}/${year} • ${hour}:${minute}`;
 }
 
-export default function FeedbackDetail({
-    data,
-}: FeedbackDetailProps) {
+export default function FeedbackDetail({ data }: FeedbackDetailProps) {
     return (
         <Stack
             sx={{
@@ -113,8 +100,7 @@ export default function FeedbackDetail({
                     backgroundColor: "#ffffff",
                     border: "1px solid #eaecf0",
                     borderRadius: 2,
-                    boxShadow:
-                        "0 1px 2px rgba(16, 24, 40, 0.04)",
+                    boxShadow: "0 1px 2px rgba(16, 24, 40, 0.04)",
                     overflow: "hidden",
                 }}
             >
@@ -138,8 +124,7 @@ export default function FeedbackDetail({
                                 xs: "flex-start",
                                 sm: "center",
                             },
-                            justifyContent:
-                                "space-between",
+                            justifyContent: "space-between",
                             gap: 1,
                         }}
                     >
@@ -198,28 +183,24 @@ export default function FeedbackDetail({
                                     gap: 0.75,
                                 }}
                             >
-                                {data.selectedOptions.map(
-                                    (option) => (
-                                        <Chip
-                                            key={option}
-                                            label={
-                                                FEEDBACK_ISSUE_LABEL_MAP[
-                                                option
-                                                ] ?? option
-                                            }
-                                            size="small"
-                                            sx={{
-                                                height: 30,
-                                                borderRadius: 1.5,
-                                                backgroundColor:
-                                                    "#eef4f8",
-                                                color: "#193B56",
-                                                fontSize: 12,
-                                                fontWeight: 500,
-                                            }}
-                                        />
-                                    ),
-                                )}
+                                {data.selectedOptions.map((option) => (
+                                    <Chip
+                                        key={option}
+                                        label={
+                                            FEEDBACK_ISSUE_LABEL_MAP[option] ??
+                                            option
+                                        }
+                                        size="small"
+                                        sx={{
+                                            height: 30,
+                                            borderRadius: 1.5,
+                                            backgroundColor: "#eef4f8",
+                                            color: "#193B56",
+                                            fontSize: 12,
+                                            fontWeight: 500,
+                                        }}
+                                    />
+                                ))}
                             </Stack>
                         ) : (
                             <Typography
@@ -242,8 +223,7 @@ export default function FeedbackDetail({
                     backgroundColor: "#ffffff",
                     border: "1px solid #eaecf0",
                     borderRadius: 2,
-                    boxShadow:
-                        "0 1px 2px rgba(16, 24, 40, 0.04)",
+                    boxShadow: "0 1px 2px rgba(16, 24, 40, 0.04)",
                     overflow: "hidden",
                 }}
             >
@@ -279,9 +259,7 @@ export default function FeedbackDetail({
                             sx={{
                                 fontSize: 14,
                                 lineHeight: 1.7,
-                                color: data.feedback
-                                    ? "#344054"
-                                    : "#98a2b3",
+                                color: data.feedback ? "#344054" : "#98a2b3",
                                 whiteSpace: "pre-wrap",
                                 wordBreak: "break-word",
                             }}

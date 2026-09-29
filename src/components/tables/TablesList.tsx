@@ -1,9 +1,4 @@
-import {
-    Box,
-    Divider,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 
 import DeleteTableDialog from "@/components/tables/DeleteTableDialog";
 import EditTableDialog from "@/components/tables/EditTableDialog";
@@ -14,12 +9,8 @@ type TablesListProps = {
     data: RestaurantTable[];
 };
 
-export default function TablesList({
-    data,
-}: TablesListProps) {
-    const tableNames = data.map(
-        (table) => table.name,
-    );
+export default function TablesList({ data }: TablesListProps) {
+    const tableNames = data.map((table) => table.name);
 
     return (
         <Box
@@ -30,8 +21,7 @@ export default function TablesList({
                 border: "1px solid #eaecf0",
                 borderRadius: 2,
                 overflow: "hidden",
-                boxShadow:
-                    "0 1px 2px rgba(16, 24, 40, 0.04)",
+                boxShadow: "0 1px 2px rgba(16, 24, 40, 0.04)",
             }}
         >
             {data.length === 0 ? (
@@ -59,8 +49,7 @@ export default function TablesList({
                             color: "#98a2b3",
                         }}
                     >
-                        Hãy thêm bàn đầu tiên cho nhà hàng
-                        của bạn.
+                        Hãy thêm bàn đầu tiên cho nhà hàng của bạn.
                     </Typography>
                 </Box>
             ) : (
@@ -77,8 +66,7 @@ export default function TablesList({
                         <Box
                             sx={{
                                 display: "grid",
-                                gridTemplateColumns:
-                                    "1.5fr 1.5fr 1fr 160px",
+                                gridTemplateColumns: "1.5fr 1.5fr 1fr 160px",
                                 alignItems: "center",
                                 px: 2.5,
                                 py: 1.5,
@@ -144,8 +132,7 @@ export default function TablesList({
                                         transition:
                                             "background-color 150ms ease",
                                         "&:hover": {
-                                            backgroundColor:
-                                                "#f8fafc",
+                                            backgroundColor: "#f8fafc",
                                         },
                                     }}
                                 >
@@ -164,10 +151,8 @@ export default function TablesList({
                                             fontSize: 12,
                                             color: "#667085",
                                             overflow: "hidden",
-                                            textOverflow:
-                                                "ellipsis",
-                                            whiteSpace:
-                                                "nowrap",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
                                             pr: 2,
                                         }}
                                     >
@@ -176,17 +161,14 @@ export default function TablesList({
 
                                     <TableStatusSwitch
                                         tableId={table.id}
-                                        isActive={
-                                            table.isActive
-                                        }
+                                        isActive={table.isActive}
                                     />
 
                                     <Box
                                         sx={{
                                             display: "flex",
                                             alignItems: "center",
-                                            justifyContent:
-                                                "flex-end",
+                                            justifyContent: "flex-end",
                                             gap: 0.5,
                                         }}
                                     >
@@ -197,15 +179,9 @@ export default function TablesList({
                                         />
 
                                         <DeleteTableDialog
-                                            tableId={
-                                                table.id
-                                            }
-                                            tableName={
-                                                table.name
-                                            }
-                                            disabled={
-                                                table.hasFeedback
-                                            }
+                                            tableId={table.id}
+                                            tableName={table.name}
+                                            disabled={table.hasFeedback}
                                         />
                                     </Box>
                                 </Box>
@@ -234,12 +210,9 @@ export default function TablesList({
                                 >
                                     <Stack
                                         sx={{
-                                            flexDirection:
-                                                "row",
-                                            alignItems:
-                                                "flex-start",
-                                            justifyContent:
-                                                "space-between",
+                                            flexDirection: "row",
+                                            alignItems: "flex-start",
+                                            justifyContent: "space-between",
                                             gap: 1.5,
                                         }}
                                     >
@@ -255,9 +228,7 @@ export default function TablesList({
                                                     color: "#193B56",
                                                 }}
                                             >
-                                                {
-                                                    table.name
-                                                }
+                                                {table.name}
                                             </Typography>
 
                                             <Typography
@@ -265,26 +236,19 @@ export default function TablesList({
                                                     mt: 0.5,
                                                     fontSize: 12,
                                                     color: "#667085",
-                                                    overflow:
-                                                        "hidden",
-                                                    textOverflow:
-                                                        "ellipsis",
-                                                    whiteSpace:
-                                                        "nowrap",
+                                                    overflow: "hidden",
+                                                    textOverflow: "ellipsis",
+                                                    whiteSpace: "nowrap",
                                                 }}
                                             >
-                                                {
-                                                    table.token
-                                                }
+                                                {table.token}
                                             </Typography>
                                         </Box>
 
                                         <Stack
                                             sx={{
-                                                flexDirection:
-                                                    "row",
-                                                alignItems:
-                                                    "center",
+                                                flexDirection: "row",
+                                                alignItems: "center",
                                                 gap: 0.5,
                                                 flexShrink: 0,
                                             }}
@@ -296,15 +260,9 @@ export default function TablesList({
                                             />
 
                                             <DeleteTableDialog
-                                                tableId={
-                                                    table.id
-                                                }
-                                                tableName={
-                                                    table.name
-                                                }
-                                                disabled={
-                                                    table.hasFeedback
-                                                }
+                                                tableId={table.id}
+                                                tableName={table.name}
+                                                disabled={table.hasFeedback}
                                             />
                                         </Stack>
                                     </Stack>
@@ -315,12 +273,8 @@ export default function TablesList({
                                         }}
                                     >
                                         <TableStatusSwitch
-                                            tableId={
-                                                table.id
-                                            }
-                                            isActive={
-                                                table.isActive
-                                            }
+                                            tableId={table.id}
+                                            isActive={table.isActive}
                                         />
                                     </Box>
                                 </Box>

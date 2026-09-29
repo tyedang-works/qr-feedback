@@ -8,7 +8,7 @@ import {
     Divider,
     Grid,
     TextField,
-    Typography
+    Typography,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -25,20 +25,17 @@ const inputSx = {
         px: 1.75,
 
         "&:-webkit-autofill": {
-            WebkitBoxShadow:
-                "0 0 0 100px #f5f6f7 inset",
+            WebkitBoxShadow: "0 0 0 100px #f5f6f7 inset",
             WebkitTextFillColor: "#263238",
             caretColor: "#263238",
         },
 
         "&:-webkit-autofill:hover": {
-            WebkitBoxShadow:
-                "0 0 0 100px #f5f6f7 inset",
+            WebkitBoxShadow: "0 0 0 100px #f5f6f7 inset",
         },
 
         "&:-webkit-autofill:focus": {
-            WebkitBoxShadow:
-                "0 0 0 100px #f5f6f7 inset",
+            WebkitBoxShadow: "0 0 0 100px #f5f6f7 inset",
         },
     },
 };
@@ -51,12 +48,9 @@ export default function LoginForm() {
     const [password, setPassword] = useState("");
 
     const [error, setError] = useState("");
-    const [isSubmitting, setIsSubmitting] =
-        useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = async (
-        event: FormEvent<HTMLFormElement>,
-    ) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (isSubmitting) {
@@ -85,23 +79,16 @@ export default function LoginForm() {
                 });
 
             if (loginError) {
-                setError(
-                    "Email hoặc mật khẩu không chính xác.",
-                );
+                setError("Email hoặc mật khẩu không chính xác.");
                 return;
             }
 
             router.push("/dashboard");
             router.refresh();
         } catch (error) {
-            console.error(
-                "Login failed:",
-                error,
-            );
+            console.error("Login failed:", error);
 
-            setError(
-                "Không thể đăng nhập. Vui lòng thử lại.",
-            );
+            setError("Không thể đăng nhập. Vui lòng thử lại.");
         } finally {
             setIsSubmitting(false);
         }
@@ -127,8 +114,7 @@ export default function LoginForm() {
                     minHeight: 620,
                     overflow: "hidden",
                     backgroundColor: "#fff",
-                    boxShadow:
-                        "0 8px 30px rgba(0, 0, 0, 0.08)",
+                    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.08)",
                 }}
             >
                 {/* Content */}
@@ -156,7 +142,14 @@ export default function LoginForm() {
                                 <Logo size={68} />
                             </Box>
                         </Grid>
-                        <Grid size={12} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Grid
+                            size={12}
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
                             <Box component="div" sx={{ display: "block" }}>
                                 <Typography
                                     sx={{
@@ -324,9 +317,7 @@ export default function LoginForm() {
                                 },
                             }}
                         >
-                            {isSubmitting
-                                ? "Signing in..."
-                                : "Sign in"}
+                            {isSubmitting ? "Signing in..." : "Sign in"}
                         </Button>
 
                         {/* Divider */}

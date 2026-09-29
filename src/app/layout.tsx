@@ -5,24 +5,22 @@ import "./globals.css";
 import MuiThemeProvider from "@/components/common/providers/MuiThemeProvider";
 
 export const metadata: Metadata = {
-  title: "QR Feedback",
-  description: "Customer feedback system for restaurants",
+    title: "QR Feedback",
+    description: "Customer feedback system for restaurants",
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="vi">
-      <body>
-        <AppRouterCacheProvider>
-          <MuiThemeProvider>
-            {children}
-          </MuiThemeProvider>
-        </AppRouterCacheProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="vi">
+            <body>
+                <AppRouterCacheProvider>
+                    <MuiThemeProvider>{children}</MuiThemeProvider>
+                </AppRouterCacheProvider>
+            </body>
+        </html>
+    );
 }

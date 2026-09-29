@@ -2,18 +2,9 @@
 
 import { forwardRef } from "react";
 
-import {
-    Alert,
-    Slide,
-    Snackbar,
-    type SlideProps,
-} from "@mui/material";
+import { Alert, Slide, Snackbar, type SlideProps } from "@mui/material";
 
-type QRSnackbarSeverity =
-    | "success"
-    | "error"
-    | "warning"
-    | "info";
+type QRSnackbarSeverity = "success" | "error" | "warning" | "info";
 
 type QRSnackbarProps = {
     open: boolean;
@@ -23,22 +14,21 @@ type QRSnackbarProps = {
     autoHideDuration?: number;
 };
 
-const SnackbarTransition = forwardRef<
-    HTMLDivElement,
-    SlideProps
->(function SnackbarTransition(props, ref) {
-    return (
-        <Slide
-            {...props}
-            ref={ref}
-            direction="right"
-            timeout={{
-                enter: 350,
-                exit: 250,
-            }}
-        />
-    );
-});
+const SnackbarTransition = forwardRef<HTMLDivElement, SlideProps>(
+    function SnackbarTransition(props, ref) {
+        return (
+            <Slide
+                {...props}
+                ref={ref}
+                direction="right"
+                timeout={{
+                    enter: 350,
+                    exit: 250,
+                }}
+            />
+        );
+    },
+);
 
 export default function QRSnackbar({
     open,

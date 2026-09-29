@@ -18,34 +18,26 @@ export async function getUserContext(): Promise<UserContext | null> {
         return null;
     }
 
-    const { data: profile, error: profileError } =
-        await supabase
-            .from("profiles")
-            .select("full_name, restaurant_id")
-            .eq("id", user.id)
-            .single();
+    const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("full_name, restaurant_id")
+        .eq("id", user.id)
+        .single();
 
     if (profileError || !profile) {
-        console.error(
-            "Failed to get user profile:",
-            profileError,
-        );
+        console.error("Failed to get user profile:", profileError);
 
         return null;
     }
 
-    const { data: restaurant, error: restaurantError } =
-        await supabase
-            .from("restaurants")
-            .select("name")
-            .eq("id", profile.restaurant_id)
-            .single();
+    const { data: restaurant, error: restaurantError } = await supabase
+        .from("restaurants")
+        .select("name")
+        .eq("id", profile.restaurant_id)
+        .single();
 
     if (restaurantError || !restaurant) {
-        console.error(
-            "Failed to get restaurant:",
-            restaurantError,
-        );
+        console.error("Failed to get restaurant:", restaurantError);
 
         return null;
     }

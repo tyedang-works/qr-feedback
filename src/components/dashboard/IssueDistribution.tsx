@@ -1,22 +1,12 @@
 import type { IssueDistributionItem } from "@/lib/dashboard/types";
-import {
-    Box,
-    Card,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Card, Stack, Typography } from "@mui/material";
 
 type IssueDistributionProps = {
     data: IssueDistributionItem[];
 };
 
-export default function IssueDistribution({
-    data,
-}: IssueDistributionProps) {
-    const maxCount = Math.max(
-        ...data.map((item) => item.count),
-        1,
-    );
+export default function IssueDistribution({ data }: IssueDistributionProps) {
+    const maxCount = Math.max(...data.map((item) => item.count), 1);
 
     return (
         <Card
@@ -58,10 +48,7 @@ export default function IssueDistribution({
                     const width =
                         item.count === 0
                             ? 0
-                            : Math.max(
-                                (item.count / maxCount) * 100,
-                                4,
-                            );
+                            : Math.max((item.count / maxCount) * 100, 4);
 
                     return (
                         <Box key={item.option}>
@@ -111,8 +98,7 @@ export default function IssueDistribution({
                                         height: "100%",
                                         borderRadius: 10,
                                         backgroundColor: "#193B56",
-                                        transition:
-                                            "width 300ms ease",
+                                        transition: "width 300ms ease",
                                     }}
                                 />
                             </Box>

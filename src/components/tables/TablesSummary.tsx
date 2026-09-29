@@ -21,9 +21,7 @@ const summaryItems = [
     },
 ] as const;
 
-export default function TablesSummary({
-    data,
-}: TablesSummaryProps) {
+export default function TablesSummary({ data }: TablesSummaryProps) {
     return (
         <Box
             sx={{
@@ -46,8 +44,7 @@ export default function TablesSummary({
                         borderRadius: 2,
                         px: { xs: 2, sm: 2.5 },
                         py: { xs: 2, sm: 2.25 },
-                        boxShadow:
-                            "0 1px 2px rgba(16, 24, 40, 0.04)",
+                        boxShadow: "0 1px 2px rgba(16, 24, 40, 0.04)",
                     }}
                 >
                     <Typography

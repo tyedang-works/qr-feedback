@@ -17,9 +17,7 @@ export type TableActionState = {
     };
 };
 
-function isDuplicateTableNameError(
-    error: unknown,
-): boolean {
+function isDuplicateTableNameError(error: unknown): boolean {
     return (
         typeof error === "object" &&
         error !== null &&
@@ -41,9 +39,7 @@ export async function createTableAction(
         };
     }
 
-    const name = String(
-        formData.get("name") ?? "",
-    ).trim();
+    const name = String(formData.get("name") ?? "").trim();
 
     if (!name) {
         return {
@@ -56,18 +52,14 @@ export async function createTableAction(
     }
 
     try {
-        const table = await createRestaurantTable(
-            userContext.restaurantId,
-            {
-                name,
-            },
-        );
+        const table = await createRestaurantTable(userContext.restaurantId, {
+            name,
+        });
 
         if (!table) {
             return {
                 success: false,
-                message:
-                    "Không thể tạo bàn. Vui lòng thử lại.",
+                message: "Không thể tạo bàn. Vui lòng thử lại.",
             };
         }
 
@@ -88,15 +80,11 @@ export async function createTableAction(
             };
         }
 
-        console.error(
-            "Failed to create table:",
-            error,
-        );
+        console.error("Failed to create table:", error);
 
         return {
             success: false,
-            message:
-                "Không thể tạo bàn. Vui lòng thử lại.",
+            message: "Không thể tạo bàn. Vui lòng thử lại.",
         };
     }
 }
@@ -114,17 +102,11 @@ export async function updateTableAction(
         };
     }
 
-    const tableId = String(
-        formData.get("tableId") ?? "",
-    ).trim();
+    const tableId = String(formData.get("tableId") ?? "").trim();
 
-    const name = String(
-        formData.get("name") ?? "",
-    ).trim();
+    const name = String(formData.get("name") ?? "").trim();
 
-    const isActiveValue = String(
-        formData.get("isActive") ?? "",
-    );
+    const isActiveValue = String(formData.get("isActive") ?? "");
 
     if (!tableId) {
         return {
@@ -150,10 +132,7 @@ export async function updateTableAction(
         updateData.isActive = false;
     }
 
-    if (
-        updateData.name === undefined &&
-        updateData.isActive === undefined
-    ) {
+    if (updateData.name === undefined && updateData.isActive === undefined) {
         return {
             success: false,
             message: "Không có thông tin cần cập nhật.",
@@ -170,8 +149,7 @@ export async function updateTableAction(
         if (!table) {
             return {
                 success: false,
-                message:
-                    "Không thể cập nhật bàn. Vui lòng thử lại.",
+                message: "Không thể cập nhật bàn. Vui lòng thử lại.",
             };
         }
 
@@ -192,15 +170,11 @@ export async function updateTableAction(
             };
         }
 
-        console.error(
-            "Failed to update table:",
-            error,
-        );
+        console.error("Failed to update table:", error);
 
         return {
             success: false,
-            message:
-                "Không thể cập nhật bàn. Vui lòng thử lại.",
+            message: "Không thể cập nhật bàn. Vui lòng thử lại.",
         };
     }
 }
@@ -218,9 +192,7 @@ export async function deleteTableAction(
         };
     }
 
-    const tableId = String(
-        formData.get("tableId") ?? "",
-    ).trim();
+    const tableId = String(formData.get("tableId") ?? "").trim();
 
     if (!tableId) {
         return {
@@ -230,11 +202,10 @@ export async function deleteTableAction(
     }
 
     try {
-        const hasFeedback =
-            await hasRestaurantTableFeedback(
-                userContext.restaurantId,
-                tableId,
-            );
+        const hasFeedback = await hasRestaurantTableFeedback(
+            userContext.restaurantId,
+            tableId,
+        );
 
         if (hasFeedback) {
             return {
@@ -244,17 +215,15 @@ export async function deleteTableAction(
             };
         }
 
-        const deleted =
-            await deleteRestaurantTable(
-                userContext.restaurantId,
-                tableId,
-            );
+        const deleted = await deleteRestaurantTable(
+            userContext.restaurantId,
+            tableId,
+        );
 
         if (!deleted) {
             return {
                 success: false,
-                message:
-                    "Không thể xóa bàn. Vui lòng thử lại.",
+                message: "Không thể xóa bàn. Vui lòng thử lại.",
             };
         }
 
@@ -265,15 +234,11 @@ export async function deleteTableAction(
             message: "Đã xóa bàn thành công.",
         };
     } catch (error) {
-        console.error(
-            "Failed to delete table:",
-            error,
-        );
+        console.error("Failed to delete table:", error);
 
         return {
             success: false,
-            message:
-                "Không thể xóa bàn. Vui lòng thử lại.",
+            message: "Không thể xóa bàn. Vui lòng thử lại.",
         };
     }
 }
@@ -299,41 +264,33 @@ export async function updateTableStatusAction(
     }
 
     try {
-        const table =
-            await updateRestaurantTable(
-                userContext.restaurantId,
-                tableId,
-                {
-                    isActive,
-                },
-            );
+        const table = await updateRestaurantTable(
+            userContext.restaurantId,
+            tableId,
+            {
+                isActive,
+            },
+        );
 
         if (!table) {
             return {
                 success: false,
-                message:
-                    "Không thể cập nhật trạng thái bàn.",
+                message: "Không thể cập nhật trạng thái bàn.",
             };
         }
 
-        revalidatePath(
-            "/dashboard/tables",
-        );
+        revalidatePath("/dashboard/tables");
 
         return {
             success: true,
             message: "",
         };
     } catch (error) {
-        console.error(
-            "Failed to update table status:",
-            error,
-        );
+        console.error("Failed to update table status:", error);
 
         return {
             success: false,
-            message:
-                "Không thể cập nhật trạng thái bàn.",
+            message: "Không thể cập nhật trạng thái bàn.",
         };
     }
 }

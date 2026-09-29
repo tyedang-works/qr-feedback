@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 
-import {
-    Box,
-    Switch,
-    Typography,
-} from "@mui/material";
+import { Box, Switch, Typography } from "@mui/material";
 
 import { updateTableStatusAction } from "@/app/dashboard/tables/actions";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
-import { getTableStatusLabelSx, tableStatusSwitchSx } from "@/styles/table.styles";
+import {
+    getTableStatusLabelSx,
+    tableStatusSwitchSx,
+} from "@/styles/table.styles";
 
 type SnackbarState = {
     open: boolean;
@@ -45,11 +44,7 @@ export default function TableStatusSwitch({
         setLoading(true);
 
         try {
-            const result =
-                await updateTableStatusAction(
-                    tableId,
-                    nextValue,
-                );
+            const result = await updateTableStatusAction(tableId, nextValue);
 
             if (!result.success) {
                 setChecked(previousValue);
@@ -57,8 +52,7 @@ export default function TableStatusSwitch({
                 setSnackbar({
                     open: true,
                     message:
-                        result.message ||
-                        "Không thể cập nhật trạng thái bàn.",
+                        result.message || "Không thể cập nhật trạng thái bàn.",
                     severity: "error",
                 });
 
@@ -73,17 +67,13 @@ export default function TableStatusSwitch({
                 severity: "success",
             });
         } catch (error) {
-            console.error(
-                "Failed to update table status:",
-                error,
-            );
+            console.error("Failed to update table status:", error);
 
             setChecked(previousValue);
 
             setSnackbar({
                 open: true,
-                message:
-                    "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
                 severity: "error",
             });
         } finally {
@@ -106,19 +96,14 @@ export default function TableStatusSwitch({
                     disabled={loading}
                     slotProps={{
                         input: {
-                            "aria-label": checked
-                                ? "Tắt bàn"
-                                : "Bật bàn",
+                            "aria-label": checked ? "Tắt bàn" : "Bật bàn",
                         },
                     }}
-                    sx={tableStatusSwitchSx} />
+                    sx={tableStatusSwitchSx}
+                />
 
-                <Typography
-                    sx={getTableStatusLabelSx(checked)}
-                >
-                    {checked
-                        ? "Đang hoạt động"
-                        : "Đã tắt"}
+                <Typography sx={getTableStatusLabelSx(checked)}>
+                    {checked ? "Đang hoạt động" : "Đã tắt"}
                 </Typography>
             </Box>
 

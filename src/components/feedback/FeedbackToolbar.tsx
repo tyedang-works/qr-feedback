@@ -1,7 +1,5 @@
 import { FEEDBACK_ISSUES } from "@/lib/feedback/constants";
-import type {
-    RestaurantTableOption,
-} from "@/lib/tables/queries";
+import type { RestaurantTableOption } from "@/lib/tables/queries";
 import {
     Box,
     Button,
@@ -38,8 +36,7 @@ export default function FeedbackToolbar({
                 backgroundColor: "#ffffff",
                 border: "1px solid #eaecf0",
                 borderRadius: 2,
-                boxShadow:
-                    "0 1px 2px rgba(16, 24, 40, 0.04)",
+                boxShadow: "0 1px 2px rgba(16, 24, 40, 0.04)",
             }}
         >
             <Stack
@@ -87,12 +84,10 @@ export default function FeedbackToolbar({
                         },
 
                         "& .MuiInputBase-input:-webkit-autofill": {
-                            WebkitBoxShadow:
-                                "0 0 0 1000px #ffffff inset",
+                            WebkitBoxShadow: "0 0 0 1000px #ffffff inset",
                             WebkitTextFillColor: "#344054",
                             caretColor: "#344054",
-                            transition:
-                                "background-color 5000s ease-in-out 0s",
+                            transition: "background-color 5000s ease-in-out 0s",
                         },
                     }}
                 />

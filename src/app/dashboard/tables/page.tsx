@@ -18,9 +18,7 @@ export default async function TablesPage() {
 
     const [tables, summary] = await Promise.all([
         getRestaurantTableList(userContext.restaurantId),
-        getRestaurantTableSummary(
-            userContext.restaurantId,
-        ),
+        getRestaurantTableSummary(userContext.restaurantId),
     ]);
 
     return (
@@ -70,9 +68,9 @@ export default async function TablesPage() {
                     </Typography>
                 </Box>
 
-                <AddTableDialog tableNames={tables.map(
-                    (table) => table.name,
-                )} />
+                <AddTableDialog
+                    tableNames={tables.map((table) => table.name)}
+                />
             </Stack>
 
             <TablesSummary data={summary} />

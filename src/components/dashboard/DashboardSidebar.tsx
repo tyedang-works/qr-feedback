@@ -2,18 +2,9 @@
 
 import Logo from "@/components/common/Logo";
 import { createClient } from "@/lib/supabase/browser";
-import {
-    Box,
-    Button,
-    Divider,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import Link from "next/link";
-import {
-    usePathname,
-    useRouter,
-} from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 type NavigationItem = {
     label: string;
@@ -21,10 +12,22 @@ type NavigationItem = {
 };
 
 const navigationItems: NavigationItem[] = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Feedback", href: "/dashboard/feedback" },
-    { label: "Tables", href: "/dashboard/tables" },
-    { label: "QR Codes" },
+    {
+        label: "Dashboard",
+        href: "/dashboard",
+    },
+    {
+        label: "Feedback",
+        href: "/dashboard/feedback",
+    },
+    {
+        label: "Tables",
+        href: "/dashboard/tables",
+    },
+    {
+        label: "QR Codes",
+        href: "/dashboard/qr-codes",
+    },
 ];
 
 export default function DashboardSidebar() {
@@ -106,20 +109,12 @@ export default function DashboardSidebar() {
                         px: 1.5,
                         py: 1.25,
                         borderRadius: 1.5,
-                        color: active
-                            ? "#193B56"
-                            : "#667085",
-                        backgroundColor: active
-                            ? "#eef4f8"
-                            : "transparent",
-                        fontWeight: active
-                            ? 700
-                            : 500,
+                        color: active ? "#193B56" : "#667085",
+                        backgroundColor: active ? "#eef4f8" : "transparent",
+                        fontWeight: active ? 700 : 500,
                         textTransform: "none",
                         "&:hover": {
-                            backgroundColor: active
-                                ? "#eef4f8"
-                                : "#f8fafc",
+                            backgroundColor: active ? "#eef4f8" : "#f8fafc",
                         },
                     };
                     if (item.href) {

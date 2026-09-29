@@ -17,31 +17,23 @@ export default async function DashboardPage() {
     const userContext = await getUserContext();
 
     const summary = userContext
-        ? await getDashboardSummary(
-            userContext.restaurantId,
-        )
+        ? await getDashboardSummary(userContext.restaurantId)
         : {
-            totalFeedback: 0,
-            todayFeedback: 0,
-            activeTables: 0,
-        };
+              totalFeedback: 0,
+              todayFeedback: 0,
+              activeTables: 0,
+          };
 
     const feedbackTrend = userContext
-        ? await getFeedbackTrend(
-            userContext.restaurantId,
-        )
+        ? await getFeedbackTrend(userContext.restaurantId)
         : [];
 
     const issueDistribution = userContext
-        ? await getIssueDistribution(
-            userContext.restaurantId,
-        )
+        ? await getIssueDistribution(userContext.restaurantId)
         : [];
 
     const recentFeedback = userContext
-        ? await getRecentFeedback(
-            userContext.restaurantId,
-        )
+        ? await getRecentFeedback(userContext.restaurantId)
         : [];
     return (
         <Stack
@@ -72,9 +64,7 @@ export default async function DashboardPage() {
             >
                 <FeedbackTrend data={feedbackTrend} />
 
-                <IssueDistribution
-                    data={issueDistribution}
-                />
+                <IssueDistribution data={issueDistribution} />
             </Box>
 
             <RecentFeedback data={recentFeedback} />

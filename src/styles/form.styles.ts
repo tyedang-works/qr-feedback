@@ -20,3 +20,8 @@ export const formErrorSx: SxProps<Theme> = {
     fontWeight: 400,
     color: "error.main",
 };
+
+export const formRequiredSx = {
+    ml: 0.25,
+    color: "error.main",
+};

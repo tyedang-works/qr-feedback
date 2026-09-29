@@ -23,10 +23,6 @@ export const FEEDBACK_ISSUES = [
     },
 ] as const;
 
-export const FEEDBACK_ISSUE_LABEL_MAP =
-    Object.fromEntries(
-        FEEDBACK_ISSUES.map((issue) => [
-            issue.option,
-            issue.label,
-        ]),
-    ) as Record<string, string>;
+export const FEEDBACK_ISSUE_LABEL_MAP = Object.fromEntries(
+    FEEDBACK_ISSUES.map((issue) => [issue.option, issue.label]),
+) as Record<string, string>;

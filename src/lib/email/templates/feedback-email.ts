@@ -1,32 +1,32 @@
 type FeedbackEmailData = {
-  restaurantName: string;
-  tableName: string;
-  selectedOptions: string[];
-  feedback: string;
-  phone: string;
-  createdAt: string;
+    restaurantName: string;
+    tableName: string;
+    selectedOptions: string[];
+    feedback: string;
+    phone: string;
+    createdAt: string;
 };
 
 const OPTION_LABELS: Record<string, string> = {
-  food_quality: "Món ăn chưa đạt yêu cầu",
-  food_presentation: "Món ăn trình bày chưa đẹp",
-  service: "Phục vụ chưa tốt",
-  space_cleanliness: "Không gian / vệ sinh chưa tốt",
-  service_time: "Thời gian phục vụ quá lâu",
+    food_quality: "Món ăn chưa đạt yêu cầu",
+    food_presentation: "Món ăn trình bày chưa đẹp",
+    service: "Phục vụ chưa tốt",
+    space_cleanliness: "Không gian / vệ sinh chưa tốt",
+    service_time: "Thời gian phục vụ quá lâu",
 };
 
 export function createFeedbackEmailHtml({
-  restaurantName,
-  tableName,
-  selectedOptions,
-  feedback,
-  phone,
-  createdAt,
+    restaurantName,
+    tableName,
+    selectedOptions,
+    feedback,
+    phone,
+    createdAt,
 }: FeedbackEmailData) {
-  const issueLabels = selectedOptions
-    .map((option) => OPTION_LABELS[option] ?? option)
-    .map(
-      (label) => `
+    const issueLabels = selectedOptions
+        .map((option) => OPTION_LABELS[option] ?? option)
+        .map(
+            (label) => `
         <span style="
           display: inline-block;
           margin: 0 6px 8px 0;
@@ -41,10 +41,10 @@ export function createFeedbackEmailHtml({
           ${label}
         </span>
       `,
-    )
-    .join("");
+        )
+        .join("");
 
-  return `
+    return `
     <!DOCTYPE html>
     <html lang="vi">
       <head>
@@ -242,8 +242,9 @@ export function createFeedbackEmailHtml({
               </div>
 
               <div>
-                ${issueLabels ||
-    `
+                ${
+                    issueLabels ||
+                    `
                     <span style="
                       font-size: 14px;
                       color: #94a3b8;
@@ -251,7 +252,7 @@ export function createFeedbackEmailHtml({
                       Không có lựa chọn cụ thể.
                     </span>
                   `
-    }
+                }
               </div>
 
             </div>
@@ -280,9 +281,7 @@ export function createFeedbackEmailHtml({
                 line-height: 1.7;
                 color: #334155;
               ">
-                ${feedback ||
-    "Không có nội dung chi tiết."
-    }
+                ${feedback || "Không có nội dung chi tiết."}
               </div>
 
             </div>

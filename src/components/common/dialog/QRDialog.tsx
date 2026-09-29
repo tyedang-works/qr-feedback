@@ -16,31 +16,27 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
-type QRDialogProps = Omit<
-    DialogProps,
-    "title" | "children"
-> & {
+type QRDialogProps = Omit<DialogProps, "title" | "children"> & {
     title: string;
     children: ReactNode;
     actions?: ReactNode;
 };
 
-const DialogTransition = forwardRef<
-    HTMLDivElement,
-    SlideProps
->(function DialogTransition(props, ref) {
-    return (
-        <Slide
-            ref={ref}
-            {...props}
-            direction="up"
-            timeout={{
-                enter: 300,
-                exit: 200,
-            }}
-        />
-    );
-});
+const DialogTransition = forwardRef<HTMLDivElement, SlideProps>(
+    function DialogTransition(props, ref) {
+        return (
+            <Slide
+                ref={ref}
+                {...props}
+                direction="up"
+                timeout={{
+                    enter: 300,
+                    exit: 200,
+                }}
+            />
+        );
+    },
+);
 
 export default function QRDialog({
     open,
@@ -97,9 +93,7 @@ export default function QRDialog({
 
                 <IconButton
                     type="button"
-                    onClick={(event) =>
-                        onClose?.(event, "escapeKeyDown")
-                    }
+                    onClick={(event) => onClose?.(event, "escapeKeyDown")}
                     aria-label="Đóng"
                     size="small"
                     sx={{

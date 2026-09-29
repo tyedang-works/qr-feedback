@@ -1,22 +1,12 @@
 import type { FeedbackTrendItem } from "@/lib/dashboard/types";
-import {
-    Box,
-    Card,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Card, Stack, Typography } from "@mui/material";
 
 type FeedbackTrendProps = {
     data: FeedbackTrendItem[];
 };
 
-export default function FeedbackTrend({
-    data,
-}: FeedbackTrendProps) {
-    const maxCount = Math.max(
-        ...data.map((item) => item.count),
-        1,
-    );
+export default function FeedbackTrend({ data }: FeedbackTrendProps) {
+    const maxCount = Math.max(...data.map((item) => item.count), 1);
 
     return (
         <Card
@@ -64,10 +54,7 @@ export default function FeedbackTrend({
                     const height =
                         item.count === 0
                             ? 4
-                            : Math.max(
-                                (item.count / maxCount) * 180,
-                                12,
-                            );
+                            : Math.max((item.count / maxCount) * 180, 12);
 
                     return (
                         <Stack
@@ -98,8 +85,7 @@ export default function FeedbackTrend({
                                     height,
                                     borderRadius: "6px 6px 2px 2px",
                                     backgroundColor: "#193B56",
-                                    transition:
-                                        "height 300ms ease",
+                                    transition: "height 300ms ease",
                                 }}
                             />
 

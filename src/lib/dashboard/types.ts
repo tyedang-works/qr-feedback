@@ -12,9 +12,9 @@ export type IssueDistributionItem = {
 };
 
 export type RecentFeedbackItem = {
-  id: string;
-  tableName: string;
-  selectedOptions: string[];
-  feedback: string;
-  createdAt: string;
+    id: string;
+    tableName: string;
+    selectedOptions: string[];
+    feedback: string;
+    createdAt: string;
 };

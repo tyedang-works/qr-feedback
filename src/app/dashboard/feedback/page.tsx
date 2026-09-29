@@ -23,22 +23,15 @@ export default async function FeedbackPage({
 
     const keyword = params.keyword ?? "";
 
-    const issue =
-        params.issue && params.issue !== "all"
-            ? params.issue
-            : "";
+    const issue = params.issue && params.issue !== "all" ? params.issue : "";
 
     const tableId =
-        params.tableId && params.tableId !== "all"
-            ? params.tableId
-            : "";
+        params.tableId && params.tableId !== "all" ? params.tableId : "";
 
     const parsedPage = Number(params.page);
 
     const page =
-        Number.isInteger(parsedPage) && parsedPage > 0
-            ? parsedPage
-            : 1;
+        Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
     const userContext = await getUserContext();
 

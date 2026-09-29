@@ -6,7 +6,9 @@ type QRCodePreviewButtonProps = {
     onClick: () => void;
 };
 
-export default function QRCodePreviewButton({ onClick }: QRCodePreviewButtonProps) {
+export default function QRCodePreviewButton({
+    onClick,
+}: QRCodePreviewButtonProps) {
     return (
         <Button
             type="button"

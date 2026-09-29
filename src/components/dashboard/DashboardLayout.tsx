@@ -1,24 +1,16 @@
 "use client";
 
-import {
-    Box,
-    Drawer,
-    IconButton,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+
 import DashboardSidebar from "./DashboardSidebar";
 
 type DashboardLayoutProps = {
     children: React.ReactNode;
 };
 
-export default function DashboardLayout({
-    children,
-}: DashboardLayoutProps) {
-    const [isMobileSidebarOpen, setIsMobileSidebarOpen] =
-        useState(false);
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     const handleOpenSidebar = () => {
         setIsMobileSidebarOpen(true);
@@ -38,6 +30,7 @@ export default function DashboardLayout({
         >
             {/* Desktop Sidebar */}
             <Box
+                className="dashboard-sidebar"
                 sx={{
                     display: {
                         xs: "none",
@@ -55,6 +48,7 @@ export default function DashboardLayout({
 
             {/* Mobile Header */}
             <Box
+                className="dashboard-mobile-header"
                 sx={{
                     display: {
                         xs: "block",
@@ -149,6 +143,7 @@ export default function DashboardLayout({
             {/* Main Content */}
             <Box
                 component="main"
+                className="dashboard-main"
                 sx={{
                     flex: 1,
                     width: "100%",

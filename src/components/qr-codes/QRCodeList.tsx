@@ -1,41 +1,189 @@
 "use client";
 
-import {
-    Box,
-    Divider,
-    Stack,
-    Typography,
-} from "@mui/material";
-
-import type { QRCodeTable } from "@/lib/qr-codes/types";
+import { Box, Checkbox, Divider, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+
+import { getSelectedQRCodeTables } from "@/app/dashboard/qr-codes/actions";
+import QRCodeBulkPrintView from "./QRCodeBulkPrintView";
+import QRCodePagination from "./QRCodePagination";
 import QRCodePreviewButton from "./QRCodePreviewButton";
 import QRCodePreviewDialog from "./QRCodePreviewDialog";
 import QRCodePrintView from "./QRCodePrintView";
+import QRCodeSelectionToolbar from "./QRCodeSelectionToolbar";
 
-type QRCodeListProps = {
-    data: QRCodeTable[];
-};
+import type {
+    QRCodeListResult,
+    QRCodeSelection,
+    QRCodeTable,
+} from "@/lib/qr-codes/types";
 
 function getStatusStyles(isActive: boolean) {
     if (isActive) {
         return {
-            color: "#027A48",
-            backgroundColor: "#ECFDF3",
             label: "Đang hoạt động",
+            color: "#027a48",
+            backgroundColor: "#ecfdf3",
+            borderColor: "#abefc6",
         };
     }
 
     return {
+        label: "Đang tắt",
         color: "#667085",
-        backgroundColor: "#F2F4F7",
-        label: "Đã tắt",
+        backgroundColor: "#f2f4f7",
+        borderColor: "#d0d5dd",
     };
 }
 
-export default function QRCodeList({ data }: QRCodeListProps) {
-    const [selectedTable, setSelectedTable] = useState<QRCodeTable | null>(null);
+type QRCodeListProps = {
+    result: QRCodeListResult;
+    onBulkPrintStart: () => void;
+    onBulkPrintClose: () => void;
+};
+
+export default function QRCodeList({
+    result,
+    onBulkPrintStart,
+    onBulkPrintClose,
+}: QRCodeListProps) {
+    const { data, total, page, pageSize, totalPages } = result;
+
+    const [selectedTable, setSelectedTable] = useState<QRCodeTable | null>(
+        null,
+    );
+
     const [isPrinting, setIsPrinting] = useState(false);
+
+    const [isBulkPrinting, setIsBulkPrinting] = useState(false);
+
+    const [bulkPrintTables, setBulkPrintTables] = useState<
+        {
+            id: string;
+            name: string;
+            token: string;
+        }[]
+    >([]);
+
+    const [loadingBulkPrint, setLoadingBulkPrint] = useState(false);
+
+    const [selection, setSelection] = useState<QRCodeSelection>({
+        mode: "manual",
+        selectedIds: [],
+        excludedIds: [],
+    });
+
+    const selectedIds = selection.selectedIds;
+
+    const isSelected = (id: string) => {
+        if (selection.mode === "all") {
+            return !selection.excludedIds.includes(id);
+        }
+
+        return selectedIds.includes(id);
+    };
+
+    const handleToggleSelection = (id: string) => {
+        setSelection((current) => {
+            if (current.mode === "all") {
+                const isExcluded = current.excludedIds.includes(id);
+
+                return {
+                    ...current,
+                    excludedIds: isExcluded
+                        ? current.excludedIds.filter((item) => item !== id)
+                        : [...current.excludedIds, id],
+                };
+            }
+
+            const isSelected = current.selectedIds.includes(id);
+
+            return {
+                ...current,
+                selectedIds: isSelected
+                    ? current.selectedIds.filter((item) => item !== id)
+                    : [...current.selectedIds, id],
+            };
+        });
+    };
+
+    const selectableTables = data.filter((table) => table.isActive);
+
+    const selectedOnCurrentPage = selectableTables.filter((table) =>
+        isSelected(table.id),
+    );
+
+    const allCurrentPageSelected =
+        selectableTables.length > 0 &&
+        selectedOnCurrentPage.length === selectableTables.length;
+
+    const someCurrentPageSelected =
+        selectedOnCurrentPage.length > 0 && !allCurrentPageSelected;
+
+    const handleSelectCurrentPage = () => {
+        setSelection((current) => {
+            const currentPageIds = selectableTables.map((table) => table.id);
+
+            if (current.mode === "all") {
+                if (allCurrentPageSelected) {
+                    return {
+                        ...current,
+                        excludedIds: [
+                            ...current.excludedIds,
+                            ...currentPageIds.filter(
+                                (id) => !current.excludedIds.includes(id),
+                            ),
+                        ],
+                    };
+                }
+
+                return {
+                    ...current,
+                    excludedIds: current.excludedIds.filter(
+                        (id) => !currentPageIds.includes(id),
+                    ),
+                };
+            }
+
+            if (allCurrentPageSelected) {
+                return {
+                    ...current,
+                    selectedIds: current.selectedIds.filter(
+                        (id) => !currentPageIds.includes(id),
+                    ),
+                };
+            }
+
+            const selectedSet = new Set(current.selectedIds);
+
+            currentPageIds.forEach((id) => {
+                selectedSet.add(id);
+            });
+
+            return {
+                ...current,
+                selectedIds: Array.from(selectedSet),
+            };
+        });
+    };
+
+    const handleClearSelection = () => {
+        setSelection({
+            mode: "manual",
+            selectedIds: [],
+            excludedIds: [],
+        });
+    };
+
+    const selectedCount =
+        selection.mode === "manual" ? selection.selectedIds.length : 0;
+
+    const handleOpenPreview = (table: QRCodeTable) => {
+        setSelectedTable(table);
+    };
+
+    const handleClosePreview = () => {
+        setSelectedTable(null);
+    };
 
     const handlePrint = () => {
         setIsPrinting(true);
@@ -44,6 +192,49 @@ export default function QRCodeList({ data }: QRCodeListProps) {
     const handleClosePrint = () => {
         setIsPrinting(false);
     };
+
+    const handleBulkPrint = async () => {
+        if (
+            selection.mode !== "manual" ||
+            selection.selectedIds.length === 0 ||
+            loadingBulkPrint
+        ) {
+            return;
+        }
+
+        setLoadingBulkPrint(true);
+
+        try {
+            const tables = await getSelectedQRCodeTables(selection.selectedIds);
+
+            if (tables.length === 0) {
+                return;
+            }
+
+            setBulkPrintTables(tables);
+            setIsBulkPrinting(true);
+            onBulkPrintStart();
+        } catch (error) {
+            console.error("Failed to prepare bulk QR print:", error);
+        } finally {
+            setLoadingBulkPrint(false);
+        }
+    };
+
+    if (isBulkPrinting) {
+        return (
+            <Box className="qr-bulk-printing">
+                <QRCodeBulkPrintView
+                    tables={bulkPrintTables}
+                    onClose={() => {
+                        setIsBulkPrinting(false);
+                        setBulkPrintTables([]);
+                        onBulkPrintClose();
+                    }}
+                />
+            </Box>
+        );
+    }
 
     if (isPrinting && selectedTable) {
         return (
@@ -55,49 +246,58 @@ export default function QRCodeList({ data }: QRCodeListProps) {
         );
     }
 
-    return (
-        <Stack
-            spacing={3}
-            sx={{
-                width: "100%",
-            }}
-        >
-            <Box>
-                <Typography
-                    sx={{
-                        fontSize: {
-                            xs: 22,
-                            sm: 24,
-                        },
-                        lineHeight: 1.4,
-                        fontWeight: 700,
-                        color: "#193B56",
-                    }}
-                >
-                    QR Codes
-                </Typography>
-
-                <Typography
-                    sx={{
-                        mt: 0.5,
-                        fontSize: 14,
-                        lineHeight: 1.5,
-                        color: "#667085",
-                    }}
-                >
-                    Quản lý mã QR cho từng bàn
-                </Typography>
-            </Box>
-
+    if (total === 0) {
+        return (
             <Box
                 sx={{
-                    width: "100%",
                     border: "1px solid #eaecf0",
                     borderRadius: 2,
                     backgroundColor: "#ffffff",
-                    overflow: "hidden",
+                    py: 8,
+                    px: 3,
                 }}
             >
+                <Stack
+                    sx={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 1,
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            fontSize: 16,
+                            fontWeight: 600,
+                            color: "#344054",
+                        }}
+                    >
+                        Không tìm thấy bàn
+                    </Typography>
+
+                    <Typography
+                        sx={{
+                            fontSize: 14,
+                            color: "#667085",
+                            textAlign: "center",
+                        }}
+                    >
+                        Không có bàn nào phù hợp với bộ lọc hiện tại.
+                    </Typography>
+                </Stack>
+            </Box>
+        );
+    }
+
+    return (
+        <>
+            <Stack sx={{ gap: 2 }}>
+                {/* Selection toolbar */}
+                <QRCodeSelectionToolbar
+                    selectedCount={selectedCount}
+                    onPrint={handleBulkPrint}
+                    onClear={handleClearSelection}
+                />
+
                 {/* Desktop */}
                 <Box
                     sx={{
@@ -105,26 +305,40 @@ export default function QRCodeList({ data }: QRCodeListProps) {
                             xs: "none",
                             md: "block",
                         },
+                        border: "1px solid #eaecf0",
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        backgroundColor: "#ffffff",
                     }}
                 >
+                    {/* Header */}
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns:
-                                "1.5fr 1.5fr 1fr 120px",
+                            gridTemplateColumns: "48px 1.5fr 1.5fr 1fr 120px",
                             alignItems: "center",
                             minHeight: 48,
                             px: 3,
                             backgroundColor: "#f9fafb",
-                            borderBottom:
-                                "1px solid #eaecf0",
+                            borderBottom: "1px solid #eaecf0",
                         }}
                     >
+                        <Checkbox
+                            checked={allCurrentPageSelected}
+                            indeterminate={someCurrentPageSelected}
+                            disabled={selectableTables.length === 0}
+                            onChange={handleSelectCurrentPage}
+                            size="small"
+                            sx={{
+                                p: 0,
+                            }}
+                        />
+
                         <Typography
                             sx={{
-                                fontSize: 12,
+                                fontSize: 14,
                                 fontWeight: 600,
-                                color: "#667085",
+                                color: "#344054",
                             }}
                         >
                             Bàn
@@ -132,9 +346,9 @@ export default function QRCodeList({ data }: QRCodeListProps) {
 
                         <Typography
                             sx={{
-                                fontSize: 12,
+                                fontSize: 14,
                                 fontWeight: 600,
-                                color: "#667085",
+                                color: "#344054",
                             }}
                         >
                             Mã QR
@@ -142,9 +356,9 @@ export default function QRCodeList({ data }: QRCodeListProps) {
 
                         <Typography
                             sx={{
-                                fontSize: 12,
+                                fontSize: 14,
                                 fontWeight: 600,
-                                color: "#667085",
+                                color: "#344054",
                             }}
                         >
                             Trạng thái hoạt động
@@ -152,9 +366,9 @@ export default function QRCodeList({ data }: QRCodeListProps) {
 
                         <Typography
                             sx={{
-                                fontSize: 12,
+                                fontSize: 14,
                                 fontWeight: 600,
-                                color: "#667085",
+                                color: "#344054",
                                 textAlign: "right",
                             }}
                         >
@@ -162,276 +376,240 @@ export default function QRCodeList({ data }: QRCodeListProps) {
                         </Typography>
                     </Box>
 
-                    {data.length === 0 ? (
-                        <Box
-                            sx={{
-                                px: 3,
-                                py: 6,
-                                textAlign: "center",
-                            }}
-                        >
-                            <Typography
+                    {/* Rows */}
+                    {data.map((table, index) => {
+                        const status = getStatusStyles(table.isActive);
+
+                        return (
+                            <Box
+                                key={table.id}
                                 sx={{
-                                    fontSize: 14,
-                                    color: "#667085",
+                                    display: "grid",
+                                    gridTemplateColumns:
+                                        "48px 1.5fr 1.5fr 1fr 120px",
+                                    alignItems: "center",
+                                    minHeight: 72,
+                                    px: 3,
+                                    borderBottom:
+                                        index === data.length - 1
+                                            ? "none"
+                                            : "1px solid #eaecf0",
                                 }}
                             >
-                                Chưa có bàn nào.
-                            </Typography>
-                        </Box>
-                    ) : (
-                        data.map((table, index) => {
-                            const status =
-                                getStatusStyles(
-                                    table.isActive,
-                                );
-
-                            return (
-                                <Box
-                                    key={table.id}
+                                <Checkbox
+                                    checked={
+                                        table.isActive && isSelected(table.id)
+                                    }
+                                    disabled={!table.isActive}
+                                    onChange={() =>
+                                        handleToggleSelection(table.id)
+                                    }
+                                    size="small"
                                     sx={{
-                                        display: "grid",
-                                        gridTemplateColumns:
-                                            "1.5fr 1.5fr 1fr 120px",
-                                        alignItems:
-                                            "center",
-                                        minHeight: 72,
-                                        px: 3,
-                                        borderBottom:
-                                            index <
-                                                data.length - 1
-                                                ? "1px solid #eaecf0"
-                                                : "none",
+                                        p: 0,
+                                    }}
+                                />
+
+                                <Typography
+                                    sx={{
+                                        fontSize: 14,
+                                        fontWeight: 500,
+                                        color: "#344054",
                                     }}
                                 >
-                                    <Typography
+                                    {table.name}
+                                </Typography>
+
+                                <Typography
+                                    sx={{
+                                        fontSize: 13,
+                                        color: "#667085",
+                                    }}
+                                >
+                                    {table.token}
+                                </Typography>
+
+                                <Box>
+                                    <Box
+                                        component="span"
                                         sx={{
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            color: "#1A202E",
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            px: 1.25,
+                                            py: 0.5,
+                                            borderRadius: 999,
+                                            border: `1px solid ${status.borderColor}`,
+                                            backgroundColor:
+                                                status.backgroundColor,
+                                            color: status.color,
+                                            fontSize: 12,
+                                            fontWeight: 500,
                                         }}
                                     >
-                                        {table.name}
-                                    </Typography>
-
-                                    <Typography
-                                        sx={{
-                                            fontSize: 13,
-                                            color: "#667085",
-                                            overflow:
-                                                "hidden",
-                                            textOverflow:
-                                                "ellipsis",
-                                            whiteSpace:
-                                                "nowrap",
-                                            pr: 2,
-                                        }}
-                                    >
-                                        {table.token}
-                                    </Typography>
-
-                                    <Box>
-                                        <Box
-                                            component="span"
-                                            sx={{
-                                                display:
-                                                    "inline-flex",
-                                                alignItems:
-                                                    "center",
-                                                px: 1.25,
-                                                py: 0.5,
-                                                borderRadius:
-                                                    10,
-                                                backgroundColor:
-                                                    status.backgroundColor,
-                                            }}
-                                        >
-                                            <Typography
-                                                sx={{
-                                                    fontSize: 12,
-                                                    lineHeight:
-                                                        1.5,
-                                                    fontWeight:
-                                                        500,
-                                                    color: status.color,
-                                                    whiteSpace:
-                                                        "nowrap",
-                                                }}
-                                            >
-                                                {status.label}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-
-                                    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                                        <QRCodePreviewButton onClick={() => setSelectedTable(table)} />
+                                        {status.label}
                                     </Box>
                                 </Box>
-                            );
-                        })
-                    )}
+
+                                <Stack
+                                    sx={{
+                                        alignItems: "flex-end",
+                                    }}
+                                >
+                                    <QRCodePreviewButton
+                                        onClick={() => handleOpenPreview(table)}
+                                    />
+                                </Stack>
+                            </Box>
+                        );
+                    })}
                 </Box>
 
                 {/* Mobile */}
-                <Box
+                <Stack
                     sx={{
                         display: {
-                            xs: "block",
+                            xs: "flex",
                             md: "none",
                         },
+                        gap: 1.5,
                     }}
                 >
-                    {data.length === 0 ? (
-                        <Box
-                            sx={{
-                                px: 2,
-                                py: 6,
-                                textAlign: "center",
-                            }}
-                        >
-                            <Typography
+                    {data.map((table) => {
+                        const status = getStatusStyles(table.isActive);
+
+                        return (
+                            <Box
+                                key={table.id}
                                 sx={{
-                                    fontSize: 14,
-                                    color: "#667085",
+                                    border: "1px solid #eaecf0",
+                                    borderRadius: 2,
+                                    backgroundColor: "#ffffff",
+                                    px: 2,
+                                    py: 1.75,
                                 }}
                             >
-                                Chưa có bàn nào.
-                            </Typography>
-                        </Box>
-                    ) : (
-                        data.map((table, index) => {
-                            const status =
-                                getStatusStyles(
-                                    table.isActive,
-                                );
-
-                            return (
-                                <Box key={table.id}>
-                                    <Box
+                                <Stack
+                                    sx={{
+                                        gap: 1.5,
+                                    }}
+                                >
+                                    <Stack
                                         sx={{
-                                            px: 2,
-                                            py: 2,
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            gap: 1,
                                         }}
                                     >
                                         <Stack
-                                            spacing={1.5}
+                                            sx={{
+                                                flexDirection: "row",
+                                                alignItems: "center",
+                                                gap: 1,
+                                                minWidth: 0,
+                                            }}
                                         >
-                                            <Box
+                                            <Checkbox
+                                                checked={
+                                                    table.isActive &&
+                                                    isSelected(table.id)
+                                                }
+                                                disabled={!table.isActive}
+                                                onChange={() =>
+                                                    handleToggleSelection(
+                                                        table.id,
+                                                    )
+                                                }
+                                                size="small"
                                                 sx={{
-                                                    display:
-                                                        "flex",
-                                                    alignItems:
-                                                        "center",
-                                                    justifyContent:
-                                                        "space-between",
-                                                    gap: 2,
+                                                    p: 0,
+                                                }}
+                                            />
+
+                                            <Typography
+                                                sx={{
+                                                    fontSize: 14,
+                                                    fontWeight: 600,
+                                                    color: "#344054",
+                                                    overflow: "hidden",
+                                                    textOverflow: "ellipsis",
+                                                    whiteSpace: "nowrap",
                                                 }}
                                             >
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            600,
-                                                        color: "#1A202E",
-                                                    }}
-                                                >
-                                                    {
-                                                        table.name
-                                                    }
-                                                </Typography>
-
-                                                <Box
-                                                    component="span"
-                                                    sx={{
-                                                        display:
-                                                            "inline-flex",
-                                                        alignItems:
-                                                            "center",
-                                                        flexShrink: 0,
-                                                        px: 1.25,
-                                                        py: 0.5,
-                                                        borderRadius:
-                                                            10,
-                                                        backgroundColor:
-                                                            status.backgroundColor,
-                                                    }}
-                                                >
-                                                    <Typography
-                                                        sx={{
-                                                            fontSize: 11,
-                                                            lineHeight:
-                                                                1.5,
-                                                            fontWeight:
-                                                                500,
-                                                            color: status.color,
-                                                            whiteSpace:
-                                                                "nowrap",
-                                                        }}
-                                                    >
-                                                        {
-                                                            status.label
-                                                        }
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-
-                                            <Box>
-                                                <Typography
-                                                    sx={{
-                                                        mb: 0.5,
-                                                        fontSize: 11,
-                                                        lineHeight:
-                                                            1.5,
-                                                        color: "#98A2B3",
-                                                    }}
-                                                >
-                                                    Mã QR
-                                                </Typography>
-
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: 13,
-                                                        color: "#667085",
-                                                        overflow:
-                                                            "hidden",
-                                                        textOverflow:
-                                                            "ellipsis",
-                                                        whiteSpace:
-                                                            "nowrap",
-                                                    }}
-                                                >
-                                                    {
-                                                        table.token
-                                                    }
-                                                </Typography>
-                                            </Box>
-
-                                            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                                                <QRCodePreviewButton onClick={() => setSelectedTable(table)} />
-                                            </Box>
+                                                {table.name}
+                                            </Typography>
                                         </Stack>
-                                    </Box>
 
-                                    {index <
-                                        data.length -
-                                        1 && (
-                                            <Divider />
-                                        )}
-                                </Box>
-                            );
-                        })
-                    )}
-                </Box>
-            </Box>
-            {selectedTable && (
-                <QRCodePreviewDialog
-                    open={Boolean(selectedTable)}
-                    tableName={selectedTable.name}
-                    tableToken={selectedTable.token}
-                    onClose={() => setSelectedTable(null)}
-                    onPrint={handlePrint}
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                flexShrink: 0,
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                px: 1,
+                                                py: 0.5,
+                                                borderRadius: 999,
+                                                border: `1px solid ${status.borderColor}`,
+                                                backgroundColor:
+                                                    status.backgroundColor,
+                                                color: status.color,
+                                                fontSize: 11,
+                                                fontWeight: 500,
+                                            }}
+                                        >
+                                            {status.label}
+                                        </Box>
+                                    </Stack>
+
+                                    <Divider />
+
+                                    <Stack sx={{ gap: 0.5 }}>
+                                        <Typography
+                                            sx={{
+                                                fontSize: 12,
+                                                color: "#98a2b3",
+                                            }}
+                                        >
+                                            Mã QR
+                                        </Typography>
+
+                                        <Typography
+                                            sx={{
+                                                fontSize: 13,
+                                                color: "#667085",
+                                                wordBreak: "break-all",
+                                            }}
+                                        >
+                                            {table.token}
+                                        </Typography>
+                                    </Stack>
+
+                                    <QRCodePreviewButton
+                                        onClick={() => handleOpenPreview(table)}
+                                    />
+                                </Stack>
+                            </Box>
+                        );
+                    })}
+                </Stack>
+
+                {/* Pagination */}
+                <QRCodePagination
+                    page={page}
+                    totalPages={totalPages}
+                    total={total}
+                    pageSize={pageSize}
                 />
-            )}
-        </Stack>
+            </Stack>
+
+            {/* Single QR preview */}
+            <QRCodePreviewDialog
+                open={Boolean(selectedTable)}
+                tableName={selectedTable?.name ?? ""}
+                tableToken={selectedTable?.token ?? ""}
+                onClose={handleClosePreview}
+                onPrint={handlePrint}
+            />
+        </>
     );
 }

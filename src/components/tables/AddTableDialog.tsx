@@ -4,11 +4,7 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@mui/material";
 
-import {
-    Form,
-    Formik,
-    type FormikHelpers,
-} from "formik";
+import { Form, Formik, type FormikHelpers } from "formik";
 import * as yup from "yup";
 
 import { createTableAction } from "@/app/dashboard/tables/actions";
@@ -34,12 +30,9 @@ const initialValues: AddTableFormValues = {
     name: "",
 };
 
-function createValidationSchema(
-    tableNames: string[],
-) {
-    const normalizedTableNames = tableNames.map(
-        (tableName) =>
-            tableName.trim().toLowerCase(),
+function createValidationSchema(tableNames: string[]) {
+    const normalizedTableNames = tableNames.map((tableName) =>
+        tableName.trim().toLowerCase(),
     );
 
     return yup.object({
@@ -47,36 +40,26 @@ function createValidationSchema(
             .string()
             .trim()
             .required("Vui lòng nhập tên bàn.")
-            .test(
-                "unique-table-name",
-                "Tên bàn này đã tồn tại.",
-                (value) => {
-                    if (!value) {
-                        return true;
-                    }
+            .test("unique-table-name", "Tên bàn này đã tồn tại.", (value) => {
+                if (!value) {
+                    return true;
+                }
 
-                    const normalizedName =
-                        value.trim().toLowerCase();
+                const normalizedName = value.trim().toLowerCase();
 
-                    return !normalizedTableNames.includes(
-                        normalizedName,
-                    );
-                },
-            ),
+                return !normalizedTableNames.includes(normalizedName);
+            }),
     });
 }
 
-export default function AddTableDialog({
-    tableNames,
-}: AddTableDialogProps) {
+export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
     const [open, setOpen] = useState(false);
 
-    const [snackbar, setSnackbar] =
-        useState<SnackbarState>({
-            open: false,
-            message: "",
-            severity: "success",
-        });
+    const [snackbar, setSnackbar] = useState<SnackbarState>({
+        open: false,
+        message: "",
+        severity: "success",
+    });
 
     const validationSchema = useMemo(
         () => createValidationSchema(tableNames),
@@ -101,10 +84,7 @@ export default function AddTableDialog({
         try {
             const formData = new FormData();
 
-            formData.append(
-                "name",
-                values.name.trim(),
-            );
+            formData.append("name", values.name.trim());
 
             const result = await createTableAction(
                 {
@@ -117,10 +97,7 @@ export default function AddTableDialog({
 
             if (!result.success) {
                 if (result.fieldErrors?.name) {
-                    setFieldError(
-                        "name",
-                        result.fieldErrors.name,
-                    );
+                    setFieldError("name", result.fieldErrors.name);
 
                     return;
                 }
@@ -141,21 +118,15 @@ export default function AddTableDialog({
 
             setSnackbar({
                 open: true,
-                message:
-                    result.message ||
-                    "Đã tạo bàn thành công.",
+                message: result.message || "Đã tạo bàn thành công.",
                 severity: "success",
             });
         } catch (error) {
-            console.error(
-                "Failed to create table:",
-                error,
-            );
+            console.error("Failed to create table:", error);
 
             setSnackbar({
                 open: true,
-                message:
-                    "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
                 severity: "error",
             });
         } finally {
@@ -232,8 +203,7 @@ export default function AddTableDialog({
                                             color: "#667085",
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            textTransform:
-                                                "none",
+                                            textTransform: "none",
                                         }}
                                     >
                                         Hủy
@@ -248,18 +218,14 @@ export default function AddTableDialog({
                                             minWidth: 100,
                                             height: 40,
                                             borderRadius: 1.5,
-                                            backgroundColor:
-                                                "#193B56",
+                                            backgroundColor: "#193B56",
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            textTransform:
-                                                "none",
+                                            textTransform: "none",
                                             boxShadow: "none",
                                             "&:hover": {
-                                                backgroundColor:
-                                                    "#142f45",
-                                                boxShadow:
-                                                    "none",
+                                                backgroundColor: "#142f45",
+                                                boxShadow: "none",
                                             },
                                         }}
                                     >
@@ -270,10 +236,7 @@ export default function AddTableDialog({
                                 </>
                             }
                         >
-                            <Form
-                                id="add-table-form"
-                                noValidate
-                            >
+                            <Form id="add-table-form" noValidate>
                                 <QRTextField
                                     name="name"
                                     label="Tên bàn"
@@ -284,18 +247,13 @@ export default function AddTableDialog({
                                         handleChange(event);
 
                                         if (errors.name) {
-                                            setFieldError(
-                                                "name",
-                                                undefined,
-                                            );
+                                            setFieldError("name", undefined);
                                         }
                                     }}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                     errorMessage={
-                                        touched.name
-                                            ? errors.name
-                                            : undefined
+                                        touched.name ? errors.name : undefined
                                     }
                                 />
                             </Form>

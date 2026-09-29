@@ -27,25 +27,19 @@ export async function POST(request: Request) {
         const body = (await request.json()) as FeedbackPayload;
 
         const tableToken =
-            typeof body.tableToken === "string"
-                ? body.tableToken.trim()
-                : "";
+            typeof body.tableToken === "string" ? body.tableToken.trim() : "";
 
         const selectedOptions = Array.isArray(body.selectedOptions)
             ? body.selectedOptions.filter(
-                (item): item is string => typeof item === "string",
-            )
+                  (item): item is string => typeof item === "string",
+              )
             : [];
 
         const feedback =
-            typeof body.feedback === "string"
-                ? body.feedback.trim()
-                : "";
+            typeof body.feedback === "string" ? body.feedback.trim() : "";
 
         const phone =
-            typeof body.phone === "string"
-                ? body.phone.replace(/\s/g, "")
-                : "";
+            typeof body.phone === "string" ? body.phone.replace(/\s/g, "") : "";
 
         // Validate table token
         if (!tableToken) {
@@ -56,11 +50,7 @@ export async function POST(request: Request) {
         }
 
         // Validate selected options
-        if (
-            selectedOptions.some(
-                (option) => !ALLOWED_OPTIONS.has(option),
-            )
-        ) {
+        if (selectedOptions.some((option) => !ALLOWED_OPTIONS.has(option))) {
             return NextResponse.json(
                 { message: "Lựa chọn phản hồi không hợp lệ." },
                 { status: 400 },
@@ -68,10 +58,7 @@ export async function POST(request: Request) {
         }
 
         // Validate feedback
-        if (
-            selectedOptions.length === 0 &&
-            !feedback
-        ) {
+        if (selectedOptions.length === 0 && !feedback) {
             return NextResponse.json(
                 {
                     message:
@@ -108,22 +95,15 @@ export async function POST(request: Request) {
         }
 
         // Get client IP
-        const forwardedFor =
-            request.headers.get("x-forwarded-for");
+        const forwardedFor = request.headers.get("x-forwarded-for");
 
-        const ip =
-            forwardedFor?.split(",")[0]?.trim() ||
-            "unknown";
+        const ip = forwardedFor?.split(",")[0]?.trim() || "unknown";
 
         // Rate limit by IP + table
         const identifier = `${ip}:${tableToken}`;
 
-        const {
-            success,
-            limit,
-            remaining,
-            reset,
-        } = await feedbackRateLimit.limit(identifier);
+        const { success, limit, remaining, reset } =
+            await feedbackRateLimit.limit(identifier);
 
         if (!success) {
             return NextResponse.json(
@@ -138,12 +118,7 @@ export async function POST(request: Request) {
                         "X-RateLimit-Remaining": String(remaining),
                         "X-RateLimit-Reset": String(reset),
                         "Retry-After": String(
-                            Math.max(
-                                1,
-                                Math.ceil(
-                                    (reset - Date.now()) / 1000,
-                                ),
-                            ),
+                            Math.max(1, Math.ceil((reset - Date.now()) / 1000)),
                         ),
                     },
                 },
@@ -153,10 +128,7 @@ export async function POST(request: Request) {
         const supabase = createAdminClient();
 
         // Find table
-        const {
-            data: table,
-            error: tableError,
-        } = await supabase
+        const { data: table, error: tableError } = await supabase
             .from("tables")
             .select("id, restaurant_id, name")
             .eq("token", tableToken)
@@ -170,39 +142,27 @@ export async function POST(request: Request) {
         }
 
         // Find restaurant
-        const {
-            data: restaurant,
-            error: restaurantError,
-        } = await supabase
+        const { data: restaurant, error: restaurantError } = await supabase
             .from("restaurants")
             .select("name")
             .eq("id", table.restaurant_id)
             .single();
 
         if (restaurantError) {
-            console.error(
-                "Failed to get restaurant:",
-                restaurantError,
-            );
+            console.error("Failed to get restaurant:", restaurantError);
         }
 
         // Save feedback
-        const { error: insertError } =
-            await supabase
-                .from("feedback")
-                .insert({
-                    restaurant_id: table.restaurant_id,
-                    table_id: table.id,
-                    selected_options: selectedOptions,
-                    feedback,
-                    phone,
-                });
+        const { error: insertError } = await supabase.from("feedback").insert({
+            restaurant_id: table.restaurant_id,
+            table_id: table.id,
+            selected_options: selectedOptions,
+            feedback,
+            phone,
+        });
 
         if (insertError) {
-            console.error(
-                "Failed to insert feedback:",
-                insertError,
-            );
+            console.error("Failed to insert feedback:", insertError);
 
             return NextResponse.json(
                 { message: "Không thể lưu phản hồi." },
@@ -211,40 +171,31 @@ export async function POST(request: Request) {
         }
 
         // Prepare email data
-        const createdAt = new Date().toLocaleString(
-            "vi-VN",
-            {
-                timeZone: "Asia/Ho_Chi_Minh",
-            },
-        );
+        const createdAt = new Date().toLocaleString("vi-VN", {
+            timeZone: "Asia/Ho_Chi_Minh",
+        });
 
-        const emailHtml =
-            createFeedbackEmailHtml({
-                restaurantName:
-                    restaurant?.name ?? "Không xác định",
-                tableName: table.name,
-                selectedOptions,
-                feedback,
-                phone,
-                createdAt,
-            });
+        const emailHtml = createFeedbackEmailHtml({
+            restaurantName: restaurant?.name ?? "Không xác định",
+            tableName: table.name,
+            selectedOptions,
+            feedback,
+            phone,
+            createdAt,
+        });
 
         // Send email
-        const { error: emailError } =
-            await resend.emails.send({
-                from: "QR Feedback <onboarding@resend.dev>",
-                to: process.env.FEEDBACK_EMAIL!,
-                subject: `[QR Feedback] Phản hồi mới • ${table.name}`,
-                html: emailHtml,
-            });
+        const { error: emailError } = await resend.emails.send({
+            from: "QR Feedback <onboarding@resend.dev>",
+            to: process.env.FEEDBACK_EMAIL!,
+            subject: `[QR Feedback] Phản hồi mới • ${table.name}`,
+            html: emailHtml,
+        });
 
         // Feedback is already saved.
         // Email failure should not make the submission fail.
         if (emailError) {
-            console.error(
-                "Failed to send feedback email:",
-                emailError,
-            );
+            console.error("Failed to send feedback email:", emailError);
         }
 
         return NextResponse.json(
@@ -254,15 +205,11 @@ export async function POST(request: Request) {
             { status: 201 },
         );
     } catch (error) {
-        console.error(
-            "Feedback API error:",
-            error,
-        );
+        console.error("Feedback API error:", error);
 
         return NextResponse.json(
             {
-                message:
-                    "Có lỗi xảy ra. Vui lòng thử lại.",
+                message: "Có lỗi xảy ra. Vui lòng thử lại.",
             },
             { status: 500 },
         );

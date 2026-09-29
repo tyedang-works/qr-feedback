@@ -1,15 +1,6 @@
 import type { RecentFeedbackItem } from "@/lib/dashboard/types";
-import {
-    FEEDBACK_ISSUE_LABEL_MAP,
-} from "@/lib/feedback/constants";
-import {
-    Box,
-    Card,
-    Chip,
-    Divider,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
+import { Box, Card, Chip, Divider, Stack, Typography } from "@mui/material";
 
 type RecentFeedbackProps = {
     data: RecentFeedbackItem[];
@@ -28,21 +19,13 @@ function formatDateTime(dateString: string) {
 }
 
 function getIssueLabel(option: string) {
-    return (
-        FEEDBACK_ISSUE_LABEL_MAP[option] ??
-        option
-    );
+    return FEEDBACK_ISSUE_LABEL_MAP[option] ?? option;
 }
 
-function getVisibleIssues(
-    selectedOptions: string[],
-) {
-    const visibleOptions =
-        selectedOptions.slice(0, 2);
+function getVisibleIssues(selectedOptions: string[]) {
+    const visibleOptions = selectedOptions.slice(0, 2);
 
-    const remainingCount =
-        selectedOptions.length -
-        visibleOptions.length;
+    const remainingCount = selectedOptions.length - visibleOptions.length;
 
     return {
         visibleOptions,
@@ -50,9 +33,7 @@ function getVisibleIssues(
     };
 }
 
-export default function RecentFeedback({
-    data,
-}: RecentFeedbackProps) {
+export default function RecentFeedback({ data }: RecentFeedbackProps) {
     return (
         <Card
             elevation={0}
@@ -110,12 +91,8 @@ export default function RecentFeedback({
             ) : (
                 <Stack>
                     {data.map((item, index) => {
-                        const {
-                            visibleOptions,
-                            remainingCount,
-                        } = getVisibleIssues(
-                            item.selectedOptions,
-                        );
+                        const { visibleOptions, remainingCount } =
+                            getVisibleIssues(item.selectedOptions);
 
                         return (
                             <Box key={item.id}>
@@ -139,8 +116,7 @@ export default function RecentFeedback({
                                                     xs: "flex-start",
                                                     sm: "center",
                                                 },
-                                                justifyContent:
-                                                    "space-between",
+                                                justifyContent: "space-between",
                                                 gap: 1,
                                             }}
                                         >
@@ -161,72 +137,69 @@ export default function RecentFeedback({
                                                     color: "#98A2B3",
                                                 }}
                                             >
-                                                {formatDateTime(
-                                                    item.createdAt,
-                                                )}
+                                                {formatDateTime(item.createdAt)}
                                             </Typography>
                                         </Stack>
 
                                         {/* Selected Issues */}
-                                        {item.selectedOptions.length >
-                                            0 && (
-                                                <Stack sx={{ gap: 1 }}>
-                                                    <Typography
-                                                        sx={{
-                                                            fontSize: 12,
-                                                            fontWeight: 600,
-                                                            color: "#667085",
-                                                        }}
-                                                    >
-                                                        Vấn đề khách hàng chọn
-                                                    </Typography>
+                                        {item.selectedOptions.length > 0 && (
+                                            <Stack sx={{ gap: 1 }}>
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: 12,
+                                                        fontWeight: 600,
+                                                        color: "#667085",
+                                                    }}
+                                                >
+                                                    Vấn đề khách hàng chọn
+                                                </Typography>
 
-                                                    <Stack
-                                                        sx={{
-                                                            flexDirection: "row",
-                                                            flexWrap: "wrap",
-                                                            gap: 0.75,
-                                                        }}
-                                                    >
-                                                        {visibleOptions.map(
-                                                            (option) => (
-                                                                <Chip
-                                                                    key={option}
-                                                                    label={getIssueLabel(
-                                                                        option,
-                                                                    )}
-                                                                    size="small"
-                                                                    sx={{
-                                                                        height: 28,
-                                                                        borderRadius: 1,
-                                                                        backgroundColor:
-                                                                            "#eef4f8",
-                                                                        color: "#193B56",
-                                                                        fontSize: 11,
-                                                                        fontWeight: 500,
-                                                                    }}
-                                                                />
-                                                            ),
-                                                        )}
-
-                                                        {remainingCount > 0 && (
+                                                <Stack
+                                                    sx={{
+                                                        flexDirection: "row",
+                                                        flexWrap: "wrap",
+                                                        gap: 0.75,
+                                                    }}
+                                                >
+                                                    {visibleOptions.map(
+                                                        (option) => (
                                                             <Chip
-                                                                label={`+${remainingCount}`}
+                                                                key={option}
+                                                                label={getIssueLabel(
+                                                                    option,
+                                                                )}
                                                                 size="small"
                                                                 sx={{
                                                                     height: 28,
                                                                     borderRadius: 1,
                                                                     backgroundColor:
-                                                                        "#f2f4f7",
-                                                                    color: "#667085",
+                                                                        "#eef4f8",
+                                                                    color: "#193B56",
                                                                     fontSize: 11,
-                                                                    fontWeight: 600,
+                                                                    fontWeight: 500,
                                                                 }}
                                                             />
-                                                        )}
-                                                    </Stack>
+                                                        ),
+                                                    )}
+
+                                                    {remainingCount > 0 && (
+                                                        <Chip
+                                                            label={`+${remainingCount}`}
+                                                            size="small"
+                                                            sx={{
+                                                                height: 28,
+                                                                borderRadius: 1,
+                                                                backgroundColor:
+                                                                    "#f2f4f7",
+                                                                color: "#667085",
+                                                                fontSize: 11,
+                                                                fontWeight: 600,
+                                                            }}
+                                                        />
+                                                    )}
                                                 </Stack>
-                                            )}
+                                            </Stack>
+                                        )}
 
                                         {/* Customer Feedback */}
                                         {item.feedback && (
@@ -246,9 +219,9 @@ export default function RecentFeedback({
                                                         px: 2,
                                                         py: 1.5,
                                                         borderRadius: 1.5,
-                                                        backgroundColor: "#f8fafc",
-                                                        border:
-                                                            "1px solid #eef2f5",
+                                                        backgroundColor:
+                                                            "#f8fafc",
+                                                        border: "1px solid #eef2f5",
                                                     }}
                                                 >
                                                     <Typography

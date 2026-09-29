@@ -10,9 +10,5 @@ type MuiThemeProviderProps = {
 };
 
 export default function MuiThemeProvider({ children }: MuiThemeProviderProps) {
-    return (
-        <ThemeProvider theme={theme}>
-            {children}
-        </ThemeProvider>
-    );
+    return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

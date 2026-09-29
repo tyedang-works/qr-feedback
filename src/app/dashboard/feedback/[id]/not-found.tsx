@@ -1,9 +1,4 @@
-import {
-    Box,
-    Button,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 
 export default function FeedbackNotFound() {
@@ -35,8 +30,7 @@ export default function FeedbackNotFound() {
                         color: "#667085",
                     }}
                 >
-                    Phản hồi này không tồn tại hoặc bạn không có
-                    quyền truy cập.
+                    Phản hồi này không tồn tại hoặc bạn không có quyền truy cập.
                 </Typography>
 
                 <Link

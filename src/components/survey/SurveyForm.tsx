@@ -8,7 +8,7 @@ import {
     Paper,
     Stack,
     TextField,
-    Typography
+    Typography,
 } from "@mui/material";
 import { useState } from "react";
 import Logo from "../common/Logo";
@@ -41,9 +41,7 @@ type SurveyFormProps = {
     tableToken: string;
 };
 
-export default function SurveyForm({
-    tableToken,
-}: SurveyFormProps) {
+export default function SurveyForm({ tableToken }: SurveyFormProps) {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [feedback, setFeedback] = useState("");
     const [phone, setPhone] = useState("");
@@ -129,22 +127,15 @@ export default function SurveyForm({
             const data = await response.json();
 
             if (!response.ok) {
-                setSubmitError(
-                    data.message || "Không thể gửi phản hồi.",
-                );
+                setSubmitError(data.message || "Không thể gửi phản hồi.");
                 return;
             }
 
             setIsSuccess(true);
         } catch (error) {
-            console.error(
-                "Failed to submit feedback:",
-                error,
-            );
+            console.error("Failed to submit feedback:", error);
 
-            setSubmitError(
-                "Không thể kết nối đến hệ thống. Vui lòng thử lại.",
-            );
+            setSubmitError("Không thể kết nối đến hệ thống. Vui lòng thử lại.");
         } finally {
             setIsSubmitting(false);
         }
@@ -231,8 +222,8 @@ export default function SurveyForm({
                                 lineHeight: 1.7,
                             }}
                         >
-                            Hãy chia sẻ trải nghiệm của bạn để chúng tôi có thể phục vụ bạn
-                            tốt hơn.
+                            Hãy chia sẻ trải nghiệm của bạn để chúng tôi có thể
+                            phục vụ bạn tốt hơn.
                         </Typography>
                     </Box>
 
@@ -266,7 +257,9 @@ export default function SurveyForm({
                             }}
                         >
                             {surveyOptions.map((option) => {
-                                const checked = selectedOptions.includes(option.id);
+                                const checked = selectedOptions.includes(
+                                    option.id,
+                                );
 
                                 return (
                                     <Box
@@ -279,14 +272,17 @@ export default function SurveyForm({
                                             minHeight: 44,
                                             px: 1,
                                             border: "1px solid",
-                                            borderColor: checked ? "primary.main" : "divider",
+                                            borderColor: checked
+                                                ? "primary.main"
+                                                : "divider",
                                             borderRadius: 2.5,
                                             backgroundColor: checked
                                                 ? "action.selected"
                                                 : "background.paper",
                                             cursor: "pointer",
                                             userSelect: "none",
-                                            WebkitTapHighlightColor: "transparent",
+                                            WebkitTapHighlightColor:
+                                                "transparent",
                                             transition:
                                                 "border-color 0.15s ease, background-color 0.15s ease",
 
@@ -299,7 +295,9 @@ export default function SurveyForm({
                                             component="input"
                                             type="checkbox"
                                             checked={checked}
-                                            onChange={() => handleToggleOption(option.id)}
+                                            onChange={() =>
+                                                handleToggleOption(option.id)
+                                            }
                                             sx={{
                                                 width: 20,
                                                 height: 20,
@@ -362,7 +360,8 @@ export default function SurveyForm({
                                 mb: 1.5,
                             }}
                         >
-                            Thông tin chi tiết sẽ giúp chúng tôi hiểu vấn đề rõ hơn.
+                            Thông tin chi tiết sẽ giúp chúng tôi hiểu vấn đề rõ
+                            hơn.
                         </Typography>
 
                         <TextField
@@ -438,7 +437,8 @@ export default function SurveyForm({
                                 mb: 1.25,
                             }}
                         >
-                            Để chúng tôi có thể liên hệ và hỗ trợ bạn khi cần thiết.
+                            Để chúng tôi có thể liên hệ và hỗ trợ bạn khi cần
+                            thiết.
                         </Typography>
 
                         <TextField
@@ -503,10 +503,11 @@ export default function SurveyForm({
                                 lineHeight: 1.6,
                             }}
                         >
-                            🔒 Thông tin của bạn được bảo mật và chỉ được sử dụng để tiếp
-                            nhận, xử lý phản hồi và hỗ trợ chăm sóc khách hàng khi cần thiết.
-                            Chúng tôi không sử dụng số điện thoại cho mục đích quảng cáo
-                            hoặc chia sẻ cho bên thứ ba khi chưa có sự đồng ý của bạn.
+                            🔒 Thông tin của bạn được bảo mật và chỉ được sử
+                            dụng để tiếp nhận, xử lý phản hồi và hỗ trợ chăm sóc
+                            khách hàng khi cần thiết. Chúng tôi không sử dụng số
+                            điện thoại cho mục đích quảng cáo hoặc chia sẻ cho
+                            bên thứ ba khi chưa có sự đồng ý của bạn.
                         </Typography>
                     </Box>
 
@@ -539,7 +540,8 @@ export default function SurveyForm({
                             fontSize: 14,
                             fontWeight: 700,
                             boxShadow: "none",
-                            transition: "transform 150ms ease, box-shadow 150ms ease",
+                            transition:
+                                "transform 150ms ease, box-shadow 150ms ease",
                             "&:hover": {
                                 boxShadow: "none",
                                 transform: "translateY(-1px)",
@@ -569,7 +571,8 @@ export default function SurveyForm({
                                         border: "2px solid rgba(255,255,255,0.45)",
                                         borderTopColor: "#fff",
                                         borderRadius: "50%",
-                                        animation: "submitSpinner 700ms linear infinite",
+                                        animation:
+                                            "submitSpinner 700ms linear infinite",
                                         "@keyframes submitSpinner": {
                                             to: {
                                                 transform: "rotate(360deg)",

@@ -37,11 +37,11 @@ export default function QRCodePrintView({
             }}
         >
             <Stack
-                spacing={3}
                 sx={{
                     height: "100%",
                     alignItems: "center",
                     justifyContent: "center",
+                    gap: 3,
                 }}
             >
                 <Box
@@ -54,8 +54,7 @@ export default function QRCodePrintView({
                         border: "1px solid #eaecf0",
                         borderRadius: 2,
                         backgroundColor: "#ffffff",
-                        boxShadow:
-                            "0 1px 3px rgba(16, 24, 40, 0.08)",
+                        boxShadow: "0 1px 3px rgba(16, 24, 40, 0.08)",
                         textAlign: "center",
                     }}
                 >
@@ -87,7 +86,7 @@ export default function QRCodePrintView({
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            mt: 3,
+                            mt: 1,
                         }}
                     >
                         <QRCodeSVG
@@ -101,7 +100,7 @@ export default function QRCodePrintView({
                     <Typography
                         className="qr-print-note"
                         sx={{
-                            mt: 3,
+                            mt: 1,
                             fontSize: 14,
                             lineHeight: 1.5,
                             fontWeight: 500,
@@ -125,9 +124,9 @@ export default function QRCodePrintView({
                     </Typography>
                 </Box>
 
-                <Box
+                <Stack
                     sx={{
-                        display: "flex",
+                        flexDirection: "row",
                         gap: 1,
                     }}
                 >
@@ -175,7 +174,7 @@ export default function QRCodePrintView({
                     >
                         In QR
                     </Button>
-                </Box>
+                </Stack>
             </Stack>
         </Box>
     );

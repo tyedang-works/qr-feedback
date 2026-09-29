@@ -6,9 +6,7 @@ type SurveyPageProps = {
     }>;
 };
 
-export default async function SurveyPage({
-    params,
-}: SurveyPageProps) {
+export default async function SurveyPage({ params }: SurveyPageProps) {
     const { token } = await params;
 
     return <SurveyForm tableToken={token} />;

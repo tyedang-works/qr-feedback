@@ -1,10 +1,7 @@
-import { Box, TextField, Typography } from "@mui/material";
 import type { TextFieldProps } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 
-import {
-    formErrorSx,
-    formLabelSx,
-} from "@/styles/form.styles";
+import { formErrorSx, formLabelSx, formRequiredSx } from "@/styles/form.styles";
 
 type QRTextFieldProps = Omit<
     TextFieldProps,
@@ -26,20 +23,11 @@ export default function QRTextField({
     return (
         <Box sx={{ width: "100%", position: "relative" }}>
             {label && (
-                <Typography
-                    component="label"
-                    sx={formLabelSx}
-                >
+                <Typography component="label" sx={formLabelSx}>
                     {label}
 
                     {required && (
-                        <Typography
-                            component="span"
-                            sx={{
-                                ml: 0.25,
-                                color: "error.main",
-                            }}
-                        >
+                        <Typography component="span" sx={formRequiredSx}>
                             *
                         </Typography>
                     )}
@@ -73,8 +61,7 @@ export default function QRTextField({
                             borderColor: "#d92d20",
                         },
 
-                        "&.Mui-error.Mui-focused fieldset":
-                        {
+                        "&.Mui-error.Mui-focused fieldset": {
                             borderColor: "#d92d20",
                         },
                     },
@@ -87,8 +74,7 @@ export default function QRTextField({
                         color: "#344054",
                     },
 
-                    "& .MuiInputBase-input::placeholder":
-                    {
+                    "& .MuiInputBase-input::placeholder": {
                         color: "#98a2b3",
                         opacity: 1,
                     },
@@ -96,10 +82,7 @@ export default function QRTextField({
             />
 
             {errorMessage && (
-                <Typography
-                    component="p"
-                    sx={formErrorSx}
-                >
+                <Typography component="p" sx={formErrorSx}>
                     {errorMessage}
                 </Typography>
             )}

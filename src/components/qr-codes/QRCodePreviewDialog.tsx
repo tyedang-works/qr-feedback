@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 
-import {
-    Box,
-    Button,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 
 import QRDialog from "@/components/common/dialog/QRDialog";
 import { APP_URL } from "@/lib/config/app";
@@ -37,114 +32,63 @@ function createFileName(tableName: string) {
     return `qr-${normalizedName || "table"}.png`;
 }
 
-async function downloadQRCode(
-    tableName: string,
-) {
+async function downloadQRCode(tableName: string) {
     const svgElement = document.querySelector(
         "#qr-code-preview",
     ) as SVGSVGElement | null;
 
     if (!svgElement) {
-        throw new Error(
-            "Không tìm thấy mã QR.",
-        );
+        throw new Error("Không tìm thấy mã QR.");
     }
 
-    const svgClone =
-        svgElement.cloneNode(
-            true,
-        ) as SVGSVGElement;
+    const svgClone = svgElement.cloneNode(true) as SVGSVGElement;
 
-    svgClone.setAttribute(
-        "xmlns",
-        "http://www.w3.org/2000/svg",
-    );
+    svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
-    svgClone.setAttribute(
-        "xmlns:xlink",
-        "http://www.w3.org/1999/xlink",
-    );
+    svgClone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
-    const svgData =
-        new XMLSerializer().serializeToString(
-            svgClone,
-        );
+    const svgData = new XMLSerializer().serializeToString(svgClone);
 
-    const svgBlob = new Blob(
-        [svgData],
-        {
-            type: "image/svg+xml;charset=utf-8",
-        },
-    );
+    const svgBlob = new Blob([svgData], {
+        type: "image/svg+xml;charset=utf-8",
+    });
 
-    const svgUrl =
-        URL.createObjectURL(svgBlob);
+    const svgUrl = URL.createObjectURL(svgBlob);
 
     try {
         const image = new Image();
 
-        await new Promise<void>(
-            (resolve, reject) => {
-                image.onload = () => resolve();
-                image.onerror = () =>
-                    reject(
-                        new Error(
-                            "Không thể tạo ảnh QR.",
-                        ),
-                    );
+        await new Promise<void>((resolve, reject) => {
+            image.onload = () => resolve();
+            image.onerror = () => reject(new Error("Không thể tạo ảnh QR."));
 
-                image.src = svgUrl;
-            },
-        );
+            image.src = svgUrl;
+        });
 
-        const canvas =
-            document.createElement(
-                "canvas",
-            );
+        const canvas = document.createElement("canvas");
 
         const size = 1024;
 
         canvas.width = size;
         canvas.height = size;
 
-        const context =
-            canvas.getContext("2d");
+        const context = canvas.getContext("2d");
 
         if (!context) {
-            throw new Error(
-                "Không thể tạo ảnh QR.",
-            );
+            throw new Error("Không thể tạo ảnh QR.");
         }
 
         context.fillStyle = "#ffffff";
-        context.fillRect(
-            0,
-            0,
-            size,
-            size,
-        );
+        context.fillRect(0, 0, size, size);
 
-        context.drawImage(
-            image,
-            0,
-            0,
-            size,
-            size,
-        );
+        context.drawImage(image, 0, 0, size, size);
 
-        const pngUrl =
-            canvas.toDataURL(
-                "image/png",
-            );
+        const pngUrl = canvas.toDataURL("image/png");
 
-        const link =
-            document.createElement(
-                "a",
-            );
+        const link = document.createElement("a");
 
         link.href = pngUrl;
-        link.download =
-            createFileName(tableName);
+        link.download = createFileName(tableName);
 
         document.body.appendChild(link);
         link.click();
@@ -173,26 +117,16 @@ export default function QRCodePreviewDialog({
         setDownloading(true);
 
         try {
-            await downloadQRCode(
-                tableName,
-            );
+            await downloadQRCode(tableName);
         } catch (error) {
-            console.error(
-                "Failed to download QR code:",
-                error,
-            );
+            console.error("Failed to download QR code:", error);
         } finally {
             setDownloading(false);
         }
     };
 
     return (
-        <QRDialog
-            open={open}
-            onClose={onClose}
-            title="Xem mã QR"
-            maxWidth="xs"
-        >
+        <QRDialog open={open} onClose={onClose} title="Xem mã QR" maxWidth="xs">
             <Stack
                 spacing={3}
                 sx={{
@@ -209,8 +143,7 @@ export default function QRCodePreviewDialog({
                         p: 2,
                         border: "1px solid #eaecf0",
                         borderRadius: 2,
-                        backgroundColor:
-                            "#ffffff",
+                        backgroundColor: "#ffffff",
                     }}
                 >
                     <QRCodeSVG
@@ -245,22 +178,23 @@ export default function QRCodePreviewDialog({
                             fontSize: 12,
                             lineHeight: 1.5,
                             color: "#667085",
-                            wordBreak:
-                                "break-all",
+                            wordBreak: "break-all",
                         }}
                     >
                         {qrUrl}
                     </Typography>
                 </Box>
 
-                <Stack spacing={1} direction="row" sx={{ justifyContent: "center" }}>
+                <Stack
+                    spacing={1}
+                    direction="row"
+                    sx={{ justifyContent: "center" }}
+                >
                     <Button
                         type="button"
                         onClick={handleDownload}
                         disabled={downloading}
-                        startIcon={
-                            <FontAwesomeIcon icon={faCircleDown} />
-                        }
+                        startIcon={<FontAwesomeIcon icon={faCircleDown} />}
                         sx={{
                             minWidth: 120,
                             height: 38,
@@ -269,19 +203,16 @@ export default function QRCodePreviewDialog({
                             fontSize: 13,
                             fontWeight: 600,
                             color: "#ffffff",
-                            backgroundColor:
-                                "#193B56",
+                            backgroundColor: "#193B56",
                             textTransform: "none",
 
                             "&:hover": {
-                                backgroundColor:
-                                    "#142F45",
+                                backgroundColor: "#142F45",
                             },
 
                             "&.Mui-disabled": {
                                 color: "#98A2B3",
-                                backgroundColor:
-                                    "#EAECF0",
+                                backgroundColor: "#EAECF0",
                             },
                         }}
                     >

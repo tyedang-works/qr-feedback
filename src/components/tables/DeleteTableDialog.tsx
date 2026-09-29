@@ -4,11 +4,7 @@ import { useState } from "react";
 
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 
-import {
-    Form,
-    Formik,
-    type FormikHelpers,
-} from "formik";
+import { Form, Formik, type FormikHelpers } from "formik";
 
 import { deleteTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
@@ -37,12 +33,11 @@ export default function DeleteTableDialog({
 }: DeleteTableDialogProps) {
     const [open, setOpen] = useState(false);
 
-    const [snackbar, setSnackbar] =
-        useState<SnackbarState>({
-            open: false,
-            message: "",
-            severity: "success",
-        });
+    const [snackbar, setSnackbar] = useState<SnackbarState>({
+        open: false,
+        message: "",
+        severity: "success",
+    });
 
     const initialValues: DeleteTableFormValues = {
         tableId,
@@ -57,18 +52,12 @@ export default function DeleteTableDialog({
 
     const handleSubmit = async (
         values: DeleteTableFormValues,
-        {
-            setSubmitting,
-            resetForm,
-        }: FormikHelpers<DeleteTableFormValues>,
+        { setSubmitting, resetForm }: FormikHelpers<DeleteTableFormValues>,
     ) => {
         try {
             const formData = new FormData();
 
-            formData.append(
-                "tableId",
-                values.tableId,
-            );
+            formData.append("tableId", values.tableId);
 
             const result = await deleteTableAction(
                 {
@@ -98,23 +87,17 @@ export default function DeleteTableDialog({
 
             setSnackbar({
                 open: true,
-                message:
-                    result.message ||
-                    "Đã xóa bàn thành công.",
+                message: result.message || "Đã xóa bàn thành công.",
                 severity: "success",
             });
         } catch (error) {
-            console.error(
-                "Failed to delete table:",
-                error,
-            );
+            console.error("Failed to delete table:", error);
 
             setOpen(false);
 
             setSnackbar({
                 open: true,
-                message:
-                    "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
                 severity: "error",
             });
         } finally {
@@ -177,9 +160,7 @@ export default function DeleteTableDialog({
                 enableReinitialize
                 onSubmit={handleSubmit}
             >
-                {({
-                    isSubmitting,
-                }) => {
+                {({ isSubmitting }) => {
                     const handleClose = () => {
                         if (isSubmitting) {
                             return;
@@ -199,9 +180,7 @@ export default function DeleteTableDialog({
                                     <Button
                                         type="button"
                                         onClick={handleClose}
-                                        disabled={
-                                            isSubmitting
-                                        }
+                                        disabled={isSubmitting}
                                         sx={{
                                             minWidth: 80,
                                             height: 40,
@@ -209,8 +188,7 @@ export default function DeleteTableDialog({
                                             color: "#667085",
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            textTransform:
-                                                "none",
+                                            textTransform: "none",
                                         }}
                                     >
                                         Hủy
@@ -220,25 +198,19 @@ export default function DeleteTableDialog({
                                         type="submit"
                                         form="delete-table-form"
                                         variant="contained"
-                                        disabled={
-                                            isSubmitting
-                                        }
+                                        disabled={isSubmitting}
                                         sx={{
                                             minWidth: 80,
                                             height: 40,
                                             borderRadius: 1.5,
-                                            backgroundColor:
-                                                "#d92d20",
+                                            backgroundColor: "#d92d20",
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            textTransform:
-                                                "none",
+                                            textTransform: "none",
                                             boxShadow: "none",
                                             "&:hover": {
-                                                backgroundColor:
-                                                    "#b42318",
-                                                boxShadow:
-                                                    "none",
+                                                backgroundColor: "#b42318",
+                                                boxShadow: "none",
                                             },
                                         }}
                                     >
@@ -249,10 +221,7 @@ export default function DeleteTableDialog({
                                 </>
                             }
                         >
-                            <Form
-                                id="delete-table-form"
-                                noValidate
-                            >
+                            <Form id="delete-table-form" noValidate>
                                 <Typography
                                     sx={{
                                         fontSize: 14,
@@ -282,8 +251,7 @@ export default function DeleteTableDialog({
                                         fontStyle: "italic",
                                     }}
                                 >
-                                    Bàn chỉ có thể xóa nếu
-                                    chưa có phản hồi.
+                                    Bàn chỉ có thể xóa nếu chưa có phản hồi.
                                 </Typography>
                             </Form>
                         </QRDialog>

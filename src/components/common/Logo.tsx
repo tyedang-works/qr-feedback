@@ -4,9 +4,7 @@ type LogoProps = {
     size?: number;
 };
 
-export default function Logo({
-    size = 68,
-}: LogoProps) {
+export default function Logo({ size = 68 }: LogoProps) {
     return (
         <Box
             component="img"
@@ -18,7 +16,6 @@ export default function Logo({
                 objectFit: "contain",
                 display: "block",
             }}
-            
         />
     );
 }

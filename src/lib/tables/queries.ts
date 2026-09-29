@@ -26,10 +26,7 @@ export async function getRestaurantTables(
         });
 
     if (error) {
-        console.error(
-            "Failed to get restaurant tables:",
-            error,
-        );
+        console.error("Failed to get restaurant tables:", error);
 
         return [];
     }
@@ -42,34 +39,27 @@ export async function getRestaurantTableList(
 ): Promise<RestaurantTable[]> {
     const supabase = await createClient();
 
-    const [tablesResult, feedbackResult] =
-        await Promise.all([
-            supabase
-                .from("tables")
-                .select(
-                    `
+    const [tablesResult, feedbackResult] = await Promise.all([
+        supabase
+            .from("tables")
+            .select(
+                `
                         id,
                         name,
                         token,
                         is_active
                     `,
-                )
-                .eq(
-                    "restaurant_id",
-                    restaurantId,
-                )
-                .order("name", {
-                    ascending: true,
-                }),
+            )
+            .eq("restaurant_id", restaurantId)
+            .order("name", {
+                ascending: true,
+            }),
 
-            supabase
-                .from("feedback")
-                .select("table_id")
-                .eq(
-                    "restaurant_id",
-                    restaurantId,
-                ),
-        ]);
+        supabase
+            .from("feedback")
+            .select("table_id")
+            .eq("restaurant_id", restaurantId),
+    ]);
 
     if (tablesResult.error) {
         console.error(
@@ -90,9 +80,7 @@ export async function getRestaurantTableList(
     }
 
     const feedbackTableIds = new Set(
-        feedbackResult.data.map(
-            (feedback) => feedback.table_id,
-        ),
+        feedbackResult.data.map((feedback) => feedback.table_id),
     );
 
     return tablesResult.data.map((table) => ({
@@ -100,9 +88,7 @@ export async function getRestaurantTableList(
         name: table.name,
         token: table.token,
         isActive: table.is_active,
-        hasFeedback: feedbackTableIds.has(
-            table.id,
-        ),
+        hasFeedback: feedbackTableIds.has(table.id),
     }));
 }
 
@@ -139,10 +125,7 @@ export async function createRestaurantTable(
         .single();
 
     if (error) {
-        console.error(
-            "Failed to create restaurant table:",
-            error,
-        );
+        console.error("Failed to create restaurant table:", error);
 
         throw error;
     }
@@ -201,23 +184,17 @@ export async function updateRestaurantTable(
         .maybeSingle();
 
     if (error) {
-        console.error(
-            "Failed to update restaurant table:",
-            error,
-        );
+        console.error("Failed to update restaurant table:", error);
 
         throw error;
     }
 
     if (!data) {
-        console.error(
-            "No table was updated:",
-            {
-                tableId,
-                restaurantId,
-                updateData,
-            },
-        );
+        console.error("No table was updated:", {
+            tableId,
+            restaurantId,
+            updateData,
+        });
 
         return null;
     }
@@ -282,7 +259,7 @@ export async function getRestaurantTableSummary(
         active,
         inactive: Math.max(total - active, 0),
     };
-};
+}
 
 export async function hasRestaurantTableFeedback(
     restaurantId: string,
@@ -300,10 +277,7 @@ export async function hasRestaurantTableFeedback(
         .eq("table_id", tableId);
 
     if (error) {
-        console.error(
-            "Failed to check restaurant table feedback:",
-            error,
-        );
+        console.error("Failed to check restaurant table feedback:", error);
 
         throw error;
     }
@@ -326,10 +300,7 @@ export async function deleteRestaurantTable(
         .maybeSingle();
 
     if (error) {
-        console.error(
-            "Failed to delete restaurant table:",
-            error,
-        );
+        console.error("Failed to delete restaurant table:", error);
 
         throw error;
     }

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-    Box,
-    Button,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 import { useRef } from "react";
 
@@ -14,15 +9,10 @@ type TableQRCodeProps = {
     size?: number;
 };
 
-export default function TableQRCode({
-    token,
-    size = 240,
-}: TableQRCodeProps) {
+export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
     const qrRef = useRef<HTMLDivElement>(null);
 
-    const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL ??
-        "http://localhost:3000";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
     const feedbackUrl = `${siteUrl}/s/${token}`;
 
@@ -87,20 +77,9 @@ export default function TableQRCode({
 
             context.fillStyle = "#ffffff";
 
-            context.fillRect(
-                0,
-                0,
-                canvas.width,
-                canvas.height,
-            );
+            context.fillRect(0, 0, canvas.width, canvas.height);
 
-            context.drawImage(
-                image,
-                0,
-                0,
-                canvas.width,
-                canvas.height,
-            );
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
             URL.revokeObjectURL(url);
 
@@ -109,11 +88,9 @@ export default function TableQRCode({
                     return;
                 }
 
-                const pngUrl =
-                    URL.createObjectURL(pngBlob);
+                const pngUrl = URL.createObjectURL(pngBlob);
 
-                const link =
-                    document.createElement("a");
+                const link = document.createElement("a");
 
                 link.href = pngUrl;
                 link.download = `${token}-qr.png`;

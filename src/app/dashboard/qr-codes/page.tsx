@@ -74,5 +74,5 @@ export default async function QRCodePage({ searchParams }: QRCodePageProps) {
 
     const result = await getQRCodeTables(userContext.restaurantId, filters);
 
-    return <QRCodePageClient result={result} />;
+    return <QRCodePageClient result={result} filters={filters} />;
 }

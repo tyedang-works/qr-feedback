@@ -119,7 +119,16 @@ export default function QRCodeBulkPrintView({
                     className="qr-print-area"
                     sx={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+
+                        // Mobile: 1 column
+                        // Tablet: 2 columns
+                        // Desktop: 3 columns
+                        gridTemplateColumns: {
+                            xs: "1fr",
+                            sm: "repeat(2, minmax(0, 1fr))",
+                            md: "repeat(3, minmax(0, 1fr))",
+                        },
+
                         gap: 2,
 
                         "@media print": {
@@ -181,6 +190,9 @@ export default function QRCodeBulkPrintView({
                                         alignItems: "center",
                                         justifyContent: "center",
                                         mt: 1,
+                                        width: 180,
+                                        height: 180,
+                                        flexShrink: 0,
                                     }}
                                 >
                                     <QRCodeSVG

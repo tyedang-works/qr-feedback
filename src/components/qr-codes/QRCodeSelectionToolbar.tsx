@@ -6,12 +6,18 @@ import { faPrint, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 type QRCodeSelectionToolbarProps = {
     selectedCount: number;
+    selectableTotal: number;
+    showSelectAll: boolean;
+    onSelectAll: () => void;
     onPrint: () => void;
     onClear: () => void;
 };
 
 export default function QRCodeSelectionToolbar({
     selectedCount,
+    selectableTotal,
+    showSelectAll,
+    onSelectAll,
     onPrint,
     onClear,
 }: QRCodeSelectionToolbarProps) {
@@ -28,45 +34,113 @@ export default function QRCodeSelectionToolbar({
                 gap: 2,
                 minHeight: 52,
                 px: 2,
+                py: 1,
                 border: "1px solid #d0d5dd",
                 borderRadius: 2,
                 backgroundColor: "#f9fafb",
+
+                /*
+                 * Desktop
+                 */
+                flexDirection: "row",
+
+                /*
+                 * Mobile
+                 */
+                "@media (max-width: 767px)": {
+                    alignItems: "stretch",
+                    flexDirection: "column",
+                    gap: 1,
+                    px: 1.5,
+                    py: 1.25,
+                },
             }}
         >
-            <Typography
-                sx={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: "#344054",
-                }}
-            >
-                ✓ {selectedCount} bàn đã chọn
-            </Typography>
-
+            {/* Selection information */}
             <Box
                 sx={{
                     display: "flex",
                     alignItems: "center",
+                    gap: 1.5,
+                    minWidth: 0,
+
+                    "@media (max-width: 767px)": {
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                        gap: 0.5,
+                        width: "100%",
+                    },
+                }}
+            >
+                <Typography
+                    sx={{
+                        flexShrink: 0,
+                        fontSize: 14,
+                        fontWeight: 500,
+                        color: "#344054",
+                    }}
+                >
+                    ✓ {selectedCount} bàn đã chọn
+                </Typography>
+
+                {showSelectAll && selectableTotal > selectedCount && (
+                    <Button
+                        type="button"
+                        variant="text"
+                        onClick={onSelectAll}
+                        sx={{
+                            minWidth: 0,
+                            p: 0,
+                            fontSize: 13,
+                            fontWeight: 600,
+                            lineHeight: 1.5,
+                            textTransform: "none",
+                            justifyContent: "flex-start",
+                            textAlign: "left",
+                            whiteSpace: "normal",
+                            color: "#1976d2",
+
+                            "&:hover": {
+                                backgroundColor: "transparent",
+                                textDecoration: "underline",
+                            },
+
+                            "@media (max-width: 767px)": {
+                                width: "100%",
+                                display: "block",
+                            },
+                        }}
+                    >
+                        Chọn tất cả {selectableTotal} bàn phù hợp với bộ lọc
+                    </Button>
+                )}
+            </Box>
+
+            {/* Actions */}
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
                     gap: 1,
+                    flexShrink: 0,
+
+                    "@media (max-width: 767px)": {
+                        width: "100%",
+                        justifyContent: "flex-end",
+                    },
                 }}
             >
                 <Button
                     type="button"
                     variant="contained"
-                    onClick={onPrint}
                     startIcon={<FontAwesomeIcon icon={faPrint} />}
+                    onClick={onPrint}
                     sx={{
                         minHeight: 36,
-                        px: 1.5,
-                        borderRadius: 1.5,
-                        fontSize: 13,
-                        fontWeight: 600,
+                        px: 1.75,
                         textTransform: "none",
-                        backgroundColor: "#193B56",
-
-                        "&:hover": {
-                            backgroundColor: "#142F45",
-                        },
+                        whiteSpace: "nowrap",
                     }}
                 >
                     In QR ({selectedCount})
@@ -81,6 +155,7 @@ export default function QRCodeSelectionToolbar({
                         display: "inline-flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        flexShrink: 0,
                         width: 32,
                         height: 32,
                         p: 0,
@@ -91,8 +166,7 @@ export default function QRCodeSelectionToolbar({
                         cursor: "pointer",
 
                         "&:hover": {
-                            backgroundColor: "#f2f4f7",
-                            color: "#344054",
+                            backgroundColor: "#eaecf0",
                         },
                     }}
                 >

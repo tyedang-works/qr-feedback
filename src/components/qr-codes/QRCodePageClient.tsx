@@ -6,13 +6,17 @@ import { useState } from "react";
 import QRCodeFilterBar from "./QRCodeFilterBar";
 import QRCodeList from "./QRCodeList";
 
-import type { QRCodeListResult } from "@/lib/qr-codes/types";
+import type { QRCodeFilters, QRCodeListResult } from "@/lib/qr-codes/types";
 
 type QRCodePageClientProps = {
     result: QRCodeListResult;
+    filters: QRCodeFilters;
 };
 
-export default function QRCodePageClient({ result }: QRCodePageClientProps) {
+export default function QRCodePageClient({
+    result,
+    filters,
+}: QRCodePageClientProps) {
     const [isBulkPrinting, setIsBulkPrinting] = useState(false);
 
     return (
@@ -21,6 +25,7 @@ export default function QRCodePageClient({ result }: QRCodePageClientProps) {
 
             <QRCodeList
                 result={result}
+                filters={filters}
                 onBulkPrintStart={() => setIsBulkPrinting(true)}
                 onBulkPrintClose={() => setIsBulkPrinting(false)}
             />

@@ -22,6 +22,7 @@ export type QRCodeFilters = {
 export type QRCodeListResult = {
     data: QRCodeTable[];
     total: number;
+    selectableTotal: number;
     page: number;
     pageSize: QRCodePageSize;
     totalPages: number;

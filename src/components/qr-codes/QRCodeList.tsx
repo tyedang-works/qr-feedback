@@ -1,21 +1,26 @@
 "use client";
 
 import { Box, Checkbox, Divider, Stack, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { getSelectedQRCodeTables } from "@/app/dashboard/qr-codes/actions";
+import {
+    getAllQRCodeTablesForBulkPrint,
+    getSelectedQRCodeTables,
+} from "@/app/dashboard/qr-codes/actions";
+
+import type {
+    QRCodeFilters,
+    QRCodeListResult,
+    QRCodeSelection,
+    QRCodeTable,
+} from "@/lib/qr-codes/types";
+
 import QRCodeBulkPrintView from "./QRCodeBulkPrintView";
 import QRCodePagination from "./QRCodePagination";
 import QRCodePreviewButton from "./QRCodePreviewButton";
 import QRCodePreviewDialog from "./QRCodePreviewDialog";
 import QRCodePrintView from "./QRCodePrintView";
 import QRCodeSelectionToolbar from "./QRCodeSelectionToolbar";
-
-import type {
-    QRCodeListResult,
-    QRCodeSelection,
-    QRCodeTable,
-} from "@/lib/qr-codes/types";
 
 function getStatusStyles(isActive: boolean) {
     if (isActive) {
@@ -37,16 +42,18 @@ function getStatusStyles(isActive: boolean) {
 
 type QRCodeListProps = {
     result: QRCodeListResult;
+    filters: QRCodeFilters;
     onBulkPrintStart: () => void;
     onBulkPrintClose: () => void;
 };
 
 export default function QRCodeList({
     result,
+    filters,
     onBulkPrintStart,
     onBulkPrintClose,
 }: QRCodeListProps) {
-    const { data, total, page, pageSize, totalPages } = result;
+    const { data, total, page, pageSize, totalPages, selectableTotal } = result;
 
     const [selectedTable, setSelectedTable] = useState<QRCodeTable | null>(
         null,
@@ -72,40 +79,90 @@ export default function QRCodeList({
         excludedIds: [],
     });
 
-    const selectedIds = selection.selectedIds;
+    /*
+     * `all` selection belongs to the current filter set.
+     *
+     * When keyword/status/sort changes, an old "select all"
+     * selection must not continue to apply to the new result set.
+     *
+     * Manual selections intentionally remain untouched.
+     */
+    const filterKey = [filters.keyword, filters.status, filters.sort].join("|");
+
+    const previousFilterKeyRef = useRef(filterKey);
+
+    useEffect(() => {
+        if (previousFilterKeyRef.current === filterKey) {
+            return;
+        }
+
+        previousFilterKeyRef.current = filterKey;
+
+        setSelection((currentSelection) => {
+            if (currentSelection.mode !== "all") {
+                return currentSelection;
+            }
+
+            return {
+                mode: "manual",
+                selectedIds: [],
+                excludedIds: [],
+            };
+        });
+    }, [filterKey]);
 
     const isSelected = (id: string) => {
         if (selection.mode === "all") {
             return !selection.excludedIds.includes(id);
         }
 
-        return selectedIds.includes(id);
+        return selection.selectedIds.includes(id);
     };
 
+    /*
+     * Toggle one table.
+     *
+     * Manual mode:
+     *   - add/remove table ID from selectedIds
+     *
+     * All mode:
+     *   - all matching active tables are selected
+     *   - clicking a table adds/removes it from excludedIds
+     */
     const handleToggleSelection = (id: string) => {
-        setSelection((current) => {
-            if (current.mode === "all") {
-                const isExcluded = current.excludedIds.includes(id);
+        setSelection((currentSelection) => {
+            if (currentSelection.mode === "all") {
+                const isExcluded = currentSelection.excludedIds.includes(id);
 
                 return {
-                    ...current,
+                    mode: "all",
+                    selectedIds: [],
                     excludedIds: isExcluded
-                        ? current.excludedIds.filter((item) => item !== id)
-                        : [...current.excludedIds, id],
+                        ? currentSelection.excludedIds.filter(
+                              (excludedId) => excludedId !== id,
+                          )
+                        : [...currentSelection.excludedIds, id],
                 };
             }
 
-            const isSelected = current.selectedIds.includes(id);
+            const isCurrentlySelected =
+                currentSelection.selectedIds.includes(id);
 
             return {
-                ...current,
-                selectedIds: isSelected
-                    ? current.selectedIds.filter((item) => item !== id)
-                    : [...current.selectedIds, id],
+                mode: "manual",
+                selectedIds: isCurrentlySelected
+                    ? currentSelection.selectedIds.filter(
+                          (selectedId) => selectedId !== id,
+                      )
+                    : [...currentSelection.selectedIds, id],
+                excludedIds: [],
             };
         });
     };
 
+    /*
+     * Only active tables can be selected for QR printing.
+     */
     const selectableTables = data.filter((table) => table.isActive);
 
     const selectedOnCurrentPage = selectableTables.filter((table) =>
@@ -119,51 +176,73 @@ export default function QRCodeList({
     const someCurrentPageSelected =
         selectedOnCurrentPage.length > 0 && !allCurrentPageSelected;
 
+    /*
+     * Toggle all selectable tables on the current page.
+     *
+     * Manual mode:
+     *   - select/deselect current page
+     *
+     * All mode:
+     *   - current page is selected by default
+     *   - clicking header excludes current page
+     *   - clicking again removes those exclusions
+     */
     const handleSelectCurrentPage = () => {
-        setSelection((current) => {
-            const currentPageIds = selectableTables.map((table) => table.id);
+        if (selectableTables.length === 0) {
+            return;
+        }
 
-            if (current.mode === "all") {
-                if (allCurrentPageSelected) {
-                    return {
-                        ...current,
-                        excludedIds: [
-                            ...current.excludedIds,
-                            ...currentPageIds.filter(
-                                (id) => !current.excludedIds.includes(id),
-                            ),
-                        ],
-                    };
-                }
-
-                return {
-                    ...current,
-                    excludedIds: current.excludedIds.filter(
-                        (id) => !currentPageIds.includes(id),
-                    ),
-                };
-            }
-
+        if (selection.mode === "all") {
             if (allCurrentPageSelected) {
-                return {
-                    ...current,
-                    selectedIds: current.selectedIds.filter(
-                        (id) => !currentPageIds.includes(id),
+                setSelection((currentSelection) => ({
+                    mode: "all",
+                    selectedIds: [],
+                    excludedIds: [
+                        ...currentSelection.excludedIds,
+                        ...selectableTables
+                            .map((table) => table.id)
+                            .filter(
+                                (id) =>
+                                    !currentSelection.excludedIds.includes(id),
+                            ),
+                    ],
+                }));
+            } else {
+                setSelection((currentSelection) => ({
+                    mode: "all",
+                    selectedIds: [],
+                    excludedIds: currentSelection.excludedIds.filter(
+                        (id) =>
+                            !selectableTables.some((table) => table.id === id),
                     ),
-                };
+                }));
             }
 
-            const selectedSet = new Set(current.selectedIds);
+            return;
+        }
 
-            currentPageIds.forEach((id) => {
-                selectedSet.add(id);
-            });
+        if (allCurrentPageSelected) {
+            setSelection((currentSelection) => ({
+                mode: "manual",
+                selectedIds: currentSelection.selectedIds.filter(
+                    (id) => !selectableTables.some((table) => table.id === id),
+                ),
+                excludedIds: [],
+            }));
 
-            return {
-                ...current,
-                selectedIds: Array.from(selectedSet),
-            };
-        });
+            return;
+        }
+
+        setSelection((currentSelection) => ({
+            mode: "manual",
+            selectedIds: [
+                ...currentSelection.selectedIds,
+                ...selectableTables
+                    .map((table) => table.id)
+                    .filter((id) => !currentSelection.selectedIds.includes(id)),
+            ],
+            excludedIds: [],
+        }));
     };
 
     const handleClearSelection = () => {
@@ -174,8 +253,17 @@ export default function QRCodeList({
         });
     };
 
+    /*
+     * Manual:
+     *   selectedIds.length
+     *
+     * All:
+     *   selectableTotal - excludedIds.length
+     */
     const selectedCount =
-        selection.mode === "manual" ? selection.selectedIds.length : 0;
+        selection.mode === "all"
+            ? Math.max(selectableTotal - selection.excludedIds.length, 0)
+            : selection.selectedIds.length;
 
     const handleOpenPreview = (table: QRCodeTable) => {
         setSelectedTable(table);
@@ -194,18 +282,28 @@ export default function QRCodeList({
     };
 
     const handleBulkPrint = async () => {
-        if (
-            selection.mode !== "manual" ||
-            selection.selectedIds.length === 0 ||
-            loadingBulkPrint
-        ) {
+        if (loadingBulkPrint) {
+            return;
+        }
+
+        if (selection.mode === "manual" && selection.selectedIds.length === 0) {
+            return;
+        }
+
+        if (selection.mode === "all" && selectedCount === 0) {
             return;
         }
 
         setLoadingBulkPrint(true);
 
         try {
-            const tables = await getSelectedQRCodeTables(selection.selectedIds);
+            const tables =
+                selection.mode === "all"
+                    ? await getAllQRCodeTablesForBulkPrint(
+                          filters,
+                          selection.excludedIds,
+                      )
+                    : await getSelectedQRCodeTables(selection.selectedIds);
 
             if (tables.length === 0) {
                 return;
@@ -219,6 +317,18 @@ export default function QRCodeList({
         } finally {
             setLoadingBulkPrint(false);
         }
+    };
+
+    const handleSelectAll = () => {
+        if (selectableTotal === 0) {
+            return;
+        }
+
+        setSelection({
+            mode: "all",
+            selectedIds: [],
+            excludedIds: [],
+        });
     };
 
     if (isBulkPrinting) {
@@ -291,9 +401,14 @@ export default function QRCodeList({
     return (
         <>
             <Stack sx={{ gap: 2 }}>
-                {/* Selection toolbar */}
                 <QRCodeSelectionToolbar
                     selectedCount={selectedCount}
+                    selectableTotal={selectableTotal}
+                    showSelectAll={
+                        selection.mode === "manual" &&
+                        selectableTotal > selectedCount
+                    }
+                    onSelectAll={handleSelectAll}
                     onPrint={handleBulkPrint}
                     onClear={handleClearSelection}
                 />
@@ -563,7 +678,11 @@ export default function QRCodeList({
 
                                     <Divider />
 
-                                    <Stack sx={{ gap: 0.5 }}>
+                                    <Stack
+                                        sx={{
+                                            gap: 0.5,
+                                        }}
+                                    >
                                         <Typography
                                             sx={{
                                                 fontSize: 12,

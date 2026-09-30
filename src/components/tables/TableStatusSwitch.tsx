@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Box, Switch, Typography } from "@mui/material";
+import { Box, CircularProgress, Switch, Typography } from "@mui/material";
 
 import { updateTableStatusAction } from "@/app/dashboard/tables/actions";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
@@ -90,17 +90,47 @@ export default function TableStatusSwitch({
                     gap: 0.75,
                 }}
             >
-                <Switch
-                    checked={checked}
-                    onChange={handleChange}
-                    disabled={loading}
-                    slotProps={{
-                        input: {
-                            "aria-label": checked ? "Tắt bàn" : "Bật bàn",
-                        },
+                <Box
+                    sx={{
+                        position: "relative",
+                        width: 38,
+                        height: 22,
+                        flexShrink: 0,
                     }}
-                    sx={tableStatusSwitchSx}
-                />
+                >
+                    <Switch
+                        checked={checked}
+                        onChange={handleChange}
+                        disabled={loading}
+                        slotProps={{
+                            input: {
+                                "aria-label": checked ? "Tắt bàn" : "Bật bàn",
+                            },
+                        }}
+                        sx={tableStatusSwitchSx}
+                    />
+
+                    {loading && (
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                inset: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                pointerEvents: "none",
+                            }}
+                        >
+                            <CircularProgress
+                                size={12}
+                                thickness={5}
+                                sx={{
+                                    color: "#ffffff",
+                                }}
+                            />
+                        </Box>
+                    )}
+                </Box>
 
                 <Typography sx={getTableStatusLabelSx(checked)}>
                     {checked ? "Đang hoạt động" : "Đã tắt"}

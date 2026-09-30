@@ -29,7 +29,6 @@ export default async function TablesPage() {
         >
             <Stack
                 sx={{
-                    maxWidth: 900,
                     flexDirection: {
                         xs: "column",
                         sm: "row",

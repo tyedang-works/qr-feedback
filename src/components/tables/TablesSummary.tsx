@@ -32,7 +32,6 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                 },
                 gap: 2,
                 width: "100%",
-                maxWidth: 900,
             }}
         >
             {summaryItems.map((item) => (

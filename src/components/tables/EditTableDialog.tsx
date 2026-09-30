@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import { updateTableAction } from "@/app/dashboard/tables/actions";
@@ -47,7 +47,6 @@ function createValidationSchema(tableName: string, tableNames: string[]) {
 
                 return !normalizedTableNames.includes(normalizedName);
             }),
-        isActive: yup.boolean().required(),
     });
 }
 
@@ -238,9 +237,21 @@ export default function EditTableDialog({
                                             },
                                         }}
                                     >
-                                        {isSubmitting
-                                            ? "Đang lưu..."
-                                            : "Lưu thay đổi"}
+                                        {isSubmitting ? (
+                                            <>
+                                                <CircularProgress
+                                                    size={16}
+                                                    thickness={5}
+                                                    sx={{
+                                                        color: "inherit",
+                                                        mr: 1,
+                                                    }}
+                                                />
+                                                Đang lưu...
+                                            </>
+                                        ) : (
+                                            "Lưu thay đổi"
+                                        )}
                                     </Button>
                                 </>
                             }

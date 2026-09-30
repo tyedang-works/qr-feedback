@@ -16,7 +16,6 @@ export default function TablesList({ data }: TablesListProps) {
         <Box
             sx={{
                 width: "100%",
-                maxWidth: 900,
                 backgroundColor: "#ffffff",
                 border: "1px solid #eaecf0",
                 borderRadius: 2,

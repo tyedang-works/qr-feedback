@@ -1,16 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-import { Button } from "@mui/material";
-
-import { Form, Formik, type FormikHelpers } from "formik";
-import * as yup from "yup";
-
 import { createTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
+import { Button, CircularProgress } from "@mui/material";
+import { Form, Formik, type FormikHelpers } from "formik";
+import { useMemo, useState } from "react";
+import * as yup from "yup";
 
 type AddTableFormValues = {
     name: string;
@@ -229,9 +226,21 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
                                             },
                                         }}
                                     >
-                                        {isSubmitting
-                                            ? "Đang thêm..."
-                                            : "Thêm bàn"}
+                                        {isSubmitting ? (
+                                            <>
+                                                <CircularProgress
+                                                    size={16}
+                                                    thickness={5}
+                                                    sx={{
+                                                        color: "inherit",
+                                                        mr: 1,
+                                                    }}
+                                                />
+                                                Đang thêm...
+                                            </>
+                                        ) : (
+                                            "Thêm bàn"
+                                        )}
                                     </Button>
                                 </>
                             }

@@ -39,7 +39,6 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                     xs: 2.5,
                     sm: 3,
                 },
-                maxWidth: 900,
                 mx: "auto",
                 width: "100%",
             }}
@@ -51,17 +50,23 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                     style={{
                         display: "inline-flex",
                         alignItems: "center",
+                        width: "fit-content",
+                        marginBottom: 12,
                         textDecoration: "none",
                         color: "#667085",
+                        fontFamily: "var(--font-fs-magistral), sans-serif",
                         fontSize: 13,
                         fontWeight: 500,
-                        marginBottom: 12,
+                        lineHeight: 1.5,
+                        transition: "color 0.2s ease",
                     }}
                 >
                     <span
                         style={{
-                            fontSize: 18,
+                            display: "inline-flex",
+                            alignItems: "center",
                             marginRight: 6,
+                            fontSize: 18,
                             lineHeight: 1,
                         }}
                     >

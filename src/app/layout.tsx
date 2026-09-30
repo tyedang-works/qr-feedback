@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
+import type { Metadata } from "next";
 
-import "./globals.css";
 import MuiThemeProvider from "@/components/common/providers/MuiThemeProvider";
+import { momoTrustSans } from "./fonts";
+import "./globals.css";
 
 export const metadata: Metadata = {
     title: "QR Feedback",
@@ -16,7 +17,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="vi">
-            <body>
+            <body className={momoTrustSans.variable}>
                 <AppRouterCacheProvider>
                     <MuiThemeProvider>{children}</MuiThemeProvider>
                 </AppRouterCacheProvider>

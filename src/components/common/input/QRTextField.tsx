@@ -72,6 +72,7 @@ export default function QRTextField({
                         py: 1.25,
                         fontSize: 14,
                         color: "#344054",
+                        lineHeight: 1,
                     },
 
                     "& .MuiInputBase-input::placeholder": {

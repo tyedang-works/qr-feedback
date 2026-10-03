@@ -8,11 +8,12 @@ export async function getRestaurantSettings(
 
     const { data, error } = await supabase
         .from("restaurants")
-        .select("id, name")
+        .select("id, name, phone, email, address")
         .eq("id", restaurantId)
         .single();
 
     if (error) {
+        console.error("Failed to get restaurant settings:", error);
         throw new Error("Không thể tải thông tin nhà hàng.");
     }
 

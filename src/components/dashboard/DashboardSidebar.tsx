@@ -30,6 +30,10 @@ const navigationItems: NavigationItem[] = [
         label: "QR Codes",
         href: "/dashboard/qr-codes",
     },
+    {
+        label: "Cài đặt",
+        href: "/dashboard/settings",
+    },
 ];
 
 export default function DashboardSidebar() {

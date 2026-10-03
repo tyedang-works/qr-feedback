@@ -89,7 +89,7 @@ export default async function SettingsPage() {
                         </Typography>
                     </Box>
 
-                    <RestaurantSettingsForm initialName={restaurant.name} />
+                    <RestaurantSettingsForm initialSettings={restaurant} />
                 </Stack>
             </Box>
         </Stack>

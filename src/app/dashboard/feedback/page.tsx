@@ -1,11 +1,13 @@
 import FeedbackList from "@/components/feedback/FeedbackList";
 import FeedbackPagination from "@/components/feedback/FeedbackPagination";
 import FeedbackToolbar from "@/components/feedback/FeedbackToolbar";
+import { USER_ROLES } from "@/lib/auth/constants";
 import { getUserContext } from "@/lib/auth/queries";
 import { FEEDBACK_PAGE_SIZE } from "@/lib/feedback/constants";
 import { getFeedbackList } from "@/lib/feedback/queries";
 import { getRestaurantTables } from "@/lib/tables/queries";
 import { Box, Stack, Typography } from "@mui/material";
+import { redirect } from "next/navigation";
 
 type FeedbackPageProps = {
     searchParams: Promise<{
@@ -37,6 +39,10 @@ export default async function FeedbackPage({
 
     if (!userContext) {
         return null;
+    }
+
+    if (userContext.role === USER_ROLES.MANAGER) {
+        redirect("/dashboard");
     }
 
     const [feedback, tables] = await Promise.all([

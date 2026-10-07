@@ -1,7 +1,8 @@
 import FeedbackDetail from "@/components/feedback/FeedbackDetail";
+import { USER_ROLES } from "@/lib/auth/constants";
 import { getUserContext } from "@/lib/auth/queries";
 import { getFeedbackDetail } from "@/lib/feedback/queries";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 type FeedbackDetailPageProps = {
     params: Promise<{
@@ -18,6 +19,10 @@ export default async function FeedbackDetailPage({
 
     if (!userContext) {
         return null;
+    }
+
+    if (userContext.role === USER_ROLES.MANAGER) {
+        redirect("/dashboard");
     }
 
     const feedback = await getFeedbackDetail(

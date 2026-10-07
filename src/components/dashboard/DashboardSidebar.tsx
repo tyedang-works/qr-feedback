@@ -2,12 +2,18 @@
 
 import Logo from "@/components/common/Logo";
 import DashboardNavigationProgress from "@/components/dashboard/DashboardNavigationProgress";
+
 import { createClient } from "@/lib/supabase/browser";
+
 import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
+
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+
 import Link from "next/link";
+
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useTransition } from "react";
 
 type NavigationItem = {
     label: string;
@@ -42,10 +48,8 @@ export default function DashboardSidebar() {
     const pathname = usePathname();
     const supabase = createClient();
 
-    const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
     const [role, setRole] = useState<UserRole | null>(null);
-
-    const isNavigating = navigatingTo !== null && pathname !== navigatingTo;
+    const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
         const loadUserRole = async () => {
@@ -100,14 +104,16 @@ export default function DashboardSidebar() {
             return;
         }
 
-        setNavigatingTo(href);
+        startTransition(() => {
+            router.push(href);
+        });
     };
 
     const isOwner = role === USER_ROLES.OWNER;
 
     return (
         <>
-            <DashboardNavigationProgress isLoading={isNavigating} />
+            <DashboardNavigationProgress isLoading={isPending} />
 
             <Box
                 sx={{
@@ -192,8 +198,6 @@ export default function DashboardSidebar() {
                             return (
                                 <Button
                                     key={item.label}
-                                    component={Link}
-                                    href={item.href}
                                     fullWidth
                                     onClick={() => handleNavigation(item.href!)}
                                     sx={buttonSx}

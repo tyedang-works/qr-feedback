@@ -7,9 +7,10 @@ import type { RestaurantTable } from "@/lib/tables/types";
 
 type TablesListProps = {
     data: RestaurantTable[];
+    canManageTables: boolean;
 };
 
-export default function TablesList({ data }: TablesListProps) {
+export default function TablesList({ data, canManageTables }: TablesListProps) {
     const tableNames = data.map((table) => table.name);
 
     return (
@@ -65,7 +66,9 @@ export default function TablesList({ data }: TablesListProps) {
                         <Box
                             sx={{
                                 display: "grid",
-                                gridTemplateColumns: "1.5fr 1.5fr 1fr 160px",
+                                gridTemplateColumns: canManageTables
+                                    ? "1.5fr 1.5fr 1fr 160px"
+                                    : "1.5fr 1.5fr 1fr",
                                 alignItems: "center",
                                 px: 2.5,
                                 py: 1.5,
@@ -102,16 +105,18 @@ export default function TablesList({ data }: TablesListProps) {
                                 Trạng thái hoạt động
                             </Typography>
 
-                            <Typography
-                                sx={{
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    color: "#667085",
-                                    textAlign: "right",
-                                }}
-                            >
-                                Thao tác
-                            </Typography>
+                            {canManageTables && (
+                                <Typography
+                                    sx={{
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        color: "#667085",
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    Thao tác
+                                </Typography>
+                            )}
                         </Box>
 
                         <Divider />
@@ -123,8 +128,9 @@ export default function TablesList({ data }: TablesListProps) {
                                 <Box
                                     sx={{
                                         display: "grid",
-                                        gridTemplateColumns:
-                                            "1.5fr 1.5fr 1fr 160px",
+                                        gridTemplateColumns: canManageTables
+                                            ? "1.5fr 1.5fr 1fr 160px"
+                                            : "1.5fr 1.5fr 1fr",
                                         alignItems: "center",
                                         px: 2.5,
                                         py: 1.75,
@@ -161,28 +167,31 @@ export default function TablesList({ data }: TablesListProps) {
                                     <TableStatusSwitch
                                         tableId={table.id}
                                         isActive={table.isActive}
+                                        canManageTables={canManageTables}
                                     />
 
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "flex-end",
-                                            gap: 0.5,
-                                        }}
-                                    >
-                                        <EditTableDialog
-                                            tableId={table.id}
-                                            tableName={table.name}
-                                            tableNames={tableNames}
-                                        />
+                                    {canManageTables && (
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "flex-end",
+                                                gap: 0.5,
+                                            }}
+                                        >
+                                            <EditTableDialog
+                                                tableId={table.id}
+                                                tableName={table.name}
+                                                tableNames={tableNames}
+                                            />
 
-                                        <DeleteTableDialog
-                                            tableId={table.id}
-                                            tableName={table.name}
-                                            disabled={table.hasFeedback}
-                                        />
-                                    </Box>
+                                            <DeleteTableDialog
+                                                tableId={table.id}
+                                                tableName={table.name}
+                                                disabled={table.hasFeedback}
+                                            />
+                                        </Box>
+                                    )}
                                 </Box>
                             </Box>
                         ))}
@@ -244,26 +253,28 @@ export default function TablesList({ data }: TablesListProps) {
                                             </Typography>
                                         </Box>
 
-                                        <Stack
-                                            sx={{
-                                                flexDirection: "row",
-                                                alignItems: "center",
-                                                gap: 0.5,
-                                                flexShrink: 0,
-                                            }}
-                                        >
-                                            <EditTableDialog
-                                                tableId={table.id}
-                                                tableName={table.name}
-                                                tableNames={tableNames}
-                                            />
+                                        {canManageTables && (
+                                            <Stack
+                                                sx={{
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    gap: 0.5,
+                                                    flexShrink: 0,
+                                                }}
+                                            >
+                                                <EditTableDialog
+                                                    tableId={table.id}
+                                                    tableName={table.name}
+                                                    tableNames={tableNames}
+                                                />
 
-                                            <DeleteTableDialog
-                                                tableId={table.id}
-                                                tableName={table.name}
-                                                disabled={table.hasFeedback}
-                                            />
-                                        </Stack>
+                                                <DeleteTableDialog
+                                                    tableId={table.id}
+                                                    tableName={table.name}
+                                                    disabled={table.hasFeedback}
+                                                />
+                                            </Stack>
+                                        )}
                                     </Stack>
 
                                     <Box
@@ -274,6 +285,7 @@ export default function TablesList({ data }: TablesListProps) {
                                         <TableStatusSwitch
                                             tableId={table.id}
                                             isActive={table.isActive}
+                                            canManageTables={canManageTables}
                                         />
                                     </Box>
                                 </Box>

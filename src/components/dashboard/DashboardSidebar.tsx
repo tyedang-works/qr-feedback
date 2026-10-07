@@ -3,6 +3,7 @@
 import Logo from "@/components/common/Logo";
 import DashboardNavigationProgress from "@/components/dashboard/DashboardNavigationProgress";
 import { createClient } from "@/lib/supabase/browser";
+import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -41,11 +42,39 @@ export default function DashboardSidebar() {
     const pathname = usePathname();
     const supabase = createClient();
 
-    const [isNavigating, setIsNavigating] = useState(false);
+    const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+    const [role, setRole] = useState<UserRole | null>(null);
+
+    const isNavigating = navigatingTo !== null && pathname !== navigatingTo;
 
     useEffect(() => {
-        setIsNavigating(false);
-    }, [pathname]);
+        const loadUserRole = async () => {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
+
+            if (!user) {
+                setRole(null);
+                return;
+            }
+
+            const { data: profile, error } = await supabase
+                .from("profiles")
+                .select("role")
+                .eq("id", user.id)
+                .single();
+
+            if (error || !profile) {
+                console.error("Failed to get current user role:", error);
+                setRole(null);
+                return;
+            }
+
+            setRole(profile.role as UserRole);
+        };
+
+        loadUserRole();
+    }, [supabase]);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -71,8 +100,10 @@ export default function DashboardSidebar() {
             return;
         }
 
-        setIsNavigating(true);
+        setNavigatingTo(href);
     };
+
+    const isOwner = role === USER_ROLES.OWNER;
 
     return (
         <>
@@ -140,6 +171,7 @@ export default function DashboardSidebar() {
                                 backgroundColor: active ? "#eef4f8" : "#f8fafc",
                             },
                         };
+
                         if (item.href) {
                             const isCurrentPage =
                                 item.href === "/dashboard" &&
@@ -185,6 +217,45 @@ export default function DashboardSidebar() {
                             </Button>
                         );
                     })}
+
+                    {/* Owner only */}
+                    {isOwner && (
+                        <Button
+                            component={Link}
+                            href="/dashboard/users-roles"
+                            fullWidth
+                            onClick={() =>
+                                handleNavigation("/dashboard/users-roles")
+                            }
+                            sx={{
+                                justifyContent: "flex-start",
+                                px: 1.5,
+                                py: 1.25,
+                                borderRadius: 1.5,
+                                color: isActive("/dashboard/users-roles")
+                                    ? "#193B56"
+                                    : "#667085",
+                                backgroundColor: isActive(
+                                    "/dashboard/users-roles",
+                                )
+                                    ? "#eef4f8"
+                                    : "transparent",
+                                fontWeight: isActive("/dashboard/users-roles")
+                                    ? 700
+                                    : 500,
+                                textTransform: "none",
+                                "&:hover": {
+                                    backgroundColor: isActive(
+                                        "/dashboard/users-roles",
+                                    )
+                                        ? "#eef4f8"
+                                        : "#f8fafc",
+                                },
+                            }}
+                        >
+                            Users & Roles
+                        </Button>
+                    )}
                 </Stack>
 
                 {/* Push Admin section to bottom */}

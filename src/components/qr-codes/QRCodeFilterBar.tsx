@@ -11,7 +11,7 @@ import type {
 import { MenuItem, Stack } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const PAGE_SIZES: QRCodePageSize[] = [10, 25, 50];
 
@@ -82,22 +82,25 @@ export default function QRCodeFilterBar() {
 
     const pageSize = isPageSize(pageSizeParam) ? pageSizeParam : 10;
 
-    const updateParams = (updates: Record<string, string | null>) => {
-        const params = new URLSearchParams(searchParams.toString());
+    const updateParams = useCallback(
+        (updates: Record<string, string | null>) => {
+            const params = new URLSearchParams(searchParams.toString());
 
-        Object.entries(updates).forEach(([key, value]) => {
-            if (value === null || value === "") {
-                params.delete(key);
-                return;
-            }
+            Object.entries(updates).forEach(([key, value]) => {
+                if (value === null || value === "") {
+                    params.delete(key);
+                    return;
+                }
 
-            params.set(key, value);
-        });
+                params.set(key, value);
+            });
 
-        params.set("page", "1");
+            params.set("page", "1");
 
-        router.replace(`${pathname}?${params.toString()}`);
-    };
+            router.replace(`${pathname}?${params.toString()}`);
+        },
+        [pathname, router, searchParams],
+    );
 
     const handleKeywordChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -131,7 +134,7 @@ export default function QRCodeFilterBar() {
         updateParams({
             keyword: debouncedKeyword,
         });
-    }, [debouncedKeyword, keywordParam]);
+    }, [debouncedKeyword, keywordParam, updateParams]);
 
     return (
         <Stack

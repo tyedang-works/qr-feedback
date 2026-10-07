@@ -21,7 +21,12 @@ export default function QRTextField({
     const hasError = Boolean(errorMessage);
 
     return (
-        <Box sx={{ width: "100%", position: "relative" }}>
+        <Box
+            sx={{
+                width: "100%",
+                position: "relative",
+            }}
+        >
             {label && (
                 <Typography component="label" sx={formLabelSx}>
                     {label}

@@ -1,5 +1,6 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 
+import AddTableDialog from "@/components/tables/AddTableDialog";
 import TablesList from "@/components/tables/TablesList";
 import TablesSummary from "@/components/tables/TablesSummary";
 import { getUserContext } from "@/lib/auth/queries";
@@ -7,7 +8,6 @@ import {
     getRestaurantTableList,
     getRestaurantTableSummary,
 } from "@/lib/tables/queries";
-import AddTableDialog from "@/components/tables/AddTableDialog";
 
 export default async function TablesPage() {
     const userContext = await getUserContext();
@@ -20,6 +20,9 @@ export default async function TablesPage() {
         getRestaurantTableList(userContext.restaurantId),
         getRestaurantTableSummary(userContext.restaurantId),
     ]);
+
+    const canManageTables =
+        userContext.role === "owner" || userContext.role === "manager";
 
     return (
         <Stack
@@ -67,14 +70,16 @@ export default async function TablesPage() {
                     </Typography>
                 </Box>
 
-                <AddTableDialog
-                    tableNames={tables.map((table) => table.name)}
-                />
+                {canManageTables && (
+                    <AddTableDialog
+                        tableNames={tables.map((table) => table.name)}
+                    />
+                )}
             </Stack>
 
             <TablesSummary data={summary} />
 
-            <TablesList data={tables} />
+            <TablesList data={tables} canManageTables={canManageTables} />
         </Stack>
     );
 }

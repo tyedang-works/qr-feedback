@@ -368,7 +368,7 @@ export default function LoginForm() {
                                 color: "text.secondary",
                             }}
                         >
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <Box
                                 component="span"
                                 sx={{

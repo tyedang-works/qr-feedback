@@ -20,11 +20,13 @@ type SnackbarState = {
 type TableStatusSwitchProps = {
     tableId: string;
     isActive: boolean;
+    canManageTables: boolean;
 };
 
 export default function TableStatusSwitch({
     tableId,
     isActive,
+    canManageTables,
 }: TableStatusSwitchProps) {
     const [checked, setChecked] = useState(isActive);
 
@@ -101,7 +103,7 @@ export default function TableStatusSwitch({
                     <Switch
                         checked={checked}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={loading || !canManageTables}
                         slotProps={{
                             input: {
                                 "aria-label": checked ? "Tắt bàn" : "Bật bàn",

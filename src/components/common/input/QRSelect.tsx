@@ -19,7 +19,12 @@ export default function QRSelect<Value = string>({
     const hasError = Boolean(errorMessage);
 
     return (
-        <Box sx={{ width: "100%", position: "relative" }}>
+        <Box
+            sx={{
+                width: "100%",
+                position: "relative",
+            }}
+        >
             {label && (
                 <Typography component="label" sx={formLabelSx}>
                     {label}
@@ -75,6 +80,39 @@ export default function QRSelect<Value = string>({
                     },
                     ...(Array.isArray(sx) ? sx : [sx]),
                 ]}
+                MenuProps={{
+                    slotProps: {
+                        paper: {
+                            sx: {
+                                mt: 0.5,
+                                borderRadius: 1,
+                                border: "1px solid #eaecf0",
+                                boxShadow: "0 4px 12px rgba(16, 24, 40, 0.08)",
+
+                                "& .MuiMenuItem-root": {
+                                    minHeight: 40,
+                                    px: 1.5,
+                                    py: 1,
+                                    fontSize: 14,
+                                    lineHeight: 1.5,
+                                    color: "#1A202E",
+                                },
+
+                                "& .MuiMenuItem-root:hover": {
+                                    backgroundColor: "#f9fafb",
+                                },
+
+                                "& .MuiMenuItem-root.Mui-selected": {
+                                    backgroundColor: "#f2f4f7",
+                                },
+
+                                "& .MuiMenuItem-root.Mui-selected:hover": {
+                                    backgroundColor: "#eaecf0",
+                                },
+                            },
+                        },
+                    },
+                }}
             />
 
             {errorMessage && (

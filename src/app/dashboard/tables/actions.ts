@@ -1,5 +1,6 @@
 "use server";
 
+import { USER_ROLES } from "@/lib/auth/constants";
 import { getUserContext } from "@/lib/auth/queries";
 import {
     createRestaurantTable,
@@ -16,6 +17,10 @@ export type TableActionState = {
         name?: string;
     };
 };
+
+function canManageTables(role: string): boolean {
+    return role === USER_ROLES.OWNER || role === USER_ROLES.MANAGER;
+}
 
 function isDuplicateTableNameError(error: unknown): boolean {
     return (
@@ -36,6 +41,13 @@ export async function createTableAction(
         return {
             success: false,
             message: "Bạn chưa đăng nhập.",
+        };
+    }
+
+    if (!canManageTables(userContext.role)) {
+        return {
+            success: false,
+            message: "Bạn không có quyền quản lý bàn.",
         };
     }
 
@@ -99,6 +111,13 @@ export async function updateTableAction(
         return {
             success: false,
             message: "Bạn chưa đăng nhập.",
+        };
+    }
+
+    if (!canManageTables(userContext.role)) {
+        return {
+            success: false,
+            message: "Bạn không có quyền quản lý bàn.",
         };
     }
 
@@ -192,6 +211,13 @@ export async function deleteTableAction(
         };
     }
 
+    if (!canManageTables(userContext.role)) {
+        return {
+            success: false,
+            message: "Bạn không có quyền quản lý bàn.",
+        };
+    }
+
     const tableId = String(formData.get("tableId") ?? "").trim();
 
     if (!tableId) {
@@ -253,6 +279,13 @@ export async function updateTableStatusAction(
         return {
             success: false,
             message: "Bạn chưa đăng nhập.",
+        };
+    }
+
+    if (!canManageTables(userContext.role)) {
+        return {
+            success: false,
+            message: "Bạn không có quyền quản lý bàn.",
         };
     }
 

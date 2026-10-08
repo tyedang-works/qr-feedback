@@ -3,6 +3,7 @@ import { Box, Stack, Typography } from "@mui/material";
 import AddTableDialog from "@/components/tables/AddTableDialog";
 import TablesList from "@/components/tables/TablesList";
 import TablesSummary from "@/components/tables/TablesSummary";
+import { canManageTables as canManageTablesPermission } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import {
     getRestaurantTableList,
@@ -21,8 +22,7 @@ export default async function TablesPage() {
         getRestaurantTableSummary(userContext.restaurantId),
     ]);
 
-    const canManageTables =
-        userContext.role === "owner" || userContext.role === "manager";
+    const canManageTables = canManageTablesPermission(userContext.role);
 
     return (
         <Stack

@@ -1,9 +1,9 @@
 "use server";
 
+import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
+import { canManageUsers } from "@/lib/auth/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-
-import { USER_ROLES, UserRole } from "@/lib/auth/constants";
 import { revalidatePath } from "next/cache";
 
 type AddUserInput = {
@@ -61,7 +61,7 @@ export async function addUserAction(
     }
 
     // 3. Only Owner can add users
-    if (currentProfile.role !== USER_ROLES.OWNER) {
+    if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
             message: "Bạn không có quyền thêm người dùng.",
@@ -204,7 +204,7 @@ export async function deleteUserAction(userId: string): Promise<{
     }
 
     // 3. Only Owner can delete users
-    if (currentProfile.role !== USER_ROLES.OWNER) {
+    if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
             message: "Bạn không có quyền xóa người dùng.",
@@ -333,7 +333,7 @@ export async function changeUserRoleAction(
         };
     }
 
-    if (currentProfile.role !== USER_ROLES.OWNER) {
+    if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
             message: "Bạn không có quyền thay đổi vai trò.",

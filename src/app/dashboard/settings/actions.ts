@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
+import { canManageSettings } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
-import { createClient } from "@/lib/supabase/server";
 import type { UpdateRestaurantSettingsInput } from "@/lib/restaurant/types";
+import { createClient } from "@/lib/supabase/server";
 
 type UpdateRestaurantSettingsResult =
     | {
@@ -72,6 +73,13 @@ export async function updateRestaurantSettings(
         return {
             success: false,
             message: "Không tìm thấy thông tin tài khoản.",
+        };
+    }
+
+    if (!canManageSettings(userContext.role)) {
+        return {
+            success: false,
+            message: "Bạn không có quyền cập nhật cài đặt nhà hàng.",
         };
     }
 

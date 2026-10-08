@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import UsersRolesClient from "@/components/users-roles/UsersRolesClient";
-import { USER_ROLES } from "@/lib/auth/constants";
+import { canManageUsers } from "@/lib/auth/permissions";
 import { getRestaurantMembers, getUserContext } from "@/lib/auth/queries";
 
 export default async function UsersRolesPage() {
@@ -11,7 +11,7 @@ export default async function UsersRolesPage() {
         redirect("/login");
     }
 
-    if (userContext.role !== USER_ROLES.OWNER) {
+    if (!canManageUsers(userContext.role)) {
         redirect("/dashboard");
     }
 

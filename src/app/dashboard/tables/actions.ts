@@ -1,6 +1,6 @@
 "use server";
 
-import { USER_ROLES } from "@/lib/auth/constants";
+import { canManageTables } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import {
     createRestaurantTable,
@@ -17,10 +17,6 @@ export type TableActionState = {
         name?: string;
     };
 };
-
-function canManageTables(role: string): boolean {
-    return role === USER_ROLES.OWNER || role === USER_ROLES.MANAGER;
-}
 
 function isDuplicateTableNameError(error: unknown): boolean {
     return (

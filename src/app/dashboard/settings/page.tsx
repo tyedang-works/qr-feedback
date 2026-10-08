@@ -3,12 +3,18 @@ import { Box, Stack, Typography } from "@mui/material";
 import RestaurantSettingsForm from "@/components/settings/RestaurantSettingsForm";
 import { getUserContext } from "@/lib/auth/queries";
 import { getRestaurantSettings } from "@/lib/restaurant/queries";
+import { redirect } from "next/navigation";
+
+import { canManageSettings } from "@/lib/auth/permissions";
 
 export default async function SettingsPage() {
     const userContext = await getUserContext();
 
     if (!userContext) {
         return null;
+    }
+    if (!canManageSettings(userContext.role)) {
+        redirect("/dashboard");
     }
 
     const restaurant = await getRestaurantSettings(userContext.restaurantId);

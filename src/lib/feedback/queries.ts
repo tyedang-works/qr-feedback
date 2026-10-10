@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import type { FeedbackStatus } from "./constants";
 import type {
     FeedbackDetail,
     FeedbackFilters,
@@ -11,12 +12,8 @@ export async function getFeedbackList(
 ): Promise<FeedbackListResult> {
     const supabase = await createClient();
 
-    const { page, pageSize, keyword, issue, tableId } = filters;
+    const { page, pageSize, keyword, issue, tableId, status } = filters;
 
-    /*
-     * Build the filtered query first.
-     * We use this query to get the total count.
-     */
     let countQuery = supabase
         .from("feedback")
         .select("id", {
@@ -37,6 +34,9 @@ export async function getFeedbackList(
         countQuery = countQuery.contains("selected_options", [issue]);
     }
 
+    if (status && status !== "all") {
+        countQuery = countQuery.eq("status", status);
+    }
     const { count, error: countError } = await countQuery;
 
     if (countError) {
@@ -67,26 +67,12 @@ export async function getFeedbackList(
         };
     }
 
-    /*
-     * Make sure the requested page is valid.
-     *
-     * Example:
-     * total = 5
-     * pageSize = 10
-     * totalPages = 1
-     *
-     * /dashboard/feedback?page=2
-     * -> safePage = 1
-     */
     const safePage = Math.min(Math.max(page, 1), totalPages);
 
     const from = (safePage - 1) * pageSize;
 
     const to = Math.min(from + pageSize - 1, total - 1);
 
-    /*
-     * Get feedback data for the current page.
-     */
     let feedbackQuery = supabase
         .from("feedback")
         .select(
@@ -97,6 +83,8 @@ export async function getFeedbackList(
         selected_options,
         feedback,
         phone,
+        status,
+        internal_note,
         created_at
     `,
         )
@@ -112,6 +100,10 @@ export async function getFeedbackList(
 
     if (issue && issue !== "all") {
         feedbackQuery = feedbackQuery.contains("selected_options", [issue]);
+    }
+
+    if (status && status !== "all") {
+        feedbackQuery = feedbackQuery.eq("status", status);
     }
 
     const { data: feedbackData, error: feedbackError } = await feedbackQuery
@@ -145,10 +137,6 @@ export async function getFeedbackList(
         };
     }
 
-    /*
-     * Get table names separately because the
-     * Supabase relationship response is typed as an array.
-     */
     const tableIds = [...new Set(feedbackData.map((item) => item.table_id))];
 
     const { data: tablesData, error: tablesError } = await supabase
@@ -172,6 +160,8 @@ export async function getFeedbackList(
         selectedOptions: item.selected_options ?? [],
         feedback: item.feedback ?? "",
         phone: item.phone,
+        status: item.status as FeedbackStatus,
+        internalNote: item.internal_note ?? null,
         createdAt: item.created_at,
     }));
 
@@ -200,6 +190,8 @@ export async function getFeedbackDetail(
                 selected_options,
                 feedback,
                 phone,
+                status,
+                internal_note,
                 created_at
             `,
         )
@@ -236,11 +228,14 @@ export async function getFeedbackDetail(
 
     return {
         id: feedback.id,
+        publicId: feedback.public_id,
         tableId: feedback.table_id,
         tableName: table?.name ?? "Không xác định",
         selectedOptions: feedback.selected_options ?? [],
         feedback: feedback.feedback ?? "",
         phone: feedback.phone,
+        status: feedback.status as FeedbackStatus,
+        internalNote: feedback.internal_note ?? null,
         createdAt: feedback.created_at,
     };
 }

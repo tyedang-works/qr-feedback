@@ -2,23 +2,23 @@
 
 import { Box, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-
 import DashboardSidebar from "./DashboardSidebar";
+import DashboardHeader from "./DashboardHeader";
+import type { UserContext } from "@/lib/auth/queries";
 
 type DashboardLayoutProps = {
     children: React.ReactNode;
+    userContext: UserContext | null;
 };
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({
+    children,
+    userContext,
+}: DashboardLayoutProps) {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-    const handleOpenSidebar = () => {
-        setIsMobileSidebarOpen(true);
-    };
-
-    const handleCloseSidebar = () => {
-        setIsMobileSidebarOpen(false);
-    };
+    const handleOpenSidebar = () => setIsMobileSidebarOpen(true);
+    const handleCloseSidebar = () => setIsMobileSidebarOpen(false);
 
     return (
         <Box
@@ -32,10 +32,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Box
                 className="dashboard-sidebar"
                 sx={{
-                    display: {
-                        xs: "none",
-                        md: "block",
-                    },
+                    display: { xs: "none", md: "block" },
                     position: "sticky",
                     top: 0,
                     alignSelf: "flex-start",
@@ -43,18 +40,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     height: "100dvh",
                 }}
             >
-                <DashboardSidebar />
+                <DashboardSidebar role={userContext?.role ?? null} />
             </Box>
 
-            {/* Mobile Header */}
+            {/* Mobile Navigation */}
             <Box
                 className="dashboard-mobile-header"
-                sx={{
-                    display: {
-                        xs: "block",
-                        md: "none",
-                    },
-                }}
+                sx={{ display: { xs: "block", md: "none" } }}
             >
                 <Box
                     sx={{
@@ -117,15 +109,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     </Stack>
                 </Box>
 
-                {/* Mobile Drawer */}
                 <Drawer
                     anchor="left"
                     open={isMobileSidebarOpen}
                     onClose={handleCloseSidebar}
-                    transitionDuration={{
-                        enter: 220,
-                        exit: 180,
-                    }}
+                    transitionDuration={{ enter: 220, exit: 180 }}
                     slotProps={{
                         paper: {
                             sx: {
@@ -136,7 +124,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         },
                     }}
                 >
-                    <DashboardSidebar />
+                    <DashboardSidebar role={userContext?.role ?? null} />
                 </Drawer>
             </Box>
 
@@ -148,17 +136,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     flex: 1,
                     width: "100%",
                     minWidth: 0,
-                    px: {
-                        xs: 2,
-                        sm: 3,
-                    },
-                    pt: {
-                        xs: 10,
-                        sm: 3,
-                    },
+                    px: { xs: 2, sm: 3 },
+                    pt: { xs: 10, sm: 3 },
                     pb: 3,
                 }}
             >
+                <DashboardHeader
+                    fullName={userContext?.fullName ?? null}
+                    restaurantName={userContext?.restaurantName ?? null}
+                    role={userContext?.role ?? null}
+                />
+
                 {children}
             </Box>
         </Box>

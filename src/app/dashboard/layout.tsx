@@ -1,11 +1,16 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { getUserContext } from "@/lib/auth/queries";
 
 type DashboardRouteLayoutProps = {
     children: React.ReactNode;
 };
 
-export default function DashboardRouteLayout({
+export default async function DashboardRouteLayout({
     children,
 }: DashboardRouteLayoutProps) {
-    return <DashboardLayout>{children}</DashboardLayout>;
+    const userContext = await getUserContext();
+
+    return (
+        <DashboardLayout userContext={userContext}>{children}</DashboardLayout>
+    );
 }

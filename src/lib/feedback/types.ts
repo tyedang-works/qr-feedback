@@ -1,3 +1,5 @@
+import type { FeedbackStatus } from "@/lib/feedback/constants";
+
 export type FeedbackListItem = {
     id: string;
     publicId: string;
@@ -6,6 +8,8 @@ export type FeedbackListItem = {
     selectedOptions: string[];
     feedback: string;
     phone: string;
+    status: FeedbackStatus;
+    internalNote: string | null;
     createdAt: string;
 };
 
@@ -15,6 +19,7 @@ export type FeedbackFilters = {
     keyword: string;
     issue: string;
     tableId: string;
+    status?: string;
 };
 
 export type FeedbackListResult = {
@@ -27,10 +32,13 @@ export type FeedbackListResult = {
 
 export type FeedbackDetail = {
     id: string;
+    publicId: string;
     tableId: string;
     tableName: string;
     selectedOptions: string[];
     feedback: string;
     phone: string;
+    status: FeedbackStatus;
+    internalNote: string | null;
     createdAt: string;
 };

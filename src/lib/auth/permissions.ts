@@ -20,6 +20,10 @@ export function canAccessFeedbackPage(role: UserRole) {
     return isOwner(role) || isStaff(role);
 }
 
+export function canManageFeedback(role: UserRole) {
+    return isOwner(role) || isStaff(role);
+}
+
 export function canManageSettings(role: UserRole) {
     return isOwner(role);
 }

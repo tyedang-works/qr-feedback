@@ -16,6 +16,8 @@ export default function QRTextField({
     label,
     errorMessage,
     required = false,
+    multiline = false,
+    sx,
     ...props
 }: QRTextFieldProps) {
     const hasError = Boolean(errorMessage);
@@ -30,7 +32,6 @@ export default function QRTextField({
             {label && (
                 <Typography component="label" sx={formLabelSx}>
                     {label}
-
                     {required && (
                         <Typography component="span" sx={formRequiredSx}>
                             *
@@ -42,49 +43,68 @@ export default function QRTextField({
             <TextField
                 {...props}
                 fullWidth
+                multiline={multiline}
                 label={undefined}
                 error={hasError}
-                sx={{
-                    "& .MuiOutlinedInput-root": {
-                        borderRadius: 1,
-                        backgroundColor: "#ffffff",
+                sx={[
+                    {
+                        "& .MuiOutlinedInput-root": {
+                            borderRadius: multiline ? 2 : 1,
+                            backgroundColor: "#ffffff",
 
-                        "& fieldset": {
-                            borderColor: "#d0d5dd",
+                            ...(multiline && {
+                                padding: 0,
+                            }),
+
+                            "& fieldset": {
+                                borderColor: "#d0d5dd",
+                            },
+
+                            "&:hover fieldset": {
+                                borderColor: "#98a2b3",
+                            },
+
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#193B56",
+                                borderWidth: 1,
+                            },
+
+                            "&.Mui-error fieldset": {
+                                borderColor: "#d92d20",
+                            },
+
+                            "&.Mui-error.Mui-focused fieldset": {
+                                borderColor: "#d92d20",
+                            },
                         },
 
-                        "&:hover fieldset": {
-                            borderColor: "#98a2b3",
+                        "& .MuiOutlinedInput-input": {
+                            boxSizing: "border-box",
+                            height: "42px",
+                            padding: "10px 12px",
+                            fontSize: 14,
+                            lineHeight: 1,
+                            color: "#344054",
                         },
 
-                        "&.Mui-focused fieldset": {
-                            borderColor: "#193B56",
-                            borderWidth: 1,
+                        "& .MuiOutlinedInput-inputMultiline": {
+                            boxSizing: "border-box",
+                            height: "auto",
+                            minHeight: "unset",
+                            padding: "8px 10px",
+                            fontSize: 13,
+                            lineHeight: 1.5,
+                            color: "#344054",
+                            resize: "vertical",
                         },
 
-                        "&.Mui-error fieldset": {
-                            borderColor: "#d92d20",
-                        },
-
-                        "&.Mui-error.Mui-focused fieldset": {
-                            borderColor: "#d92d20",
+                        "& .MuiInputBase-input::placeholder": {
+                            color: "#98a2b3",
+                            opacity: 1,
                         },
                     },
-
-                    "& .MuiInputBase-input": {
-                        height: 22,
-                        px: 1.5,
-                        py: 1.25,
-                        fontSize: 14,
-                        color: "#344054",
-                        lineHeight: 1,
-                    },
-
-                    "& .MuiInputBase-input::placeholder": {
-                        color: "#98a2b3",
-                        opacity: 1,
-                    },
-                }}
+                    ...(Array.isArray(sx) ? sx : [sx]),
+                ]}
             />
 
             {errorMessage && (

@@ -1,4 +1,3 @@
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import FeedbackTrend from "@/components/dashboard/FeedbackTrend";
 import SummaryCards from "@/components/dashboard/SummaryCards";
 import { getUserContext } from "@/lib/auth/queries";
@@ -35,17 +34,9 @@ export default async function DashboardPage() {
     const recentFeedback = userContext
         ? await getRecentFeedback(userContext.restaurantId)
         : [];
-    return (
-        <Stack
-            sx={{
-                gap: 3,
-            }}
-        >
-            <DashboardHeader
-                fullName={userContext?.fullName}
-                restaurantName={userContext?.restaurantName}
-            />
 
+    return (
+        <Stack sx={{ gap: 3 }}>
             <SummaryCards
                 totalFeedback={summary.totalFeedback}
                 todayFeedback={summary.todayFeedback}

@@ -1,5 +1,4 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
-
 import DeleteTableDialog from "@/components/tables/DeleteTableDialog";
 import EditTableDialog from "@/components/tables/EditTableDialog";
 import TableStatusSwitch from "@/components/tables/TableStatusSwitch";

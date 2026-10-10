@@ -43,6 +43,9 @@ export default function QRSelect<Value = string>({
                 error={hasError}
                 sx={[
                     {
+                        height: 42,
+                        minHeight: 42,
+                        boxSizing: "border-box",
                         borderRadius: 1,
                         backgroundColor: "#ffffff",
 
@@ -69,10 +72,13 @@ export default function QRSelect<Value = string>({
                             },
 
                         "& .MuiSelect-select": {
-                            minHeight: "unset",
+                            height: "auto",
+                            minHeight: "0 !important",
                             boxSizing: "border-box",
                             px: 1.5,
-                            py: 1.25,
+                            py: 0,
+                            display: "flex",
+                            alignItems: "center",
                             fontSize: 14,
                             lineHeight: 1.5,
                             color: "#344054",

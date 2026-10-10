@@ -1,5 +1,14 @@
 export const FEEDBACK_PAGE_SIZE = 10;
 
+export const FEEDBACK_STATUS = {
+    NEW: "new",
+    IN_PROGRESS: "in_progress",
+    RESOLVED: "resolved",
+} as const;
+
+export type FeedbackStatus =
+    (typeof FEEDBACK_STATUS)[keyof typeof FEEDBACK_STATUS];
+
 export const FEEDBACK_ISSUES = [
     {
         option: "food_quality",

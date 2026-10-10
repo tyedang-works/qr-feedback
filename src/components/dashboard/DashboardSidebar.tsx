@@ -2,18 +2,15 @@
 
 import Logo from "@/components/common/Logo";
 import DashboardNavigationProgress from "@/components/dashboard/DashboardNavigationProgress";
-
-import { createClient } from "@/lib/supabase/browser";
-
 import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
-
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
-
 import Link from "next/link";
-
 import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
 
-import { useEffect, useState, useTransition } from "react";
+type DashboardSidebarProps = {
+    role: UserRole | null;
+};
 
 type NavigationItem = {
     label: string;
@@ -21,71 +18,17 @@ type NavigationItem = {
 };
 
 const navigationItems: NavigationItem[] = [
-    {
-        label: "Dashboard",
-        href: "/dashboard",
-    },
-    {
-        label: "Feedback",
-        href: "/dashboard/feedback",
-    },
-    {
-        label: "Tables",
-        href: "/dashboard/tables",
-    },
-    {
-        label: "QR Codes",
-        href: "/dashboard/qr-codes",
-    },
-    {
-        label: "Cài đặt",
-        href: "/dashboard/settings",
-    },
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Feedback", href: "/dashboard/feedback" },
+    { label: "Tables", href: "/dashboard/tables" },
+    { label: "QR Codes", href: "/dashboard/qr-codes" },
+    { label: "Cài đặt", href: "/dashboard/settings" },
 ];
 
-export default function DashboardSidebar() {
+export default function DashboardSidebar({ role }: DashboardSidebarProps) {
     const router = useRouter();
     const pathname = usePathname();
-    const supabase = createClient();
-
-    const [role, setRole] = useState<UserRole | null>(null);
     const [isPending, startTransition] = useTransition();
-
-    useEffect(() => {
-        const loadUserRole = async () => {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-
-            if (!user) {
-                setRole(null);
-                return;
-            }
-
-            const { data: profile, error } = await supabase
-                .from("profiles")
-                .select("role")
-                .eq("id", user.id)
-                .single();
-
-            if (error || !profile) {
-                console.error("Failed to get current user role:", error);
-                setRole(null);
-                return;
-            }
-
-            setRole(profile.role as UserRole);
-        };
-
-        loadUserRole();
-    }, [supabase]);
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-
-        router.push("/login");
-        router.refresh();
-    };
 
     const isActive = (href?: string) => {
         if (!href) {
@@ -157,9 +100,7 @@ export default function DashboardSidebar() {
                 <Stack
                     component="nav"
                     aria-label="Dashboard navigation"
-                    sx={{
-                        gap: 0.5,
-                    }}
+                    sx={{ gap: 0.5 }}
                 >
                     {navigationItems.map((item) => {
                         const active = isActive(item.href);
@@ -178,28 +119,11 @@ export default function DashboardSidebar() {
                             },
                         };
 
-                        if (item.href) {
-                            const isCurrentPage =
-                                item.href === "/dashboard" &&
-                                pathname === "/dashboard";
-
-                            if (isCurrentPage) {
-                                return (
-                                    <Button
-                                        key={item.label}
-                                        fullWidth
-                                        sx={buttonSx}
-                                    >
-                                        {item.label}
-                                    </Button>
-                                );
-                            }
-
+                        if (item.href === "/dashboard" && active) {
                             return (
                                 <Button
                                     key={item.label}
                                     fullWidth
-                                    onClick={() => handleNavigation(item.href!)}
                                     sx={buttonSx}
                                 >
                                     {item.label}
@@ -211,11 +135,8 @@ export default function DashboardSidebar() {
                             <Button
                                 key={item.label}
                                 fullWidth
-                                disabled
-                                sx={{
-                                    ...buttonSx,
-                                    color: "#98a2b3",
-                                }}
+                                onClick={() => handleNavigation(item.href!)}
+                                sx={buttonSx}
                             >
                                 {item.label}
                             </Button>
@@ -257,47 +178,9 @@ export default function DashboardSidebar() {
                                 },
                             }}
                         >
-                            Users & Roles
+                            Users &amp; Roles
                         </Button>
                     )}
-                </Stack>
-
-                {/* Push Admin section to bottom */}
-                <Box sx={{ flex: 1 }} />
-
-                <Divider sx={{ mb: 2 }} />
-
-                {/* Admin */}
-                <Stack sx={{ gap: 1 }}>
-                    <Typography
-                        sx={{
-                            px: 1.5,
-                            fontSize: 13,
-                            color: "#667085",
-                        }}
-                    >
-                        Admin
-                    </Typography>
-
-                    <Button
-                        fullWidth
-                        onClick={handleLogout}
-                        sx={{
-                            justifyContent: "flex-start",
-                            px: 1.5,
-                            py: 1.25,
-                            borderRadius: 1.5,
-                            color: "#667085",
-                            fontWeight: 500,
-                            textTransform: "none",
-                            "&:hover": {
-                                backgroundColor: "#f8fafc",
-                                color: "#344054",
-                            },
-                        }}
-                    >
-                        Logout
-                    </Button>
                 </Stack>
             </Box>
         </>

@@ -1,27 +1,39 @@
-import { FEEDBACK_ISSUES } from "@/lib/feedback/constants";
+import QRSelect from "@/components/common/input/QRSelect";
+import QRTextField from "@/components/common/input/QRTextField";
+import { FEEDBACK_ISSUES, FEEDBACK_STATUS } from "@/lib/feedback/constants";
 import type { RestaurantTableOption } from "@/lib/tables/queries";
-import {
-    Box,
-    Button,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    Stack,
-    TextField,
-} from "@mui/material";
+import { Box, Button, MenuItem, Stack } from "@mui/material";
 
 type FeedbackToolbarProps = {
     keyword: string;
     issue: string;
     tableId: string;
+    status: string;
     tables: RestaurantTableOption[];
+};
+
+const STATUS_OPTIONS = [
+    { value: FEEDBACK_STATUS.NEW, label: "Chưa xử lý" },
+    { value: FEEDBACK_STATUS.IN_PROGRESS, label: "Đang xử lý" },
+    { value: FEEDBACK_STATUS.RESOLVED, label: "Đã xử lý" },
+] as const;
+
+const FILTER_WIDTHS = {
+    issue: { xs: "100%", md: 220 },
+    table: { xs: "100%", md: 170 },
+    status: { xs: "100%", md: 180 },
+} as const;
+
+const selectSx = {
+    height: 40,
+    fontSize: 14,
 };
 
 export default function FeedbackToolbar({
     keyword,
     issue,
     tableId,
+    status,
     tables,
 }: FeedbackToolbarProps) {
     return (
@@ -29,10 +41,7 @@ export default function FeedbackToolbar({
             component="form"
             method="get"
             sx={{
-                p: {
-                    xs: 1.5,
-                    sm: 1.5,
-                },
+                p: 1.5,
                 backgroundColor: "#ffffff",
                 border: "1px solid #eaecf0",
                 borderRadius: 2,
@@ -41,171 +50,97 @@ export default function FeedbackToolbar({
         >
             <Stack
                 sx={{
-                    flexDirection: {
-                        xs: "column",
-                        md: "row",
-                    },
-                    alignItems: {
-                        xs: "stretch",
-                        md: "center",
-                    },
-                    gap: {
-                        xs: 3,
-                        md: 1,
-                    },
+                    flexDirection: { xs: "column", md: "row" },
+                    alignItems: { xs: "stretch", md: "center" },
+                    gap: 1,
                 }}
             >
-                {/* Search */}
-                <TextField
-                    name="keyword"
-                    placeholder="Tìm kiếm phản hồi..."
-                    defaultValue={keyword}
-                    fullWidth
-                    size="small"
+                <Box
                     sx={{
-                        flex: {
-                            md: 1,
-                        },
+                        flex: 1,
                         minWidth: 0,
-
-                        "& .MuiInputBase-root": {
-                            height: 40,
-                            fontSize: 14,
-                        },
-
-                        "& .MuiInputBase-input": {
-                            fontSize: 14,
-                        },
-
-                        "& .MuiInputBase-input::placeholder": {
-                            fontSize: 14,
-                            opacity: 1,
-                            color: "#98a2b3",
-                        },
-
-                        "& .MuiInputBase-input:-webkit-autofill": {
-                            WebkitBoxShadow: "0 0 0 1000px #ffffff inset",
-                            WebkitTextFillColor: "#344054",
-                            caretColor: "#344054",
-                            transition: "background-color 5000s ease-in-out 0s",
-                        },
-                    }}
-                />
-
-                {/* Issue */}
-                <FormControl
-                    size="small"
-                    fullWidth
-                    sx={{
-                        width: {
-                            xs: "100%",
-                            md: 220,
-                        },
+                        marginTop: { xs: 0, md: "24px" },
                     }}
                 >
-                    <InputLabel
-                        sx={{
-                            fontSize: 14,
-                        }}
-                    >
-                        Vấn đề
-                    </InputLabel>
+                    <QRTextField
+                        name="keyword"
+                        placeholder="Tìm kiếm phản hồi..."
+                        defaultValue={keyword}
+                    />
+                </Box>
 
-                    <Select
+                <Box
+                    sx={{
+                        width: FILTER_WIDTHS.issue,
+                        flexShrink: 0,
+                    }}
+                >
+                    <QRSelect
                         name="issue"
-                        defaultValue={issue || "all"}
                         label="Vấn đề"
-                        sx={{
-                            height: 40,
-                            fontSize: 14,
-                        }}
+                        defaultValue={issue || "all"}
+                        sx={selectSx}
                     >
-                        <MenuItem
-                            value="all"
-                            sx={{
-                                fontSize: 14,
-                            }}
-                        >
-                            All
-                        </MenuItem>
+                        <MenuItem value="all">All</MenuItem>
 
-                        {FEEDBACK_ISSUES.map((item) => (
-                            <MenuItem
-                                key={item.option}
-                                value={item.option}
-                                sx={{
-                                    fontSize: 14,
-                                }}
-                            >
-                                {item.label}
+                        {FEEDBACK_ISSUES.map(({ option, label }) => (
+                            <MenuItem key={option} value={option}>
+                                {label}
                             </MenuItem>
                         ))}
-                    </Select>
-                </FormControl>
+                    </QRSelect>
+                </Box>
 
-                {/* Table */}
-                <FormControl
-                    size="small"
-                    fullWidth
+                <Box
                     sx={{
-                        width: {
-                            xs: "100%",
-                            md: 170,
-                        },
+                        width: FILTER_WIDTHS.table,
+                        flexShrink: 0,
                     }}
                 >
-                    <InputLabel
-                        sx={{
-                            fontSize: 14,
-                        }}
-                    >
-                        Bàn
-                    </InputLabel>
-
-                    <Select
+                    <QRSelect
                         name="tableId"
-                        defaultValue={tableId || "all"}
                         label="Bàn"
-                        sx={{
-                            height: 40,
-                            fontSize: 14,
-                        }}
+                        defaultValue={tableId || "all"}
+                        sx={selectSx}
                     >
-                        <MenuItem
-                            value="all"
-                            sx={{
-                                fontSize: 14,
-                            }}
-                        >
-                            All
-                        </MenuItem>
+                        <MenuItem value="all">All</MenuItem>
 
-                        {tables.map((table) => (
-                            <MenuItem
-                                key={table.id}
-                                value={table.id}
-                                sx={{
-                                    fontSize: 14,
-                                }}
-                            >
-                                {table.name}
+                        {tables.map(({ id, name }) => (
+                            <MenuItem key={id} value={id}>
+                                {name}
                             </MenuItem>
                         ))}
-                    </Select>
-                </FormControl>
+                    </QRSelect>
+                </Box>
 
-                {/* Search button */}
+                <Box
+                    sx={{
+                        width: FILTER_WIDTHS.status,
+                        flexShrink: 0,
+                    }}
+                >
+                    <QRSelect
+                        name="status"
+                        label="Trạng thái"
+                        defaultValue={status || "all"}
+                        sx={selectSx}
+                    >
+                        <MenuItem value="all">Tất cả trạng thái</MenuItem>
+
+                        {STATUS_OPTIONS.map(({ value, label }) => (
+                            <MenuItem key={value} value={value}>
+                                {label}
+                            </MenuItem>
+                        ))}
+                    </QRSelect>
+                </Box>
+
                 <Button
                     type="submit"
                     variant="contained"
                     sx={{
-                        width: {
-                            xs: "100%",
-                            md: "auto",
-                        },
-                        minWidth: {
-                            md: 100,
-                        },
+                        width: { xs: "100%", md: "auto" },
+                        minWidth: { md: 100 },
                         height: 40,
                         px: 2.5,
                         borderRadius: 1.5,
@@ -215,7 +150,7 @@ export default function FeedbackToolbar({
                         textTransform: "none",
                         boxShadow: "none",
                         flexShrink: 0,
-
+                        marginTop: { xs: "10px", md: "24px" },
                         "&:hover": {
                             backgroundColor: "#1565c0",
                             boxShadow: "none",

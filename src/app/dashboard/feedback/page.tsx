@@ -14,6 +14,7 @@ type FeedbackPageProps = {
         keyword?: string;
         issue?: string;
         tableId?: string;
+        status?: string;
         page?: string;
     }>;
 };
@@ -24,14 +25,13 @@ export default async function FeedbackPage({
     const params = await searchParams;
 
     const keyword = params.keyword ?? "";
-
     const issue = params.issue && params.issue !== "all" ? params.issue : "";
-
     const tableId =
         params.tableId && params.tableId !== "all" ? params.tableId : "";
+    const status =
+        params.status && params.status !== "all" ? params.status : "";
 
     const parsedPage = Number(params.page);
-
     const page =
         Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
@@ -52,17 +52,27 @@ export default async function FeedbackPage({
             keyword,
             issue,
             tableId,
+            status,
         }),
         getRestaurantTables(userContext.restaurantId),
     ]);
 
     return (
-        <Stack sx={{ gap: 3 }}>
+        <Stack
+            sx={{
+                width: "100%",
+                maxWidth: 1440,
+                mx: "auto",
+                gap: { xs: 2.5, md: 3 },
+            }}
+        >
             <Box>
                 <Typography
+                    component="h1"
                     sx={{
-                        fontSize: 24,
+                        fontSize: { xs: 22, md: 26 },
                         fontWeight: 700,
+                        lineHeight: 1.3,
                         color: "#193B56",
                     }}
                 >
@@ -71,12 +81,13 @@ export default async function FeedbackPage({
 
                 <Typography
                     sx={{
-                        mt: 0.5,
+                        mt: 0.75,
                         fontSize: 14,
+                        lineHeight: 1.6,
                         color: "#667085",
                     }}
                 >
-                    Quản lý tất cả phản hồi của khách hàng.
+                    Theo dõi và xử lý phản hồi của khách hàng.
                 </Typography>
             </Box>
 
@@ -85,25 +96,35 @@ export default async function FeedbackPage({
                 issue={issue}
                 tableId={tableId}
                 tables={tables}
+                status={status}
             />
 
-            <Typography
+            <Stack
                 sx={{
-                    fontSize: 14,
-                    color: "#667085",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 1,
                 }}
             >
-                Tổng số phản hồi:{" "}
-                <Box
-                    component="span"
+                <Typography
                     sx={{
-                        fontWeight: 700,
-                        color: "#193B56",
+                        fontSize: 13,
+                        color: "#667085",
                     }}
                 >
-                    {feedback.total}
-                </Box>
-            </Typography>
+                    Tổng số phản hồi{" "}
+                    <Box
+                        component="span"
+                        sx={{
+                            fontWeight: 700,
+                            color: "#193B56",
+                        }}
+                    >
+                        {feedback.total}
+                    </Box>
+                </Typography>
+            </Stack>
 
             <FeedbackList data={feedback.data} />
 

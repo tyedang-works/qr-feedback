@@ -1,11 +1,12 @@
+import FeedbackStatusChart from "@/components/dashboard/FeedbackStatusChart";
 import FeedbackTrend from "@/components/dashboard/FeedbackTrend";
-import SummaryCards from "@/components/dashboard/SummaryCards";
-import { getUserContext } from "@/lib/auth/queries";
-
 import IssueDistribution from "@/components/dashboard/IssueDistribution";
 import RecentFeedback from "@/components/dashboard/RecentFeedback";
+import SummaryCards from "@/components/dashboard/SummaryCards";
+import { getUserContext } from "@/lib/auth/queries";
 import {
     getDashboardSummary,
+    getFeedbackStatusDistribution,
     getFeedbackTrend,
     getIssueDistribution,
     getRecentFeedback,
@@ -31,36 +32,57 @@ export default async function DashboardPage() {
         ? await getIssueDistribution(userContext.restaurantId)
         : [];
 
+    const feedbackStatusDistribution = userContext
+        ? await getFeedbackStatusDistribution(userContext.restaurantId)
+        : [];
+
     const recentFeedback = userContext
         ? await getRecentFeedback(userContext.restaurantId)
         : [];
 
     return (
-        <Stack sx={{ gap: 3 }}>
+        <Stack sx={{ gap: 2 }}>
             <SummaryCards
                 totalFeedback={summary.totalFeedback}
                 todayFeedback={summary.todayFeedback}
                 activeTables={summary.activeTables}
             />
 
+            {/* Hàng 1: Xu hướng phản hồi và trạng thái xử lý */}
             <Box
                 sx={{
                     display: "grid",
                     gridTemplateColumns: {
-                        xs: "1fr",
-                        lg: "minmax(0, 1.5fr) minmax(0, 1fr)",
+                        xs: "minmax(0, 1fr)",
+                        lg: "minmax(0, 1.35fr) minmax(0, 1fr)",
                     },
                     gap: 2,
+                    alignItems: "stretch",
+                    minWidth: 0,
                 }}
             >
                 <FeedbackTrend data={feedbackTrend} />
 
-                <IssueDistribution data={issueDistribution} />
+                <FeedbackStatusChart data={feedbackStatusDistribution} />
             </Box>
 
-            <RecentFeedback data={recentFeedback} />
+            {/* Hàng 2: Phân bố vấn đề và phản hồi gần đây */}
+            <Box
+                sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "minmax(0, 1fr)",
+                        lg: "minmax(0, 1fr) minmax(0, 1.35fr)",
+                    },
+                    gap: 2,
+                    alignItems: "stretch",
+                    minWidth: 0,
+                }}
+            >
+                <IssueDistribution data={issueDistribution} />
 
-            <RecentFeedback data={recentFeedback} />
+                <RecentFeedback data={recentFeedback} />
+            </Box>
         </Stack>
     );
 }

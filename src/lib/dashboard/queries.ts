@@ -1,6 +1,7 @@
 import { FEEDBACK_ISSUES } from "@/lib/feedback/constants";
 import { createClient } from "@/lib/supabase/server";
 import type {
+    FeedbackStatusDistributionItem,
     FeedbackTrendItem,
     IssueDistributionItem,
     RecentFeedbackItem,
@@ -10,6 +11,9 @@ export type DashboardSummary = {
     totalFeedback: number;
     todayFeedback: number;
     activeTables: number;
+    newFeedback: number;
+    inProgressFeedback: number;
+    resolvedFeedback: number;
 };
 
 function getVietnamDateString() {
@@ -27,74 +31,89 @@ export async function getDashboardSummary(
     const supabase = await createClient();
 
     const vietnamDate = getVietnamDateString();
-
     const startOfToday = `${vietnamDate}T00:00:00+07:00`;
 
     const endOfToday = new Date(
         new Date(startOfToday).getTime() + 24 * 60 * 60 * 1000,
     ).toISOString();
 
-    const [totalFeedbackResult, todayFeedbackResult, activeTablesResult] =
-        await Promise.all([
-            supabase
-                .from("feedback")
-                .select("id", {
-                    count: "exact",
-                    head: true,
-                })
-                .eq("restaurant_id", restaurantId),
+    const [
+        totalFeedbackResult,
+        todayFeedbackResult,
+        activeTablesResult,
+        newFeedbackResult,
+        inProgressFeedbackResult,
+        resolvedFeedbackResult,
+    ] = await Promise.all([
+        supabase
+            .from("feedback")
+            .select("id", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantId),
 
-            supabase
-                .from("feedback")
-                .select("id", {
-                    count: "exact",
-                    head: true,
-                })
-                .eq("restaurant_id", restaurantId)
-                .gte("created_at", startOfToday)
-                .lt("created_at", endOfToday),
+        supabase
+            .from("feedback")
+            .select("id", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantId)
+            .gte("created_at", startOfToday)
+            .lt("created_at", endOfToday),
 
-            supabase
-                .from("tables")
-                .select("id", {
-                    count: "exact",
-                    head: true,
-                })
-                .eq("restaurant_id", restaurantId)
-                .eq("is_active", true),
-        ]);
+        supabase
+            .from("tables")
+            .select("id", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantId)
+            .eq("is_active", true),
 
-    if (totalFeedbackResult.error) {
-        console.error(
-            "Failed to get total feedback:",
-            totalFeedbackResult.error,
-        );
-    }
+        supabase
+            .from("feedback")
+            .select("id", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantId)
+            .eq("status", "new"),
 
-    if (todayFeedbackResult.error) {
-        console.error(
-            "Failed to get today's feedback:",
-            todayFeedbackResult.error,
-        );
-    }
+        supabase
+            .from("feedback")
+            .select("id", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantId)
+            .eq("status", "in_progress"),
 
-    if (activeTablesResult.error) {
-        console.error("Failed to get active tables:", activeTablesResult.error);
-    }
+        supabase
+            .from("feedback")
+            .select("id", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantId)
+            .eq("status", "resolved"),
+    ]);
+
+    const results = [
+        ["total feedback", totalFeedbackResult],
+        ["today feedback", todayFeedbackResult],
+        ["active tables", activeTablesResult],
+        ["new feedback", newFeedbackResult],
+        ["in-progress feedback", inProgressFeedbackResult],
+        ["resolved feedback", resolvedFeedbackResult],
+    ] as const;
+
+    results.forEach(([label, result]) => {
+        if (result.error) {
+            console.error(`Failed to get ${label}:`, result.error);
+        }
+    });
 
     return {
         totalFeedback: totalFeedbackResult.count ?? 0,
         todayFeedback: todayFeedbackResult.count ?? 0,
         activeTables: activeTablesResult.count ?? 0,
+        newFeedback: newFeedbackResult.count ?? 0,
+        inProgressFeedback: inProgressFeedbackResult.count ?? 0,
+        resolvedFeedback: resolvedFeedbackResult.count ?? 0,
     };
 }
 
+export type FeedbackTrendPeriod = 7 | 30;
+
 export async function getFeedbackTrend(
     restaurantId: string,
+    period: FeedbackTrendPeriod = 7,
 ): Promise<FeedbackTrendItem[]> {
     const supabase = await createClient();
-
-    const now = new Date();
 
     const vietnamFormatter = new Intl.DateTimeFormat("en-CA", {
         timeZone: "Asia/Ho_Chi_Minh",
@@ -103,23 +122,36 @@ export async function getFeedbackTrend(
         day: "2-digit",
     });
 
+    const today = vietnamFormatter.format(new Date());
+    const [year, month, day] = today.split("-").map(Number);
+
+    // Tạo danh sách ngày theo lịch Việt Nam, không phụ thuộc múi giờ server.
     const dates: string[] = [];
 
-    for (let index = 6; index >= 0; index -= 1) {
-        const date = new Date(now);
+    for (let index = period - 1; index >= 0; index -= 1) {
+        const date = new Date(Date.UTC(year, month - 1, day - index));
 
-        date.setDate(date.getDate() - index);
-
-        dates.push(vietnamFormatter.format(date));
+        dates.push(
+            [
+                date.getUTCFullYear(),
+                String(date.getUTCMonth() + 1).padStart(2, "0"),
+                String(date.getUTCDate()).padStart(2, "0"),
+            ].join("-"),
+        );
     }
 
     const startOfPeriod = `${dates[0]}T00:00:00+07:00`;
+
+    const endOfPeriod = new Date(
+        new Date(`${today}T00:00:00+07:00`).getTime() + 24 * 60 * 60 * 1000,
+    ).toISOString();
 
     const { data, error } = await supabase
         .from("feedback")
         .select("created_at")
         .eq("restaurant_id", restaurantId)
-        .gte("created_at", startOfPeriod);
+        .gte("created_at", startOfPeriod)
+        .lt("created_at", endOfPeriod);
 
     if (error) {
         console.error("Failed to get feedback trend:", error);
@@ -138,9 +170,9 @@ export async function getFeedbackTrend(
     });
 
     data.forEach((feedback) => {
-        const date = new Date(feedback.created_at);
-
-        const dateString = vietnamFormatter.format(date);
+        const dateString = vietnamFormatter.format(
+            new Date(feedback.created_at),
+        );
 
         if (countByDate.has(dateString)) {
             countByDate.set(dateString, (countByDate.get(dateString) ?? 0) + 1);
@@ -222,20 +254,17 @@ export async function getRecentFeedback(
 
     const { data: feedbackData, error: feedbackError } = await supabase
         .from("feedback")
-        .select("id, table_id, selected_options, feedback, created_at")
+        .select("id, table_id, selected_options, feedback, status, created_at")
         .eq("restaurant_id", restaurantId)
-        .order("created_at", {
-            ascending: false,
-        })
+        .order("created_at", { ascending: false })
         .limit(5);
 
     if (feedbackError) {
         console.error("Failed to get recent feedback:", feedbackError);
-
         return [];
     }
 
-    if (!feedbackData.length) {
+    if (feedbackData.length === 0) {
         return [];
     }
 
@@ -244,6 +273,7 @@ export async function getRecentFeedback(
     const { data: tablesData, error: tablesError } = await supabase
         .from("tables")
         .select("id, name")
+        .eq("restaurant_id", restaurantId)
         .in("id", tableIds);
 
     if (tablesError) {
@@ -259,6 +289,63 @@ export async function getRecentFeedback(
         tableName: tableNameMap.get(item.table_id) ?? "Không xác định",
         selectedOptions: item.selected_options ?? [],
         feedback: item.feedback ?? "",
+        status: item.status as RecentFeedbackItem["status"],
         createdAt: item.created_at,
     }));
+}
+
+export async function getFeedbackStatusDistribution(
+    restaurantId: string,
+): Promise<FeedbackStatusDistributionItem[]> {
+    const supabase = await createClient();
+
+    const statuses = [
+        { status: "new", label: "Chưa xử lý" },
+        { status: "in_progress", label: "Đang xử lý" },
+        { status: "resolved", label: "Đã giải quyết" },
+    ] as const;
+
+    const { data, error } = await supabase
+        .from("feedback")
+        .select("status")
+        .eq("restaurant_id", restaurantId);
+
+    if (error) {
+        console.error("Failed to get feedback status distribution:", error);
+
+        return statuses.map((item) => ({
+            ...item,
+            count: 0,
+            percentage: 0,
+        }));
+    }
+
+    const countByStatus = new Map<string, number>();
+
+    statuses.forEach(({ status }) => {
+        countByStatus.set(status, 0);
+    });
+
+    data.forEach((item) => {
+        const count = countByStatus.get(item.status);
+
+        if (count !== undefined) {
+            countByStatus.set(item.status, count + 1);
+        }
+    });
+
+    const total = statuses.reduce(
+        (sum, item) => sum + (countByStatus.get(item.status) ?? 0),
+        0,
+    );
+
+    return statuses.map((item) => {
+        const count = countByStatus.get(item.status) ?? 0;
+
+        return {
+            ...item,
+            count,
+            percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+        };
+    });
 }

@@ -1,32 +1,153 @@
+"use client";
+
 import type { FeedbackTrendItem } from "@/lib/dashboard/types";
-import { Box, Card, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, CircularProgress, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+    CartesianGrid,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
 
 type FeedbackTrendProps = {
     data: FeedbackTrendItem[];
 };
 
+type FeedbackTrendPeriod = 7 | 30;
+
+type FeedbackTrendResponse = {
+    data: FeedbackTrendItem[];
+};
+
 export default function FeedbackTrend({ data }: FeedbackTrendProps) {
-    const maxCount = Math.max(...data.map((item) => item.count), 1);
+    const [period, setPeriod] = useState<FeedbackTrendPeriod>(7);
+    const [chartData, setChartData] = useState(data);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    const displayedData = period === 7 ? data : chartData;
+
+    useEffect(() => {
+        if (period === 7) {
+            return;
+        }
+
+        const controller = new AbortController();
+
+        async function fetchFeedbackTrend() {
+            setIsLoading(true);
+            setErrorMessage("");
+
+            try {
+                const response = await fetch(
+                    `/api/dashboard/feedback-trend?period=${period}`,
+                    { signal: controller.signal },
+                );
+
+                if (!response.ok) {
+                    throw new Error("Không thể tải dữ liệu xu hướng phản hồi.");
+                }
+
+                const result: FeedbackTrendResponse = await response.json();
+
+                setChartData(result.data);
+            } catch (error) {
+                if (error instanceof Error && error.name === "AbortError") {
+                    return;
+                }
+
+                setErrorMessage("Không thể tải dữ liệu. Vui lòng thử lại.");
+            } finally {
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
+            }
+        }
+
+        void fetchFeedbackTrend();
+
+        return () => {
+            controller.abort();
+        };
+    }, [period]);
 
     return (
         <Card
             elevation={0}
             sx={{
-                p: 3,
-                border: "1px solid #e5e7eb",
-                borderRadius: 2,
-                backgroundColor: "#ffffff",
+                p: { xs: 2, sm: 2.5 },
+                border: "1px solid #E5E7EB",
+                borderRadius: 2.5,
+                backgroundColor: "#FFFFFF",
+                minWidth: 0,
             }}
         >
-            <Typography
+            <Box
                 sx={{
-                    fontSize: 16,
-                    fontWeight: 700,
-                    color: "#193B56",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: { xs: "flex-start", sm: "center" },
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: 1.5,
                 }}
             >
-                Feedback Trend
-            </Typography>
+                <Typography
+                    sx={{
+                        fontSize: 16,
+                        fontWeight: 700,
+                        color: "#193B56",
+                    }}
+                >
+                    Xu hướng phản hồi
+                </Typography>
+
+                <Box sx={{ display: "flex", gap: 0.75 }}>
+                    {([7, 30] as const).map((value) => {
+                        const isSelected = period === value;
+
+                        return (
+                            <Button
+                                key={value}
+                                size="small"
+                                variant={isSelected ? "contained" : "outlined"}
+                                onClick={() => setPeriod(value)}
+                                disabled={isLoading}
+                                sx={{
+                                    minWidth: 0,
+                                    px: 1.5,
+                                    py: 0.5,
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    textTransform: "none",
+                                    borderRadius: 1.5,
+                                    borderColor: "#D0D5DD",
+                                    color: isSelected ? "#FFFFFF" : "#475467",
+                                    backgroundColor: isSelected
+                                        ? "#193B56"
+                                        : "#FFFFFF",
+                                    boxShadow: "none",
+                                    "&:hover": {
+                                        borderColor: "#193B56",
+                                        backgroundColor: isSelected
+                                            ? "#142F45"
+                                            : "#F9FAFB",
+                                        boxShadow: "none",
+                                    },
+                                    "&.Mui-disabled": {
+                                        borderColor: "#D0D5DD",
+                                    },
+                                }}
+                            >
+                                {value} ngày
+                            </Button>
+                        );
+                    })}
+                </Box>
+            </Box>
 
             <Typography
                 sx={{
@@ -35,73 +156,122 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                     color: "#667085",
                 }}
             >
-                Phản hồi trong 7 ngày gần nhất
+                Số lượng phản hồi trong {period} ngày gần nhất
             </Typography>
 
-            <Stack
+            <Box
                 sx={{
-                    mt: 4,
-                    height: 220,
-                    flexDirection: "row",
-                    alignItems: "flex-end",
-                    gap: {
-                        xs: 1,
-                        sm: 2,
-                    },
+                    mt: 2,
+                    width: "100%",
+                    height: 240,
+                    position: "relative",
                 }}
             >
-                {data.map((item) => {
-                    const height =
-                        item.count === 0
-                            ? 4
-                            : Math.max((item.count / maxCount) * 180, 12);
-
-                    return (
-                        <Stack
-                            key={item.date}
+                {isLoading ? (
+                    <Box
+                        sx={{
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <CircularProgress size={28} sx={{ color: "#193B56" }} />
+                    </Box>
+                ) : errorMessage ? (
+                    <Box
+                        sx={{
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            px: 2,
+                        }}
+                    >
+                        <Typography
                             sx={{
-                                flex: 1,
-                                height: "100%",
-                                alignItems: "center",
-                                justifyContent: "flex-end",
-                                gap: 1,
-                                minWidth: 0,
+                                color: "#D92D20",
+                                fontSize: 13,
+                                textAlign: "center",
                             }}
                         >
-                            <Typography
-                                sx={{
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    color: "#193B56",
-                                }}
-                            >
-                                {item.count}
-                            </Typography>
+                            {errorMessage}
+                        </Typography>
+                    </Box>
+                ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                            data={displayedData}
+                            margin={{
+                                top: 8,
+                                right: 12,
+                                left: -16,
+                                bottom: 4,
+                            }}
+                        >
+                            <CartesianGrid
+                                stroke="#EAECF0"
+                                strokeDasharray="3 3"
+                                vertical={false}
+                            />
 
-                            <Box
-                                sx={{
-                                    width: "100%",
-                                    maxWidth: 44,
-                                    height,
-                                    borderRadius: "6px 6px 2px 2px",
-                                    backgroundColor: "#193B56",
-                                    transition: "height 300ms ease",
+                            <XAxis
+                                dataKey="label"
+                                tick={{
+                                    fontSize: 11,
+                                    fill: "#667085",
+                                }}
+                                tickLine={false}
+                                axisLine={false}
+                                interval={period === 7 ? 0 : "preserveStartEnd"}
+                            />
+
+                            <YAxis
+                                allowDecimals={false}
+                                width={36}
+                                tick={{
+                                    fontSize: 11,
+                                    fill: "#667085",
+                                }}
+                                tickLine={false}
+                                axisLine={false}
+                            />
+
+                            <Tooltip
+                                formatter={(value) => [
+                                    value ?? 0,
+                                    "Số phản hồi",
+                                ]}
+                                labelFormatter={(label) => `Ngày ${label}`}
+                                contentStyle={{
+                                    border: "1px solid #EAECF0",
+                                    borderRadius: 8,
+                                    fontSize: 12,
+                                    fontFamily:
+                                        "var(--font-momo-trust-sans), sans-serif",
                                 }}
                             />
 
-                            <Typography
-                                sx={{
-                                    fontSize: 11,
-                                    color: "#667085",
-                                    whiteSpace: "nowrap",
+                            <Line
+                                type="monotone"
+                                dataKey="count"
+                                name="Số phản hồi"
+                                stroke="#193B56"
+                                strokeWidth={2.5}
+                                dot={{
+                                    r: period === 7 ? 4 : 2,
+                                    fill: "#193B56",
+                                    strokeWidth: 0,
                                 }}
-                            >
-                                {item.label}
-                            </Typography>
-                        </Stack>
-                    );
-                })}
-            </Stack>
+                                activeDot={{
+                                    r: 6,
+                                    fill: "#193B56",
+                                }}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                )}
+            </Box>
         </Card>
     );
 }

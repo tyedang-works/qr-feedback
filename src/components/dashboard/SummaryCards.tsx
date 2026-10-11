@@ -1,3 +1,9 @@
+import {
+    faCalendarCheck,
+    faList,
+    faTableCells,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Card, Stack, Typography } from "@mui/material";
 
 type SummaryCardsProps = {
@@ -13,16 +19,28 @@ export default function SummaryCards({
 }: SummaryCardsProps) {
     const summaryItems = [
         {
-            label: "Total Feedback",
+            label: "Tổng phản hồi",
             value: totalFeedback,
+            color: "#193B56",
+            backgroundColor: "#EEF4F8",
+            indicator: "#193B56",
+            icon: faList,
         },
         {
-            label: "Today",
+            label: "Hôm nay",
             value: todayFeedback,
+            color: "#193B56",
+            backgroundColor: "#FFF5E8",
+            indicator: "#E89A42",
+            icon: faCalendarCheck,
         },
         {
-            label: "Tables",
+            label: "Bàn đang hoạt động",
             value: activeTables,
+            color: "#193B56",
+            backgroundColor: "#ECFDF3",
+            indicator: "#12B76A",
+            icon: faTableCells,
         },
     ];
 
@@ -31,46 +49,85 @@ export default function SummaryCards({
             sx={{
                 display: "grid",
                 gridTemplateColumns: {
-                    xs: "1fr",
-                    sm: "repeat(3, 1fr)",
+                    xs: "minmax(0, 1fr)",
+                    sm: "repeat(3, minmax(0, 1fr))",
                 },
                 gap: 2,
             }}
         >
-            {summaryItems.map((item) => (
-                <Card
-                    key={item.label}
-                    elevation={0}
-                    sx={{
-                        p: 2.5,
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 2,
-                        backgroundColor: "#ffffff",
-                    }}
-                >
-                    <Stack sx={{ gap: 1 }}>
-                        <Typography
+            {summaryItems.map((item) => {
+                return (
+                    <Card
+                        key={item.label}
+                        elevation={0}
+                        sx={{
+                            p: { xs: 2, sm: 2.5 },
+                            border: "1px solid #E5E7EB",
+                            borderRadius: 2.5,
+                            backgroundColor: item.backgroundColor,
+                            minWidth: 0,
+                        }}
+                    >
+                        <Stack
                             sx={{
-                                fontSize: 13,
-                                color: "#667085",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 1.5,
                             }}
                         >
-                            {item.label}
-                        </Typography>
+                            <Box
+                                sx={{
+                                    width: 44,
+                                    height: 44,
+                                    flexShrink: 0,
+                                    borderRadius: "50%",
+                                    backgroundColor:
+                                        item.label === "Tổng phản hồi"
+                                            ? "transparent"
+                                            : "#FFFFFF",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    border: "none",
+                                }}
+                            >
+                                <FontAwesomeIcon
+                                    icon={item.icon}
+                                    size="sm"
+                                    style={{
+                                        color: item.indicator,
+                                        fontSize: "18px",
+                                    }}
+                                />
+                            </Box>
 
-                        <Typography
-                            sx={{
-                                fontSize: 28,
-                                lineHeight: 1,
-                                fontWeight: 700,
-                                color: "#193B56",
-                            }}
-                        >
-                            {item.value}
-                        </Typography>
-                    </Stack>
-                </Card>
-            ))}
+                            <Box sx={{ minWidth: 0, flex: 1 }}>
+                                <Typography
+                                    sx={{
+                                        fontSize: 13,
+                                        color: "#667085",
+                                        mb: 0.5,
+                                    }}
+                                >
+                                    {item.label}
+                                </Typography>
+
+                                <Typography
+                                    sx={{
+                                        fontSize: { xs: 25, sm: 28 },
+                                        lineHeight: 1.2,
+                                        fontWeight: 700,
+                                        color: item.color,
+                                        fontVariantNumeric: "tabular-nums",
+                                    }}
+                                >
+                                    {item.value.toLocaleString("vi-VN")}
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Card>
+                );
+            })}
         </Box>
     );
 }

@@ -1,21 +1,33 @@
+"use client";
+
 import type { IssueDistributionItem } from "@/lib/dashboard/types";
-import { Box, Card, Stack, Typography } from "@mui/material";
+import { Box, Card, Typography } from "@mui/material";
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
 
 type IssueDistributionProps = {
     data: IssueDistributionItem[];
 };
 
 export default function IssueDistribution({ data }: IssueDistributionProps) {
-    const maxCount = Math.max(...data.map((item) => item.count), 1);
-
     return (
         <Card
             elevation={0}
             sx={{
-                p: 3,
-                border: "1px solid #e5e7eb",
-                borderRadius: 2,
-                backgroundColor: "#ffffff",
+                p: { xs: 2, sm: 2.5 },
+                border: "1px solid #E5E7EB",
+                borderRadius: 2.5,
+                backgroundColor: "#FFFFFF",
+                minWidth: 0,
+                height: "100%",
             }}
         >
             <Typography
@@ -25,7 +37,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                     color: "#193B56",
                 }}
             >
-                Issue Distribution
+                Phân bố vấn đề
             </Typography>
 
             <Typography
@@ -35,77 +47,81 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                     color: "#667085",
                 }}
             >
-                Các vấn đề được khách hàng lựa chọn
+                Các vấn đề khách hàng lựa chọn
             </Typography>
 
-            <Stack
-                sx={{
-                    mt: 3,
-                    gap: 2.5,
-                }}
-            >
-                {data.map((item) => {
-                    const width =
-                        item.count === 0
-                            ? 0
-                            : Math.max((item.count / maxCount) * 100, 4);
+            <Box sx={{ mt: 2, width: "100%", height: 240 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                        data={data}
+                        layout="vertical"
+                        margin={{
+                            top: 4,
+                            right: 12,
+                            left: 8,
+                            bottom: 4,
+                        }}
+                    >
+                        <CartesianGrid
+                            stroke="#EAECF0"
+                            strokeDasharray="3 3"
+                            horizontal={false}
+                        />
 
-                    return (
-                        <Box key={item.option}>
-                            <Stack
-                                sx={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                    gap: 2,
-                                    mb: 0.75,
-                                }}
-                            >
-                                <Typography
-                                    sx={{
-                                        minWidth: 0,
-                                        fontSize: 13,
-                                        color: "#344054",
-                                    }}
-                                >
-                                    {item.label}
-                                </Typography>
+                        <XAxis
+                            type="number"
+                            allowDecimals={false}
+                            tick={{
+                                fontSize: 11,
+                                fill: "#667085",
+                                fontFamily:
+                                    "var(--font-momo-trust-sans), sans-serif",
+                            }}
+                            tickLine={false}
+                            axisLine={false}
+                        />
 
-                                <Typography
-                                    sx={{
-                                        flexShrink: 0,
-                                        fontSize: 13,
-                                        fontWeight: 600,
-                                        color: "#193B56",
-                                    }}
-                                >
-                                    {item.count} ({item.percentage}%)
-                                </Typography>
-                            </Stack>
+                        <YAxis
+                            type="category"
+                            dataKey="label"
+                            width={160}
+                            tick={{
+                                fontSize: 11,
+                                fill: "#344054",
+                                fontFamily:
+                                    "var(--font-momo-trust-sans), sans-serif",
+                            }}
+                            tickLine={false}
+                            axisLine={false}
+                        />
 
-                            <Box
-                                sx={{
-                                    width: "100%",
-                                    height: 7,
-                                    overflow: "hidden",
-                                    borderRadius: 10,
-                                    backgroundColor: "#eef2f5",
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        width: `${width}%`,
-                                        height: "100%",
-                                        borderRadius: 10,
-                                        backgroundColor: "#193B56",
-                                        transition: "width 300ms ease",
-                                    }}
-                                />
-                            </Box>
-                        </Box>
-                    );
-                })}
-            </Stack>
+                        <Tooltip
+                            formatter={(value, _name, item) => [
+                                `${Number(value ?? 0).toLocaleString("vi-VN")} lượt (${item.payload.percentage}%)`,
+                                "Số phản hồi",
+                            ]}
+                            contentStyle={{
+                                border: "1px solid #EAECF0",
+                                borderRadius: 8,
+                                fontSize: 12,
+                                fontFamily:
+                                    "var(--font-momo-trust-sans), sans-serif",
+                            }}
+                        />
+
+                        <Bar
+                            dataKey="count"
+                            name="Số phản hồi"
+                            radius={[0, 5, 5, 0]}
+                            maxBarSize={26}
+                        >
+                            {data.map((item) => (
+                                <Cell key={item.option} fill="#193B56" />
+                            ))}
+                        </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+            </Box>
         </Card>
     );
 }

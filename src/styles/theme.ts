@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material/styles";
+const fontFamily = "var(--font-momo-trust-sans), sans-serif";
 
 export const theme = createTheme({
     typography: {
@@ -14,6 +15,13 @@ export const theme = createTheme({
                     alignItems: "center",
                     justifyContent: "center",
                     lineHeight: 1.2,
+                },
+            },
+        },
+        MuiCssBaseline: {
+            styleOverrides: {
+                body: {
+                    fontFamily,
                 },
             },
         },

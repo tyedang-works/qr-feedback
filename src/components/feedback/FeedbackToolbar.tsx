@@ -1,3 +1,5 @@
+"use client";
+
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
 import { FEEDBACK_ISSUES, FEEDBACK_STATUS } from "@/lib/feedback/constants";
@@ -135,30 +137,37 @@ export default function FeedbackToolbar({
                     </QRSelect>
                 </Box>
 
-                <Button
-                    type="submit"
-                    variant="contained"
+                <Stack
                     sx={{
-                        width: { xs: "100%", md: "auto" },
-                        minWidth: { md: 100 },
-                        height: 40,
-                        px: 2.5,
-                        borderRadius: 1.5,
-                        backgroundColor: "#1976d2",
-                        fontSize: 14,
-                        fontWeight: 600,
-                        textTransform: "none",
-                        boxShadow: "none",
+                        flexDirection: { xs: "column", sm: "row" },
+                        gap: 1,
                         flexShrink: 0,
                         marginTop: { xs: "10px", md: "24px" },
-                        "&:hover": {
-                            backgroundColor: "#1565c0",
-                            boxShadow: "none",
-                        },
                     }}
                 >
-                    Tìm kiếm
-                </Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{
+                            width: { xs: "100%", md: "auto" },
+                            minWidth: { md: 100 },
+                            height: 40,
+                            px: 2.5,
+                            borderRadius: 1.5,
+                            backgroundColor: "#1976d2",
+                            fontSize: 14,
+                            fontWeight: 600,
+                            textTransform: "none",
+                            boxShadow: "none",
+                            "&:hover": {
+                                backgroundColor: "#1565c0",
+                                boxShadow: "none",
+                            },
+                        }}
+                    >
+                        Tìm kiếm
+                    </Button>
+                </Stack>
             </Stack>
         </Box>
     );

@@ -3,6 +3,7 @@ import type { FeedbackStatus } from "./constants";
 import type {
     FeedbackDetail,
     FeedbackFilters,
+    FeedbackListItem,
     FeedbackListResult,
 } from "./types";
 
@@ -238,4 +239,108 @@ export async function getFeedbackDetail(
         internalNote: feedback.internal_note ?? null,
         createdAt: feedback.created_at,
     };
+}
+
+export async function getFeedbackExport(
+    restaurantId: string,
+    filters: Pick<FeedbackFilters, "keyword" | "issue" | "tableId" | "status">,
+): Promise<FeedbackListItem[]> {
+    const supabase = await createClient();
+    const batchSize = 500;
+    const result: FeedbackListItem[] = [];
+
+    const { keyword, issue, tableId, status } = filters;
+
+    let from = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+        let query = supabase
+            .from("feedback")
+            .select(
+                `
+                    id,
+                    public_id,
+                    table_id,
+                    selected_options,
+                    feedback,
+                    phone,
+                    status,
+                    internal_note,
+                    created_at
+                `,
+            )
+            .eq("restaurant_id", restaurantId);
+
+        if (keyword.trim()) {
+            query = query.ilike("feedback", `%${keyword.trim()}%`);
+        }
+
+        if (tableId && tableId !== "all") {
+            query = query.eq("table_id", tableId);
+        }
+
+        if (issue && issue !== "all") {
+            query = query.contains("selected_options", [issue]);
+        }
+
+        if (status && status !== "all") {
+            query = query.eq("status", status);
+        }
+
+        const { data, error } = await query
+            .order("created_at", { ascending: false })
+            .range(from, from + batchSize - 1);
+
+        if (error) {
+            console.error("Failed to export feedback:", error);
+            throw new Error("Không thể tải dữ liệu phản hồi để xuất báo cáo.");
+        }
+
+        const feedbackData = data ?? [];
+
+        if (feedbackData.length === 0) {
+            hasMore = false;
+            continue;
+        }
+
+        const tableIds = [
+            ...new Set(feedbackData.map((item) => item.table_id)),
+        ];
+
+        const { data: tablesData, error: tablesError } = await supabase
+            .from("tables")
+            .select("id, name")
+            .eq("restaurant_id", restaurantId)
+            .in("id", tableIds);
+
+        if (tablesError) {
+            console.error("Failed to get feedback export tables:", tablesError);
+            throw new Error("Không thể tải thông tin bàn để xuất báo cáo.");
+        }
+
+        const tableNameMap = new Map(
+            (tablesData ?? []).map((table) => [table.id, table.name]),
+        );
+
+        result.push(
+            ...feedbackData.map((item) => ({
+                id: item.id,
+                publicId: item.public_id,
+                tableId: item.table_id,
+                tableName: tableNameMap.get(item.table_id) ?? "Không xác định",
+                selectedOptions: item.selected_options ?? [],
+                feedback: item.feedback ?? "",
+                phone: item.phone,
+                status: item.status as FeedbackStatus,
+                internalNote: item.internal_note ?? null,
+                createdAt: item.created_at,
+            })),
+        );
+
+        hasMore = feedbackData.length === batchSize;
+        from += batchSize;
+    }
+
+    return result;
 }

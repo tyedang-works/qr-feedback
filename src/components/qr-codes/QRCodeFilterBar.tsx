@@ -8,10 +8,18 @@ import type {
     QRCodeSort,
     QRCodeStatusFilter,
 } from "@/lib/qr-codes/types";
-import { MenuItem, Stack } from "@mui/material";
+import {
+    Box,
+    IconButton,
+    InputAdornment,
+    MenuItem,
+    Tooltip,
+} from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
+import { faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const PAGE_SIZES: QRCodePageSize[] = [10, 25, 50];
 
@@ -19,32 +27,17 @@ const STATUS_OPTIONS: {
     value: QRCodeStatusFilter;
     label: string;
 }[] = [
-    {
-        value: "all",
-        label: "Tất cả trạng thái",
-    },
-    {
-        value: "active",
-        label: "Đang hoạt động",
-    },
-    {
-        value: "inactive",
-        label: "Đang tắt",
-    },
+    { value: "all", label: "Tất cả trạng thái" },
+    { value: "active", label: "Đang hoạt động" },
+    { value: "inactive", label: "Đang tắt" },
 ];
 
 const SORT_OPTIONS: {
     value: QRCodeSort;
     label: string;
 }[] = [
-    {
-        value: "name_asc",
-        label: "Tên bàn A → Z",
-    },
-    {
-        value: "name_desc",
-        label: "Tên bàn Z → A",
-    },
+    { value: "name_asc", label: "Tên bàn A → Z" },
+    { value: "name_desc", label: "Tên bàn Z → A" },
 ];
 
 function isPageSize(value: number): value is QRCodePageSize {
@@ -65,21 +58,16 @@ export default function QRCodeFilterBar() {
     const searchParams = useSearchParams();
 
     const keywordParam = searchParams.get("keyword") ?? "";
+    const statusParam = searchParams.get("status") ?? "all";
+    const sortParam = searchParams.get("sort") ?? "name_asc";
+    const pageSizeParam = Number(searchParams.get("pageSize") ?? "10");
 
     const [keyword, setKeyword] = useState(keywordParam);
 
     const debouncedKeyword = useDebounce(keyword, 400);
 
-    const statusParam = searchParams.get("status") ?? "all";
-
     const status = isStatus(statusParam) ? statusParam : "all";
-
-    const sortParam = searchParams.get("sort") ?? "name_asc";
-
     const sort = isSort(sortParam) ? sortParam : "name_asc";
-
-    const pageSizeParam = Number(searchParams.get("pageSize") ?? "10");
-
     const pageSize = isPageSize(pageSizeParam) ? pageSizeParam : 10;
 
     const updateParams = useCallback(
@@ -89,15 +77,20 @@ export default function QRCodeFilterBar() {
             Object.entries(updates).forEach(([key, value]) => {
                 if (value === null || value === "") {
                     params.delete(key);
-                    return;
+                } else {
+                    params.set(key, value);
                 }
-
-                params.set(key, value);
             });
 
             params.set("page", "1");
 
-            router.replace(`${pathname}?${params.toString()}`);
+            const query = params.toString();
+            const nextUrl = query ? `${pathname}?${query}` : pathname;
+            const currentUrl = `${pathname}?${searchParams.toString()}`;
+
+            if (nextUrl !== currentUrl) {
+                router.replace(nextUrl, { scroll: false });
+            }
         },
         [pathname, router, searchParams],
     );
@@ -108,22 +101,20 @@ export default function QRCodeFilterBar() {
         setKeyword(event.target.value);
     };
 
+    const handleClearKeyword = () => {
+        setKeyword("");
+    };
+
     const handleStatusChange = (event: SelectChangeEvent) => {
-        updateParams({
-            status: event.target.value,
-        });
+        updateParams({ status: event.target.value });
     };
 
     const handleSortChange = (event: SelectChangeEvent) => {
-        updateParams({
-            sort: event.target.value,
-        });
+        updateParams({ sort: event.target.value });
     };
 
     const handlePageSizeChange = (event: SelectChangeEvent) => {
-        updateParams({
-            pageSize: event.target.value,
-        });
+        updateParams({ pageSize: event.target.value });
     };
 
     useEffect(() => {
@@ -132,114 +123,133 @@ export default function QRCodeFilterBar() {
         }
 
         updateParams({
-            keyword: debouncedKeyword,
+            keyword: debouncedKeyword.trim() || null,
         });
     }, [debouncedKeyword, keywordParam, updateParams]);
 
     return (
-        <Stack
+        <Box
+            component="section"
+            aria-label="Bộ lọc bàn"
             sx={{
-                flexDirection: {
-                    xs: "column",
-                    sm: "row",
-                },
-                gap: 1.5,
-                alignItems: {
-                    xs: "stretch",
-                    sm: "center",
-                },
+                p: { xs: 1.5, sm: 2 },
+                backgroundColor: "#FFFFFF",
+                border: "1px solid #EAECF0",
+                borderRadius: 2,
+                boxShadow: "0 1px 3px rgba(16, 24, 40, 0.04)",
             }}
         >
-            <QRTextField
-                value={keyword}
-                onChange={handleKeywordChange}
-                placeholder="Tìm bàn..."
-                size="small"
-                fullWidth
-                slotProps={{
-                    htmlInput: {
-                        "aria-label": "Tìm bàn",
-                    },
-                }}
-            />
-
-            <QRSelect
-                value={status}
-                onChange={handleStatusChange}
-                size="small"
-                inputProps={{
-                    "aria-label": "Lọc trạng thái",
-                }}
+            <Box
                 sx={{
-                    maxWidth: {
-                        sm: 180,
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "minmax(0, 1fr)",
+                        sm: "repeat(2, minmax(0, 1fr))",
+                        lg: [
+                            "minmax(240px, 2fr)",
+                            "minmax(180px, 1.1fr)",
+                            "minmax(190px, 1.2fr)",
+                            "minmax(130px, 0.8fr)",
+                        ].join(" "),
                     },
+                    gap: 1.5,
+                    alignItems: "start",
                 }}
             >
-                {STATUS_OPTIONS.map((option) => (
-                    <MenuItem
-                        key={option.value}
-                        value={option.value}
-                        sx={{
-                            fontSize: 14,
-                        }}
-                    >
-                        {option.label}
-                    </MenuItem>
-                ))}
-            </QRSelect>
+                <QRTextField
+                    label="Tìm kiếm bàn"
+                    value={keyword}
+                    onChange={handleKeywordChange}
+                    placeholder="Nhập tên bàn..."
+                    size="small"
+                    slotProps={{
+                        htmlInput: {
+                            "aria-label": "Tìm kiếm bàn",
+                        },
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <FontAwesomeIcon
+                                        icon={faMagnifyingGlass}
+                                        style={{
+                                            fontSize: 14,
+                                            color: "#98A2B3",
+                                        }}
+                                    />
+                                </InputAdornment>
+                            ),
+                            endAdornment: keyword ? (
+                                <InputAdornment position="end">
+                                    <Tooltip title="Xóa từ khóa">
+                                        <IconButton
+                                            type="button"
+                                            size="small"
+                                            aria-label="Xóa từ khóa tìm kiếm"
+                                            onClick={handleClearKeyword}
+                                            edge="end"
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faXmark}
+                                                style={{
+                                                    fontSize: 14,
+                                                }}
+                                            />
+                                        </IconButton>
+                                    </Tooltip>
+                                </InputAdornment>
+                            ) : undefined,
+                        },
+                    }}
+                />
 
-            <QRSelect
-                value={sort}
-                onChange={handleSortChange}
-                size="small"
-                inputProps={{
-                    "aria-label": "Sắp xếp",
-                }}
-                sx={{
-                    maxWidth: {
-                        sm: 170,
-                    },
-                }}
-            >
-                {SORT_OPTIONS.map((option) => (
-                    <MenuItem
-                        key={option.value}
-                        value={option.value}
-                        sx={{
-                            fontSize: 14,
-                        }}
-                    >
-                        {option.label}
-                    </MenuItem>
-                ))}
-            </QRSelect>
+                <QRSelect
+                    label="Trạng thái"
+                    value={status}
+                    onChange={handleStatusChange}
+                    size="small"
+                    inputProps={{
+                        "aria-label": "Lọc trạng thái",
+                    }}
+                >
+                    {STATUS_OPTIONS.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                        </MenuItem>
+                    ))}
+                </QRSelect>
 
-            <QRSelect
-                value={String(pageSize)}
-                onChange={handlePageSizeChange}
-                size="small"
-                inputProps={{
-                    "aria-label": "Số bàn mỗi trang",
-                }}
-                sx={{
-                    maxWidth: {
-                        sm: 120,
-                    },
-                }}
-            >
-                {PAGE_SIZES.map((size) => (
-                    <MenuItem
-                        key={size}
-                        value={String(size)}
-                        sx={{
-                            fontSize: 14,
-                        }}
-                    >
-                        {size} / trang
-                    </MenuItem>
-                ))}
-            </QRSelect>
-        </Stack>
+                <QRSelect
+                    label="Sắp xếp theo"
+                    value={sort}
+                    onChange={handleSortChange}
+                    size="small"
+                    inputProps={{
+                        "aria-label": "Sắp xếp bàn",
+                    }}
+                >
+                    {SORT_OPTIONS.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                        </MenuItem>
+                    ))}
+                </QRSelect>
+
+                <QRSelect
+                    label="Hiển thị"
+                    value={String(pageSize)}
+                    onChange={handlePageSizeChange}
+                    size="small"
+                    inputProps={{
+                        "aria-label": "Số bàn mỗi trang",
+                    }}
+                >
+                    {PAGE_SIZES.map((size) => (
+                        <MenuItem key={size} value={String(size)}>
+                            {size} / trang
+                        </MenuItem>
+                    ))}
+                </QRSelect>
+            </Box>
+        </Box>
     );
 }

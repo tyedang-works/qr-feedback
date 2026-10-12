@@ -15,6 +15,7 @@ import type {
     QRCodeTable,
 } from "@/lib/qr-codes/types";
 
+import { checkboxStyleSx } from "@/styles/form.styles";
 import QRCodeBulkPrintView from "./QRCodeBulkPrintView";
 import QRCodePagination from "./QRCodePagination";
 import QRCodePreviewButton from "./QRCodePreviewButton";
@@ -79,14 +80,6 @@ export default function QRCodeList({
         excludedIds: [],
     });
 
-    /*
-     * `all` selection belongs to the current filter set.
-     *
-     * When keyword/status/sort changes, an old "select all"
-     * selection must not continue to apply to the new result set.
-     *
-     * Manual selections intentionally remain untouched.
-     */
     const filterKey = [filters.keyword, filters.status, filters.sort].join("|");
 
     const previousFilterKeyRef = useRef(filterKey);
@@ -119,16 +112,6 @@ export default function QRCodeList({
         return selection.selectedIds.includes(id);
     };
 
-    /*
-     * Toggle one table.
-     *
-     * Manual mode:
-     *   - add/remove table ID from selectedIds
-     *
-     * All mode:
-     *   - all matching active tables are selected
-     *   - clicking a table adds/removes it from excludedIds
-     */
     const handleToggleSelection = (id: string) => {
         setSelection((currentSelection) => {
             if (currentSelection.mode === "all") {
@@ -160,9 +143,6 @@ export default function QRCodeList({
         });
     };
 
-    /*
-     * Only active tables can be selected for QR printing.
-     */
     const selectableTables = data.filter((table) => table.isActive);
 
     const selectedOnCurrentPage = selectableTables.filter((table) =>
@@ -176,17 +156,6 @@ export default function QRCodeList({
     const someCurrentPageSelected =
         selectedOnCurrentPage.length > 0 && !allCurrentPageSelected;
 
-    /*
-     * Toggle all selectable tables on the current page.
-     *
-     * Manual mode:
-     *   - select/deselect current page
-     *
-     * All mode:
-     *   - current page is selected by default
-     *   - clicking header excludes current page
-     *   - clicking again removes those exclusions
-     */
     const handleSelectCurrentPage = () => {
         if (selectableTables.length === 0) {
             return;
@@ -253,13 +222,6 @@ export default function QRCodeList({
         });
     };
 
-    /*
-     * Manual:
-     *   selectedIds.length
-     *
-     * All:
-     *   selectableTotal - excludedIds.length
-     */
     const selectedCount =
         selection.mode === "all"
             ? Math.max(selectableTotal - selection.excludedIds.length, 0)
@@ -444,9 +406,7 @@ export default function QRCodeList({
                             disabled={selectableTables.length === 0}
                             onChange={handleSelectCurrentPage}
                             size="small"
-                            sx={{
-                                p: 0,
-                            }}
+                            sx={checkboxStyleSx}
                         />
 
                         <Typography
@@ -483,7 +443,7 @@ export default function QRCodeList({
                             sx={{
                                 fontSize: 14,
                                 fontWeight: 600,
-                                color: "#344054",
+                                color: "#1a202e",
                                 textAlign: "right",
                             }}
                         >
@@ -520,9 +480,7 @@ export default function QRCodeList({
                                         handleToggleSelection(table.id)
                                     }
                                     size="small"
-                                    sx={{
-                                        p: 0,
-                                    }}
+                                    sx={checkboxStyleSx}
                                 />
 
                                 <Typography
@@ -636,9 +594,7 @@ export default function QRCodeList({
                                                     )
                                                 }
                                                 size="small"
-                                                sx={{
-                                                    p: 0,
-                                                }}
+                                                sx={checkboxStyleSx}
                                             />
 
                                             <Typography

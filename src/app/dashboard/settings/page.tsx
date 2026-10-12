@@ -1,11 +1,11 @@
-import { Box, Stack, Typography } from "@mui/material";
-
 import RestaurantSettingsForm from "@/components/settings/RestaurantSettingsForm";
+import { canManageSettings } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import { getRestaurantSettings } from "@/lib/restaurant/queries";
+import { faBell, faGear } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Box, Stack, Typography } from "@mui/material";
 import { redirect } from "next/navigation";
-
-import { canManageSettings } from "@/lib/auth/permissions";
 
 export default async function SettingsPage() {
     const userContext = await getUserContext();
@@ -13,6 +13,7 @@ export default async function SettingsPage() {
     if (!userContext) {
         return null;
     }
+
     if (!canManageSettings(userContext.role)) {
         redirect("/dashboard");
     }
@@ -22,81 +23,114 @@ export default async function SettingsPage() {
     return (
         <Stack
             sx={{
-                gap: 3,
+                gap: { xs: 3, md: 4 },
+                width: "100%",
+                minWidth: 0,
             }}
         >
-            <Box>
-                <Typography
+            <Stack
+                sx={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 2,
+                }}
+            >
+                <Box
                     sx={{
-                        fontSize: {
-                            xs: 22,
-                            sm: 24,
-                        },
-                        lineHeight: 1.4,
-                        fontWeight: 700,
-                        color: "#193B56",
+                        width: 48,
+                        height: 48,
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 2.5,
+                        bgcolor: "#EAF3F0",
+                        color: "#237A62",
                     }}
                 >
-                    Cài đặt
-                </Typography>
+                    <FontAwesomeIcon icon={faGear} style={{ fontSize: 22 }} />
+                </Box>
 
-                <Typography
-                    sx={{
-                        mt: 0.5,
-                        fontSize: 14,
-                        lineHeight: 1.5,
-                        color: "#667085",
-                    }}
-                >
-                    Quản lý thông tin nhà hàng của bạn.
-                </Typography>
-            </Box>
+                <Box sx={{ minWidth: 0 }}>
+                    <Typography
+                        sx={{
+                            fontSize: { xs: 22, sm: 26 },
+                            lineHeight: 1.35,
+                            fontWeight: 700,
+                            color: "#193B56",
+                        }}
+                    >
+                        Cài đặt nhà hàng
+                    </Typography>
+
+                    <Typography
+                        sx={{
+                            mt: 0.5,
+                            fontSize: 14,
+                            lineHeight: 1.6,
+                            color: "#667085",
+                        }}
+                    >
+                        Quản lý thông tin và thông tin liên hệ của nhà hàng.
+                    </Typography>
+                </Box>
+            </Stack>
 
             <Box
                 sx={{
                     width: "100%",
-                    maxWidth: 900,
-                    border: "1px solid #eaecf0",
-                    borderRadius: 2,
-                    backgroundColor: "#ffffff",
+                    border: "1px solid #E4E7EC",
+                    borderRadius: 3,
+                    bgcolor: "#FFFFFF",
                     overflow: "hidden",
+                    boxShadow: "0 2px 8px rgba(16, 24, 40, 0.03)",
                 }}
             >
-                <Stack
+                <Box
                     sx={{
-                        gap: 3,
-                        p: {
-                            xs: 2,
-                            sm: 3,
-                        },
+                        px: { xs: 2.5, sm: 3.5 },
+                        py: { xs: 3, sm: 3.5 },
                     }}
                 >
-                    <Box>
-                        <Typography
-                            sx={{
-                                fontSize: 16,
-                                lineHeight: 1.5,
-                                fontWeight: 600,
-                                color: "#193B56",
-                            }}
-                        >
-                            Thông tin nhà hàng
-                        </Typography>
-
-                        <Typography
-                            sx={{
-                                mt: 0.5,
-                                fontSize: 13,
-                                lineHeight: 1.5,
-                                color: "#667085",
-                            }}
-                        >
-                            Cập nhật thông tin cơ bản của nhà hàng.
-                        </Typography>
-                    </Box>
-
                     <RestaurantSettingsForm initialSettings={restaurant} />
-                </Stack>
+                </Box>
+
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 1,
+                        px: { xs: 2.5, sm: 3.5 },
+                        py: 2,
+                        borderTop: "1px solid #EAECF0",
+                        bgcolor: "#FCFCFD",
+                    }}
+                >
+                    <FontAwesomeIcon
+                        icon={faBell}
+                        size="sm"
+                        style={{
+                            color: "#98A2B3",
+                            flexShrink: 0,
+                            marginTop: 2,
+                        }}
+                    />
+
+                    <Typography
+                        sx={{
+                            minWidth: 0,
+                            flex: 1,
+                            fontSize: 12,
+                            lineHeight: 1.6,
+                            color: "#667085",
+                            fontStyle: "italic",
+                            overflowWrap: "anywhere",
+                        }}
+                    >
+                        Thông tin nhà hàng được sử dụng trong quá trình quản lý
+                        và hỗ trợ khách hàng.
+                    </Typography>
+                </Box>
             </Box>
         </Stack>
     );

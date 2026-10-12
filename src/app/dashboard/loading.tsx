@@ -135,7 +135,6 @@ function RecentFeedbackSkeleton() {
 export default function DashboardLoading() {
     return (
         <Stack sx={{ gap: 2 }}>
-            {/* Summary cards */}
             <Box
                 sx={{
                     display: "grid",
@@ -166,7 +165,6 @@ export default function DashboardLoading() {
                 ))}
             </Box>
 
-            {/* Row 1: Feedback trend and status distribution */}
             <Box
                 sx={{
                     display: "grid",

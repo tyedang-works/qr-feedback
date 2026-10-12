@@ -42,3 +42,10 @@ export type FeedbackDetail = {
     internalNote: string | null;
     createdAt: string;
 };
+
+export type FeedbackSummary = {
+    total: number;
+    new: number;
+    inProgress: number;
+    resolved: number;
+};

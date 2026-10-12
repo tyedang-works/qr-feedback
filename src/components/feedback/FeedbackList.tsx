@@ -274,10 +274,10 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                 display: "grid",
                 gridTemplateColumns: {
                     xs: "minmax(0, 1fr)",
-                    md: "minmax(280px, 0.85fr) minmax(0, 1.15fr)",
+                    md: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
                 },
                 alignItems: "start",
-                gap: 2,
+                gap: { xs: 1.5, md: 2 },
                 width: "100%",
             }}
         >

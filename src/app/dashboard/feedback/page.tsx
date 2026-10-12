@@ -1,10 +1,11 @@
 import FeedbackList from "@/components/feedback/FeedbackList";
 import FeedbackPagination from "@/components/feedback/FeedbackPagination";
+import FeedbackSummary from "@/components/feedback/FeedbackSummary";
 import FeedbackToolbar from "@/components/feedback/FeedbackToolbar";
 import { USER_ROLES } from "@/lib/auth/constants";
 import { getUserContext } from "@/lib/auth/queries";
 import { FEEDBACK_PAGE_SIZE } from "@/lib/feedback/constants";
-import { getFeedbackList } from "@/lib/feedback/queries";
+import { getFeedbackList, getFeedbackSummary } from "@/lib/feedback/queries";
 import { getRestaurantTables } from "@/lib/tables/queries";
 import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -48,7 +49,7 @@ export default async function FeedbackPage({
         redirect("/dashboard");
     }
 
-    const [feedback, tables] = await Promise.all([
+    const [feedback, tables, summary] = await Promise.all([
         getFeedbackList(userContext.restaurantId, {
             page,
             pageSize: FEEDBACK_PAGE_SIZE,
@@ -58,6 +59,7 @@ export default async function FeedbackPage({
             status,
         }),
         getRestaurantTables(userContext.restaurantId),
+        getFeedbackSummary(userContext.restaurantId),
     ]);
 
     const exportParams = new URLSearchParams();
@@ -87,9 +89,9 @@ export default async function FeedbackPage({
         <Stack
             sx={{
                 width: "100%",
-                maxWidth: 1440,
+                minWidth: 0,
                 mx: "auto",
-                gap: { xs: 2.5, md: 3 },
+                gap: { xs: 2, md: 2.5 },
             }}
         >
             <Box>
@@ -107,7 +109,7 @@ export default async function FeedbackPage({
 
                 <Typography
                     sx={{
-                        mt: 0.75,
+                        mt: 0.5,
                         fontSize: 14,
                         lineHeight: 1.6,
                         color: "#667085",
@@ -117,12 +119,16 @@ export default async function FeedbackPage({
                 </Typography>
             </Box>
 
+            <FeedbackSummary data={summary} />
+
             <FeedbackToolbar
+                key={`${keyword}-${issue}-${tableId}-${status}`}
                 keyword={keyword}
                 issue={issue}
                 tableId={tableId}
                 tables={tables}
                 status={status}
+                summary={summary}
             />
 
             <Stack
@@ -152,52 +158,39 @@ export default async function FeedbackPage({
                     </Box>
                 </Typography>
 
-                {feedback.total > 0 ? (
-                    <Link
-                        href={exportUrl}
-                        style={{
-                            textDecoration: "none",
-                        }}
-                    >
-                        <Button
-                            variant="outlined"
-                            startIcon={<FontAwesomeIcon icon={faFileExcel} />}
-                            sx={{
-                                height: 40,
-                                px: 2,
-                                borderRadius: 1.5,
-                                borderColor: "#193B56",
-                                color: "#193B56",
-                                fontSize: 14,
-                                fontWeight: 600,
-                                textTransform: "none",
-                                whiteSpace: "nowrap",
-                                "&:hover": {
-                                    borderColor: "#193B56",
-                                    backgroundColor: "#F0F6FA",
-                                },
-                            }}
-                        >
-                            Xuất Excel
-                        </Button>
-                    </Link>
-                ) : (
+                <Link
+                    href={exportUrl}
+                    aria-disabled={feedback.total === 0}
+                    tabIndex={feedback.total === 0 ? -1 : undefined}
+                    style={{
+                        textDecoration: "none",
+                        pointerEvents:
+                            feedback.total === 0 ? "none" : undefined,
+                    }}
+                >
                     <Button
                         variant="outlined"
-                        disabled
+                        disabled={feedback.total === 0}
                         startIcon={<FontAwesomeIcon icon={faFileExcel} />}
                         sx={{
-                            height: 40,
+                            height: 38,
                             px: 2,
                             borderRadius: 1.5,
-                            fontSize: 14,
+                            borderColor: "#193B56",
+                            color: "#193B56",
+                            fontSize: 13,
                             fontWeight: 600,
                             textTransform: "none",
+                            whiteSpace: "nowrap",
+                            "&:hover": {
+                                borderColor: "#193B56",
+                                backgroundColor: "#F0F6FA",
+                            },
                         }}
                     >
                         Xuất Excel
                     </Button>
-                )}
+                </Link>
             </Stack>
 
             <FeedbackList data={feedback.data} />

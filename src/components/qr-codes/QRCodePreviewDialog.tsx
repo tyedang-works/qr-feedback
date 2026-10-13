@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-
 import { Box, Button, Stack, Typography } from "@mui/material";
-
 import QRDialog from "@/components/common/dialog/QRDialog";
 import { APP_URL } from "@/lib/config/app";
 import { faCircleDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { QRCodeSVG } from "qrcode.react";
+import { buttonBaseSx } from "@/styles/button.styles";
 
 type QRCodePreviewDialogProps = {
     open: boolean;
@@ -192,51 +191,20 @@ export default function QRCodePreviewDialog({
                 >
                     <Button
                         type="button"
+                        variant="contained"
                         onClick={handleDownload}
                         disabled={downloading}
                         startIcon={<FontAwesomeIcon icon={faCircleDown} />}
-                        sx={{
-                            minWidth: 120,
-                            height: 38,
-                            px: 1.5,
-                            borderRadius: 1.5,
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: "#ffffff",
-                            backgroundColor: "#193B56",
-                            textTransform: "none",
-
-                            "&:hover": {
-                                backgroundColor: "#142F45",
-                            },
-
-                            "&.Mui-disabled": {
-                                color: "#98A2B3",
-                                backgroundColor: "#EAECF0",
-                            },
-                        }}
+                        sx={buttonBaseSx}
                     >
                         {downloading ? "Đang tải..." : "Tải xuống"}
                     </Button>
 
                     <Button
                         type="button"
+                        variant="contained"
                         onClick={onPrint}
-                        sx={{
-                            minWidth: 80,
-                            height: 38,
-                            px: 1.5,
-                            borderRadius: 1.5,
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: "#ffffff",
-                            backgroundColor: "#193B56",
-                            textTransform: "none",
-
-                            "&:hover": {
-                                backgroundColor: "#142F45",
-                            },
-                        }}
+                        sx={buttonBaseSx}
                     >
                         In QR
                     </Button>

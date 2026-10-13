@@ -6,11 +6,18 @@ type PageHeaderProps = {
     title: string;
     subtitle: string;
     icon: IconDefinition;
+    className?: string;
 };
 
-export default function PageHeader({ title, subtitle, icon }: PageHeaderProps) {
+export default function PageHeader({
+    title,
+    subtitle,
+    icon,
+    className,
+}: PageHeaderProps) {
     return (
         <Stack
+            className={className}
             sx={{
                 flexDirection: "row",
                 alignItems: "center",

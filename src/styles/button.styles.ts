@@ -6,7 +6,7 @@ export const buttonBaseSx: SxProps<Theme> = {
     borderRadius: 1.5,
     backgroundColor: "#193B56",
     fontSize: 14,
-    fontWeight: 600,
+    fontWeight: 400,
     textTransform: "none",
     boxShadow: "none",
     "&:hover": {

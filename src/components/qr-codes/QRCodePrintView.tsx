@@ -4,6 +4,7 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 
 import { APP_URL } from "@/lib/config/app";
+import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 
 type QRCodePrintViewProps = {
     tableName: string;
@@ -132,45 +133,18 @@ export default function QRCodePrintView({
                 >
                     <Button
                         type="button"
+                        variant="outlined"
                         onClick={onClose}
-                        sx={{
-                            minWidth: 80,
-                            height: 38,
-                            px: 1.5,
-                            borderRadius: 1.5,
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: "#344054",
-                            backgroundColor: "#ffffff",
-                            textTransform: "none",
-                            border: "1px solid #D0D5DD",
-
-                            "&:hover": {
-                                backgroundColor: "#F9FAFB",
-                            },
-                        }}
+                        sx={buttonBaseCancelSx}
                     >
                         Quay lại
                     </Button>
 
                     <Button
                         type="button"
+                        variant="contained"
                         onClick={handlePrint}
-                        sx={{
-                            minWidth: 80,
-                            height: 38,
-                            px: 1.5,
-                            borderRadius: 1.5,
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: "#ffffff",
-                            backgroundColor: "#193B56",
-                            textTransform: "none",
-
-                            "&:hover": {
-                                backgroundColor: "#142F45",
-                            },
-                        }}
+                        sx={buttonBaseSx}
                     >
                         In QR
                     </Button>

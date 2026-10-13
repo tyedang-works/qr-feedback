@@ -1,8 +1,9 @@
 "use client";
 
-import { Box, Button, Typography } from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { buttonBaseSx } from "@/styles/button.styles";
 import { faPrint, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Box, Button, Typography } from "@mui/material";
 
 type QRCodeSelectionToolbarProps = {
     selectedCount: number;
@@ -38,15 +39,7 @@ export default function QRCodeSelectionToolbar({
                 border: "1px solid #d0d5dd",
                 borderRadius: 2,
                 backgroundColor: "#f9fafb",
-
-                /*
-                 * Desktop
-                 */
                 flexDirection: "row",
-
-                /*
-                 * Mobile
-                 */
                 "@media (max-width: 767px)": {
                     alignItems: "stretch",
                     flexDirection: "column",
@@ -56,7 +49,6 @@ export default function QRCodeSelectionToolbar({
                 },
             }}
         >
-            {/* Selection information */}
             <Box
                 sx={{
                     display: "flex",
@@ -116,7 +108,6 @@ export default function QRCodeSelectionToolbar({
                 )}
             </Box>
 
-            {/* Actions */}
             <Box
                 sx={{
                     display: "flex",
@@ -136,12 +127,7 @@ export default function QRCodeSelectionToolbar({
                     variant="contained"
                     startIcon={<FontAwesomeIcon icon={faPrint} />}
                     onClick={onPrint}
-                    sx={{
-                        minHeight: 36,
-                        px: 1.75,
-                        textTransform: "none",
-                        whiteSpace: "nowrap",
-                    }}
+                    sx={buttonBaseSx}
                 >
                     In QR ({selectedCount})
                 </Button>

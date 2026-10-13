@@ -46,6 +46,7 @@ type QRCodeListProps = {
     filters: QRCodeFilters;
     onBulkPrintStart: () => void;
     onBulkPrintClose: () => void;
+    onPrintModeChange: (isPrinting: boolean) => void;
 };
 
 export default function QRCodeList({
@@ -53,6 +54,7 @@ export default function QRCodeList({
     filters,
     onBulkPrintStart,
     onBulkPrintClose,
+    onPrintModeChange,
 }: QRCodeListProps) {
     const { data, total, page, pageSize, totalPages, selectableTotal } = result;
 
@@ -237,10 +239,12 @@ export default function QRCodeList({
 
     const handlePrint = () => {
         setIsPrinting(true);
+        onPrintModeChange(true);
     };
 
     const handleClosePrint = () => {
         setIsPrinting(false);
+        onPrintModeChange(false);
     };
 
     const handleBulkPrint = async () => {
@@ -375,7 +379,6 @@ export default function QRCodeList({
                     onClear={handleClearSelection}
                 />
 
-                {/* Desktop */}
                 <Box
                     sx={{
                         display: {
@@ -388,7 +391,6 @@ export default function QRCodeList({
                         backgroundColor: "#ffffff",
                     }}
                 >
-                    {/* Header */}
                     <Box
                         sx={{
                             display: "grid",
@@ -451,7 +453,6 @@ export default function QRCodeList({
                         </Typography>
                     </Box>
 
-                    {/* Rows */}
                     {data.map((table, index) => {
                         const status = getStatusStyles(table.isActive);
 
@@ -537,7 +538,6 @@ export default function QRCodeList({
                     })}
                 </Box>
 
-                {/* Mobile */}
                 <Stack
                     sx={{
                         display: {
@@ -668,7 +668,6 @@ export default function QRCodeList({
                     })}
                 </Stack>
 
-                {/* Pagination */}
                 <QRCodePagination
                     page={page}
                     totalPages={totalPages}
@@ -677,7 +676,6 @@ export default function QRCodeList({
                 />
             </Stack>
 
-            {/* Single QR preview */}
             <QRCodePreviewDialog
                 open={Boolean(selectedTable)}
                 tableName={selectedTable?.name ?? ""}

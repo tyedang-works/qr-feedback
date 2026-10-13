@@ -2,8 +2,8 @@
 
 import type { UserContext } from "@/lib/auth/queries";
 import { Box, Drawer, IconButton, Stack, Typography } from "@mui/material";
+import { Menu as MenuIcon } from "lucide-react";
 import { useState } from "react";
-import DashboardHeader from "./DashboardHeader";
 import DashboardSidebar from "./DashboardSidebar";
 
 type DashboardLayoutProps = {
@@ -20,12 +20,23 @@ export default function DashboardLayout({
     const handleOpenSidebar = () => setIsMobileSidebarOpen(true);
     const handleCloseSidebar = () => setIsMobileSidebarOpen(false);
 
+    const role = userContext?.role ?? null;
+    const fullName = userContext?.fullName ?? null;
+    const restaurantName = userContext?.restaurantName ?? null;
+
+    const sidebarProps = {
+        role,
+        fullName,
+        restaurantName,
+    };
+
     return (
         <Box
             sx={{
                 minHeight: "100dvh",
                 display: "flex",
-                backgroundColor: "#f8fafc",
+                bgcolor: "var(--color-background, #FFFFFF)",
+                color: "var(--color-text-primary, #111827)",
             }}
         >
             <Box
@@ -39,12 +50,14 @@ export default function DashboardLayout({
                     height: "100dvh",
                 }}
             >
-                <DashboardSidebar role={userContext?.role ?? null} />
+                <DashboardSidebar {...sidebarProps} />
             </Box>
 
             <Box
                 className="dashboard-mobile-header"
-                sx={{ display: { xs: "block", md: "none" } }}
+                sx={{
+                    display: { xs: "block", md: "none" },
+                }}
             >
                 <Box
                     sx={{
@@ -57,53 +70,64 @@ export default function DashboardLayout({
                 >
                     <Stack
                         sx={{
-                            height: 64,
+                            minHeight: 64,
                             flexDirection: "row",
                             alignItems: "center",
-                            gap: 1,
-                            px: 1.5,
-                            backgroundColor: "#ffffff",
-                            borderBottom: "1px solid #e5e7eb",
+                            gap: 1.5,
+                            px: 2,
+                            py: 1,
+                            bgcolor: "var(--color-surface, #FFFFFF)",
+                            borderBottom:
+                                "1px solid var(--color-border, #F0F1F3)",
                         }}
                     >
                         <IconButton
                             onClick={handleOpenSidebar}
-                            aria-label="Open menu"
+                            aria-label="Mở menu"
+                            aria-expanded={isMobileSidebarOpen}
                             size="small"
-                        >
-                            <Box
-                                sx={{
-                                    width: 22,
-                                    height: 18,
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "space-between",
-                                }}
-                            >
-                                {[1, 2, 3].map((item) => (
-                                    <Box
-                                        key={item}
-                                        component="span"
-                                        sx={{
-                                            width: "100%",
-                                            height: 2,
-                                            borderRadius: 1,
-                                            backgroundColor: "#193B56",
-                                        }}
-                                    />
-                                ))}
-                            </Box>
-                        </IconButton>
-
-                        <Typography
                             sx={{
-                                fontSize: 17,
-                                fontWeight: 700,
-                                color: "#193B56",
+                                width: 36,
+                                height: 36,
+                                flexShrink: 0,
+                                color: "var(--color-text-primary, #111827)",
+                                borderRadius: 2,
+                                "&:hover": {
+                                    bgcolor:
+                                        "var(--color-surface-hover, #F9FAFB)",
+                                },
                             }}
                         >
-                            QR Feedback
-                        </Typography>
+                            <MenuIcon size={21} strokeWidth={1.8} />
+                        </IconButton>
+
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography
+                                sx={{
+                                    fontSize: 10,
+                                    lineHeight: 1.4,
+                                    fontWeight: 600,
+                                    letterSpacing: "0.7px",
+                                    color: "var(--color-text-muted, #9CA3AF)",
+                                    textTransform: "uppercase",
+                                }}
+                            >
+                                QR Feedback
+                            </Typography>
+
+                            <Typography
+                                noWrap
+                                title={restaurantName || "Restaurant"}
+                                sx={{
+                                    fontSize: 14,
+                                    lineHeight: 1.4,
+                                    fontWeight: 700,
+                                    color: "var(--color-text-primary, #111827)",
+                                }}
+                            >
+                                {restaurantName || "Restaurant"}
+                            </Typography>
+                        </Box>
                     </Stack>
                 </Box>
 
@@ -115,14 +139,21 @@ export default function DashboardLayout({
                     slotProps={{
                         paper: {
                             sx: {
-                                width: 240,
+                                width: "240px",
+                                maxWidth: "85vw",
                                 height: "100dvh",
-                                backgroundColor: "#ffffff",
+                                bgcolor: "var(--color-surface, #FFFFFF)",
+                                borderRight:
+                                    "1px solid var(--color-border, #F0F1F3)",
+                                boxShadow: "0 8px 32px rgba(17, 24, 39, 0.08)",
                             },
                         },
                     }}
                 >
-                    <DashboardSidebar role={userContext?.role ?? null} />
+                    <DashboardSidebar
+                        {...sidebarProps}
+                        onNavigate={handleCloseSidebar}
+                    />
                 </Drawer>
             </Box>
 
@@ -131,19 +162,26 @@ export default function DashboardLayout({
                 className="dashboard-main"
                 sx={{
                     flex: 1,
-                    width: "100%",
+                    width: 0,
                     minWidth: 0,
-                    px: { xs: 2, sm: 3 },
-                    pt: { xs: "80px", md: 3 },
-                    pb: 3,
+                    minHeight: "100dvh",
+                    bgcolor: "var(--color-background, #FFFFFF)",
+                    px: {
+                        xs: 2,
+                        sm: 3,
+                        lg: 3.5,
+                        xl: 4,
+                    },
+                    pt: {
+                        xs: "80px",
+                        md: 3,
+                    },
+                    pb: {
+                        xs: 3,
+                        md: 4,
+                    },
                 }}
             >
-                <DashboardHeader
-                    fullName={userContext?.fullName ?? null}
-                    restaurantName={userContext?.restaurantName ?? null}
-                    role={userContext?.role ?? null}
-                />
-
                 {children}
             </Box>
         </Box>

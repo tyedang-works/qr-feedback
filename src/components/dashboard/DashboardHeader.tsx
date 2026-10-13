@@ -12,8 +12,10 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import { LogOut, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { MouseEvent } from "react";
 
 type DashboardHeaderProps = {
     fullName: string | null;
@@ -42,7 +44,7 @@ export default function DashboardHeader({
               .replace(/\b\w/g, (character) => character.toUpperCase())
         : "";
 
-    const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
+    const handleOpenMenu = (event: MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -76,62 +78,47 @@ export default function DashboardHeader({
                 justifyContent: "space-between",
                 gap: 2,
                 minHeight: 76,
-                px: { xs: 0, sm: 1 },
+                px: { xs: 2, sm: 3 },
                 py: 1.5,
-                mb: 3,
-                backgroundColor: "#ffffff",
-                borderBottom: "1px solid #e5e7eb",
-                boxShadow: "0 2px 8px rgba(16, 24, 40, 0.03)",
+                mb: 0,
+                bgcolor: "#FFFFFF",
             }}
         >
-            {/* Restaurant identity */}
             <Stack
                 sx={{
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 1.5,
                     minWidth: 0,
+                    flex: 1,
                 }}
             >
                 <Box
                     sx={{
-                        width: 42,
-                        height: 42,
+                        width: 40,
+                        height: 40,
                         flexShrink: 0,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         borderRadius: 2,
-                        color: "#193B56",
-                        backgroundColor: "#eef4f8",
+                        color: "#111827",
+                        bgcolor: "#F3F4F6",
                     }}
                 >
-                    <Box
-                        component="svg"
-                        viewBox="0 0 24 24"
-                        sx={{ width: 23, height: 23 }}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={1.8}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <path d="M3 10h18" />
-                        <path d="M5 10l1.5-6h11L19 10" />
-                        <path d="M5 10v10h14V10" />
-                        <path d="M9 20v-6h6v6" />
-                    </Box>
+                    <Store size={20} strokeWidth={1.8} />
                 </Box>
 
                 <Box sx={{ minWidth: 0 }}>
                     <Typography
                         sx={{
-                            fontSize: 11,
-                            fontWeight: 600,
-                            letterSpacing: 0.7,
-                            color: "#667085",
-                            textTransform: "uppercase",
                             mb: 0.25,
+                            fontSize: 10.5,
+                            lineHeight: 1.5,
+                            fontWeight: 650,
+                            letterSpacing: "0.8px",
+                            color: "#9CA3AF",
+                            textTransform: "uppercase",
                         }}
                     >
                         QR Feedback
@@ -140,10 +127,11 @@ export default function DashboardHeader({
                     <Typography
                         title={restaurantName || "Restaurant"}
                         sx={{
-                            fontSize: { xs: 16, sm: 19 },
-                            lineHeight: 1.35,
+                            fontSize: { xs: 15, sm: 18 },
+                            lineHeight: 1.4,
                             fontWeight: 700,
-                            color: "#193B56",
+                            letterSpacing: "-0.35px",
+                            color: "#111827",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
@@ -154,62 +142,67 @@ export default function DashboardHeader({
                 </Box>
             </Stack>
 
-            {/* Account menu */}
+            {/* Account menu trigger */}
             <Stack
                 sx={{
                     flexDirection: "row",
                     alignItems: "center",
                     flexShrink: 0,
+                    gap: 1,
                 }}
             >
                 <Box
                     sx={{
                         display: { xs: "none", sm: "block" },
                         textAlign: "right",
-                        mr: 1.25,
+                        mr: 0.5,
                     }}
                 >
                     <Typography
                         sx={{
-                            fontSize: 14,
+                            fontSize: 13.5,
                             lineHeight: 1.5,
-                            fontWeight: 600,
-                            color: "#344054",
+                            fontWeight: 650,
+                            color: "#111827",
                         }}
                     >
                         {displayName}
                     </Typography>
 
                     {roleLabel && (
-                        <Typography
+                        <Box
                             sx={{
-                                display: "inline-block",
-                                mt: 0.25,
+                                display: "inline-flex",
+                                alignItems: "center",
+                                mt: 0.375,
                                 px: 1,
-                                py: 0.125,
+                                py: 0.25,
                                 borderRadius: 1,
-                                backgroundColor: "#eef4f8",
-                                color: "#193B56",
-                                fontSize: 11,
+                                bgcolor: "#F3F4F6",
+                                color: "#374151",
+                                fontSize: 10.5,
+                                lineHeight: 1.4,
                                 fontWeight: 600,
                             }}
                         >
                             {roleLabel}
-                        </Typography>
+                        </Box>
                     )}
                 </Box>
 
                 <IconButton
                     onClick={handleOpenMenu}
-                    aria-label="Open account menu"
+                    aria-label="Mở menu tài khoản"
                     aria-controls={isMenuOpen ? "account-menu" : undefined}
                     aria-haspopup="true"
                     aria-expanded={isMenuOpen ? "true" : undefined}
                     sx={{
                         p: 0.5,
                         borderRadius: 2,
+                        bgcolor: isMenuOpen ? "#F3F4F6" : "transparent",
+                        transition: "background-color 150ms ease",
                         "&:hover": {
-                            backgroundColor: "#f2f4f7",
+                            bgcolor: "#F3F4F6",
                         },
                     }}
                 >
@@ -217,10 +210,10 @@ export default function DashboardHeader({
                         sx={{
                             width: 40,
                             height: 40,
-                            backgroundColor: "#193B56",
-                            color: "#ffffff",
+                            bgcolor: "#111827",
+                            color: "#FFFFFF",
                             fontSize: 15,
-                            fontWeight: 700,
+                            fontWeight: 650,
                         }}
                     >
                         {initial}
@@ -243,67 +236,188 @@ export default function DashboardHeader({
                     slotProps={{
                         paper: {
                             sx: {
-                                mt: 1,
-                                minWidth: 220,
-                                border: "1px solid #eaecf0",
-                                borderRadius: 2,
-                                boxShadow: "0 8px 24px rgba(16, 24, 40, 0.10)",
+                                mt: 1.25,
+                                width: 280,
+                                maxWidth: "calc(100vw - 24px)",
+                                overflow: "hidden",
+                                border: "1px solid #E5E7EB",
+                                borderRadius: 3,
+                                bgcolor: "#FFFFFF",
+                                boxShadow:
+                                    "0 12px 32px rgba(17, 24, 39, 0.10), 0 2px 6px rgba(17, 24, 39, 0.04)",
+                                backgroundImage: "none",
                             },
                         },
                     }}
                 >
-                    <Box sx={{ px: 2, py: 1.5 }}>
-                        <Typography
-                            sx={{
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "#344054",
-                            }}
-                        >
-                            {displayName}
-                        </Typography>
-
-                        {roleLabel && (
-                            <Typography
-                                sx={{
-                                    mt: 0.5,
-                                    fontSize: 12,
-                                    color: "#667085",
-                                }}
-                            >
-                                {roleLabel}
-                            </Typography>
-                        )}
-
-                        <Typography
-                            sx={{
-                                mt: 0.5,
-                                fontSize: 12,
-                                color: "#667085",
-                                overflowWrap: "anywhere",
-                            }}
-                        >
-                            {restaurantName || "Restaurant"}
-                        </Typography>
-                    </Box>
-
-                    <Divider />
-
-                    <MenuItem
-                        onClick={handleLogout}
+                    {/* Account information */}
+                    <Box
                         sx={{
-                            mx: 0.75,
-                            my: 0.5,
-                            borderRadius: 1,
-                            color: "#b42318",
-                            fontSize: 14,
-                            "&:hover": {
-                                backgroundColor: "#fef3f2",
-                            },
+                            px: 2,
+                            pt: 2,
+                            pb: 1.75,
                         }}
                     >
-                        Logout
-                    </MenuItem>
+                        <Stack
+                            sx={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 1.5,
+                            }}
+                        >
+                            <Avatar
+                                sx={{
+                                    width: 44,
+                                    height: 44,
+                                    flexShrink: 0,
+                                    bgcolor: "#111827",
+                                    color: "#FFFFFF",
+                                    fontSize: 16,
+                                    fontWeight: 700,
+                                }}
+                            >
+                                {initial}
+                            </Avatar>
+
+                            <Box sx={{ minWidth: 0, flex: 1 }}>
+                                <Typography
+                                    noWrap
+                                    title={displayName}
+                                    sx={{
+                                        fontSize: 14,
+                                        lineHeight: 1.5,
+                                        fontWeight: 650,
+                                        color: "#111827",
+                                    }}
+                                >
+                                    {displayName}
+                                </Typography>
+
+                                {roleLabel && (
+                                    <Box
+                                        sx={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            mt: 0.5,
+                                            px: 1,
+                                            py: 0.25,
+                                            borderRadius: 1,
+                                            bgcolor: "#F3F4F6",
+                                            color: "#374151",
+                                            fontSize: 11,
+                                            lineHeight: 1.5,
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {roleLabel}
+                                    </Box>
+                                )}
+                            </Box>
+                        </Stack>
+                    </Box>
+
+                    <Divider sx={{ borderColor: "#F0F1F3" }} />
+
+                    {/* Restaurant information */}
+                    <Box
+                        sx={{
+                            px: 2,
+                            py: 1.75,
+                        }}
+                    >
+                        <Stack
+                            sx={{
+                                flexDirection: "row",
+                                alignItems: "flex-start",
+                                gap: 1.25,
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    width: 34,
+                                    height: 34,
+                                    flexShrink: 0,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    border: "1px solid #E5E7EB",
+                                    borderRadius: 1.5,
+                                    color: "#374151",
+                                    bgcolor: "#FFFFFF",
+                                }}
+                            >
+                                <Store size={17} strokeWidth={1.8} />
+                            </Box>
+
+                            <Box sx={{ minWidth: 0, flex: 1 }}>
+                                <Typography
+                                    sx={{
+                                        mb: 0.5,
+                                        fontSize: 11,
+                                        lineHeight: 1.5,
+                                        fontWeight: 600,
+                                        color: "#9CA3AF",
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.5px",
+                                    }}
+                                >
+                                    Nhà hàng hiện tại
+                                </Typography>
+
+                                <Typography
+                                    title={restaurantName || "Restaurant"}
+                                    sx={{
+                                        fontSize: 13,
+                                        lineHeight: 1.6,
+                                        fontWeight: 500,
+                                        color: "#111827",
+                                        overflowWrap: "anywhere",
+                                    }}
+                                >
+                                    {restaurantName || "Restaurant"}
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Box>
+
+                    <Divider sx={{ borderColor: "#F0F1F3" }} />
+
+                    {/* Logout action */}
+                    <Box sx={{ p: 1 }}>
+                        <MenuItem
+                            onClick={handleLogout}
+                            sx={{
+                                minHeight: 42,
+                                px: 1.25,
+                                py: 1,
+                                gap: 1.25,
+                                borderRadius: 1.5,
+                                color: "#B42318",
+                                fontSize: 13.5,
+                                fontWeight: 550,
+                                "&:hover": {
+                                    bgcolor: "#FEF3F2",
+                                },
+                                "&:focus-visible": {
+                                    outline: "2px solid #FECACA",
+                                    outlineOffset: -2,
+                                },
+                            }}
+                        >
+                            <LogOut size={17} strokeWidth={1.8} />
+
+                            <Typography
+                                component="span"
+                                sx={{
+                                    fontSize: "inherit",
+                                    fontWeight: "inherit",
+                                    color: "inherit",
+                                }}
+                            >
+                                Đăng xuất
+                            </Typography>
+                        </MenuItem>
+                    </Box>
                 </Menu>
             </Stack>
         </Stack>

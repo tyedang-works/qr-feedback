@@ -8,9 +8,9 @@ import {
     CartesianGrid,
     Cell,
     ResponsiveContainer,
-    Tooltip,
     XAxis,
     YAxis,
+    Tooltip,
 } from "recharts";
 
 type IssueDistributionProps = {
@@ -50,11 +50,31 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                 Các vấn đề khách hàng lựa chọn
             </Typography>
 
-            <Box sx={{ mt: 2, width: "100%", height: 240 }}>
+            <Box
+                sx={{
+                    mt: 2,
+                    width: "100%",
+                    height: 240,
+                    "& .recharts-wrapper": {
+                        outline: "none",
+                    },
+                    "& .recharts-surface": {
+                        outline: "none",
+                    },
+                    "& .recharts-layer": {
+                        outline: "none",
+                    },
+                    // "& .recharts-tooltip-wrapper": {
+                    //     display: "none !important",
+                    // },
+                }}
+            >
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={data}
                         layout="vertical"
+                        accessibilityLayer={false}
+                        style={{ outline: "none" }}
                         margin={{
                             top: 4,
                             right: 12,
@@ -96,6 +116,10 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                         />
 
                         <Tooltip
+                            active={undefined}
+                            trigger="hover"
+                            cursor={false}
+                            isAnimationActive={false}
                             formatter={(value, _name, item) => [
                                 `${Number(value ?? 0).toLocaleString("vi-VN")} lượt (${item.payload.percentage}%)`,
                                 "Số phản hồi",
@@ -106,6 +130,16 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                 fontSize: 12,
                                 fontFamily:
                                     "var(--font-momo-trust-sans), sans-serif",
+                                boxShadow: "0 4px 12px rgba(16, 24, 40, 0.08)",
+                                outline: "none",
+                            }}
+                            itemStyle={{
+                                color: "#193B56",
+                            }}
+                            labelStyle={{
+                                color: "#344054",
+                                fontWeight: 600,
+                                marginBottom: 4,
                             }}
                         />
 
@@ -114,9 +148,15 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             name="Số phản hồi"
                             radius={[0, 5, 5, 0]}
                             maxBarSize={26}
+                            activeBar={false}
+                            isAnimationActive={false}
                         >
                             {data.map((item) => (
-                                <Cell key={item.option} fill="#193B56" />
+                                <Cell
+                                    key={item.option}
+                                    fill="#193B56"
+                                    stroke="none"
+                                />
                             ))}
                         </Bar>
                     </BarChart>

@@ -13,6 +13,49 @@ body {
     min-height: 100vh;
 }
 
+:root {
+    color-scheme: light;
+
+    /* Primary colors */
+    --color-primary: #111827;
+    --color-background: #ffffff;
+
+    /* Surfaces */
+    --color-surface: #ffffff;
+    --color-surface-hover: #f9fafb;
+    --color-surface-active: #f3f4f6;
+
+    /* Text */
+    --color-text-primary: var(--color-primary);
+    --color-text-secondary: #6b7280;
+    --color-text-muted: #9ca3af;
+
+    /* Borders and shadows */
+    --color-border: #f0f1f3;
+    --shadow-card:
+        0 1px 2px rgba(17, 24, 39, 0.025), 0 4px 12px rgba(17, 24, 39, 0.025);
+
+    --sidebar-width: 230px;
+}
+
+/* Reserve theme-specific variables for future dark mode */
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    --color-primary: #f9fafb;
+    --color-background: #111827;
+    --color-surface: #1f2937;
+    --color-surface-hover: #374151;
+    --color-surface-active: #374151;
+
+    --color-text-primary: #f9fafb;
+    --color-text-secondary: #d1d5db;
+    --color-text-muted: #9ca3af;
+
+    --color-border: #374151;
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
 @media print {
     @page {
         size: auto;

@@ -27,12 +27,46 @@ export type ChangeUserRoleActionState = {
     message: string;
 };
 
+function getAuthErrorMessage(message?: string): string {
+    if (!message) {
+        return "Không thể tạo tài khoản với email này.";
+    }
+
+    const normalizedMessage = message.toLowerCase();
+
+    if (
+        normalizedMessage.includes("already been registered") ||
+        normalizedMessage.includes("already exists") ||
+        normalizedMessage.includes("user already registered")
+    ) {
+        return "Email này đã được đăng ký.";
+    }
+
+    if (
+        normalizedMessage.includes("invalid email") ||
+        normalizedMessage.includes("email address is invalid")
+    ) {
+        return "Địa chỉ email không hợp lệ.";
+    }
+
+    if (normalizedMessage.includes("password")) {
+        return "Thông tin mật khẩu không hợp lệ.";
+    }
+
+    if (
+        normalizedMessage.includes("rate limit") ||
+        normalizedMessage.includes("too many requests")
+    ) {
+        return "Bạn đã thực hiện quá nhiều yêu cầu. Vui lòng thử lại sau.";
+    }
+
+    return "Không thể tạo tài khoản với email này.";
+}
+
 export async function addUserAction(
     input: AddUserInput,
 ): Promise<AddUserResult> {
     const supabase = await createClient();
-
-    // 1. Get current authenticated user
     const {
         data: { user: currentUser },
     } = await supabase.auth.getUser();
@@ -44,7 +78,6 @@ export async function addUserAction(
         };
     }
 
-    // 2. Get current user's profile
     const { data: currentProfile, error: profileError } = await supabase
         .from("profiles")
         .select("restaurant_id, role")
@@ -60,7 +93,6 @@ export async function addUserAction(
         };
     }
 
-    // 3. Only Owner can add users
     if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
@@ -72,7 +104,6 @@ export async function addUserAction(
     const email = input.email.trim().toLowerCase();
     const role = input.role;
 
-    // 4. Validate input on server
     if (!fullName) {
         return {
             success: false,
@@ -103,8 +134,6 @@ export async function addUserAction(
         };
     }
 
-    // 5. Create Supabase Auth user
-    // Email invitation / OTP will be implemented in a later feature.
     const adminSupabase = createAdminClient();
 
     const { data: authData, error: authError } =
@@ -118,25 +147,22 @@ export async function addUserAction(
 
     if (authError || !authData.user) {
         console.error("Failed to create user:", {
-            error: authError,
             message: authError?.message,
             status: authError?.status,
+            code: authError?.code,
         });
 
         return {
             success: false,
             message: "Không thể thêm người dùng.",
             fieldErrors: {
-                email:
-                    authError?.message ||
-                    "Không thể tạo tài khoản với email này.",
+                email: getAuthErrorMessage(authError?.message),
             },
         };
     }
 
     const newUser = authData.user;
 
-    // 6. Create profile
     const { error: newProfileError } = await adminSupabase
         .from("profiles")
         .insert({
@@ -149,7 +175,6 @@ export async function addUserAction(
     if (newProfileError) {
         console.error("Failed to create user profile:", newProfileError);
 
-        // Roll back Auth user if profile creation fails.
         const { error: deleteUserError } =
             await adminSupabase.auth.admin.deleteUser(newUser.id);
 

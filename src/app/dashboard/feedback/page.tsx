@@ -1,13 +1,14 @@
+import PageHeader from "@/components/common/layout/PageHeader";
 import FeedbackList from "@/components/feedback/FeedbackList";
 import FeedbackPagination from "@/components/feedback/FeedbackPagination";
 import FeedbackSummary from "@/components/feedback/FeedbackSummary";
 import FeedbackToolbar from "@/components/feedback/FeedbackToolbar";
 import { USER_ROLES } from "@/lib/auth/constants";
 import { getUserContext } from "@/lib/auth/queries";
-import { FEEDBACK_PAGE_SIZE } from "@/lib/feedback/constants";
+import { FEEDBACK_ISSUES, FEEDBACK_PAGE_SIZE } from "@/lib/feedback/constants";
 import { getFeedbackList, getFeedbackSummary } from "@/lib/feedback/queries";
 import { getRestaurantTables } from "@/lib/tables/queries";
-import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import { faComments, faFileExcel } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import Link from "next/link";
@@ -16,7 +17,7 @@ import { redirect } from "next/navigation";
 type FeedbackPageProps = {
     searchParams: Promise<{
         keyword?: string;
-        issue?: string;
+        issue?: string | string[];
         tableId?: string;
         status?: string;
         page?: string;
@@ -29,7 +30,21 @@ export default async function FeedbackPage({
     const params = await searchParams;
 
     const keyword = params.keyword ?? "";
-    const issue = params.issue && params.issue !== "all" ? params.issue : "";
+    const rawIssues = params.issue
+        ? Array.isArray(params.issue)
+            ? params.issue
+            : [params.issue]
+        : [];
+
+    const issues = [
+        ...new Set(
+            rawIssues.filter(
+                (value) =>
+                    value !== "all" &&
+                    FEEDBACK_ISSUES.some((item) => item.option === value),
+            ),
+        ),
+    ];
     const tableId =
         params.tableId && params.tableId !== "all" ? params.tableId : "";
     const status =
@@ -54,7 +69,7 @@ export default async function FeedbackPage({
             page,
             pageSize: FEEDBACK_PAGE_SIZE,
             keyword,
-            issue,
+            issues,
             tableId,
             status,
         }),
@@ -68,9 +83,9 @@ export default async function FeedbackPage({
         exportParams.set("keyword", keyword);
     }
 
-    if (issue) {
-        exportParams.set("issue", issue);
-    }
+    issues.forEach((value) => {
+        exportParams.append("issue", value);
+    });
 
     if (tableId) {
         exportParams.set("tableId", tableId);
@@ -94,37 +109,18 @@ export default async function FeedbackPage({
                 gap: { xs: 2, md: 2.5 },
             }}
         >
-            <Box>
-                <Typography
-                    component="h1"
-                    sx={{
-                        fontSize: { xs: 22, md: 26 },
-                        fontWeight: 700,
-                        lineHeight: 1.3,
-                        color: "#193B56",
-                    }}
-                >
-                    Feedback
-                </Typography>
-
-                <Typography
-                    sx={{
-                        mt: 0.5,
-                        fontSize: 14,
-                        lineHeight: 1.6,
-                        color: "#667085",
-                    }}
-                >
-                    Theo dõi và xử lý phản hồi của khách hàng.
-                </Typography>
-            </Box>
+            <PageHeader
+                title="Feedback"
+                subtitle="Theo dõi và xử lý phản hồi của khách hàng."
+                icon={faComments}
+            />
 
             <FeedbackSummary data={summary} />
 
             <FeedbackToolbar
-                key={`${keyword}-${issue}-${tableId}-${status}`}
+                key={`${keyword}-${issues}-${tableId}-${status}`}
                 keyword={keyword}
-                issue={issue}
+                issues={issues}
                 tableId={tableId}
                 tables={tables}
                 status={status}
@@ -140,12 +136,7 @@ export default async function FeedbackPage({
                     gap: 1.5,
                 }}
             >
-                <Typography
-                    sx={{
-                        fontSize: 13,
-                        color: "#667085",
-                    }}
-                >
+                <Typography sx={{ fontSize: 13, color: "#667085" }}>
                     Tổng số phản hồi{" "}
                     <Box
                         component="span"

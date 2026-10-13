@@ -3,7 +3,7 @@ import { SxProps, Theme } from "@mui/material/styles";
 export const buttonBaseSx: SxProps<Theme> = {
     minWidth: 100,
     height: 40,
-    borderRadius: 1.5,
+    borderRadius: 1,
     backgroundColor: "#193B56",
     fontSize: 14,
     fontWeight: 400,
@@ -21,9 +21,20 @@ export const buttonBaseCancelSx: SxProps<Theme> = {
     borderColor: "#D0D5DD",
     color: "#344054",
     textTransform: "none",
-    borderRadius: 2,
+    borderRadius: 1,
     "&:hover": {
         borderColor: "#98A2B3",
         backgroundColor: "#F9FAFB",
+    },
+};
+
+export const chipBaseSx: SxProps<Theme> = {
+    maxWidth: "100%",
+    bgcolor: "#F2F4F7",
+    fontSize: 12,
+    borderRadius: "5px",
+    "& .MuiChip-label": {
+        overflow: "hidden",
+        textOverflow: "ellipsis",
     },
 };

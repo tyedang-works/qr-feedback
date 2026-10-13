@@ -49,7 +49,6 @@ function UserRoleCard({ member }: UserRoleCardProps) {
             }}
         >
             <Stack sx={{ gap: 1.5 }}>
-                {/* User information */}
                 <Stack
                     sx={{
                         flexDirection: "row",
@@ -112,7 +111,6 @@ function UserRoleCard({ member }: UserRoleCardProps) {
                     />
                 </Stack>
 
-                {/* User actions */}
                 {!isOwner && (
                     <Stack
                         sx={{

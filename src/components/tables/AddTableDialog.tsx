@@ -4,6 +4,7 @@ import { createTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
+import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import { Button, CircularProgress } from "@mui/material";
 import { Form, Formik, type FormikHelpers } from "formik";
 import { useMemo, useState } from "react";
@@ -136,21 +137,7 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
             <Button
                 variant="contained"
                 onClick={() => setOpen(true)}
-                sx={{
-                    minWidth: 110,
-                    height: 40,
-                    px: 2,
-                    borderRadius: 1.5,
-                    backgroundColor: "#193B56",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    textTransform: "none",
-                    boxShadow: "none",
-                    "&:hover": {
-                        backgroundColor: "#142f45",
-                        boxShadow: "none",
-                    },
-                }}
+                sx={buttonBaseSx}
             >
                 + Thêm bàn
             </Button>
@@ -191,17 +178,10 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
                                 <>
                                     <Button
                                         type="button"
+                                        variant="outlined"
                                         onClick={handleClose}
                                         disabled={isSubmitting}
-                                        sx={{
-                                            minWidth: 80,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            color: "#667085",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                        }}
+                                        sx={buttonBaseCancelSx}
                                     >
                                         Hủy
                                     </Button>
@@ -211,20 +191,7 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
                                         form="add-table-form"
                                         variant="contained"
                                         disabled={isSubmitting}
-                                        sx={{
-                                            minWidth: 100,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            backgroundColor: "#193B56",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                            boxShadow: "none",
-                                            "&:hover": {
-                                                backgroundColor: "#142f45",
-                                                boxShadow: "none",
-                                            },
-                                        }}
+                                        sx={buttonBaseSx}
                                     >
                                         {isSubmitting ? (
                                             <>

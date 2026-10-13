@@ -281,7 +281,6 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                 width: "100%",
             }}
         >
-            {/* Feedback list */}
             <Card
                 elevation={0}
                 sx={{
@@ -326,8 +325,6 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                     return (
                         <Box key={item.id}>
                             {index > 0 && <Divider />}
-
-                            {/* Desktop: select feedback in the current panel */}
                             <Box
                                 component="button"
                                 type="button"
@@ -353,7 +350,6 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                                 />
                             </Box>
 
-                            {/* Mobile: open the existing detail route */}
                             <Box
                                 component={Link}
                                 href={`/dashboard/feedback/${item.publicId}`}
@@ -376,7 +372,6 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                 })}
             </Card>
 
-            {/* Selected feedback detail — desktop only */}
             <Box
                 sx={{
                     display: {
@@ -398,12 +393,7 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                             textAlign: "center",
                         }}
                     >
-                        <Typography
-                            sx={{
-                                fontSize: 13,
-                                color: "#667085",
-                            }}
-                        >
+                        <Typography sx={{ fontSize: 13, color: "#667085" }}>
                             Chọn một phản hồi để xem chi tiết.
                         </Typography>
                     </Card>

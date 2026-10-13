@@ -1,10 +1,10 @@
 "use client";
 
+import type { UserContext } from "@/lib/auth/queries";
 import { Box, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-import DashboardSidebar from "./DashboardSidebar";
 import DashboardHeader from "./DashboardHeader";
-import type { UserContext } from "@/lib/auth/queries";
+import DashboardSidebar from "./DashboardSidebar";
 
 type DashboardLayoutProps = {
     children: React.ReactNode;
@@ -28,7 +28,6 @@ export default function DashboardLayout({
                 backgroundColor: "#f8fafc",
             }}
         >
-            {/* Desktop Sidebar */}
             <Box
                 className="dashboard-sidebar"
                 sx={{
@@ -43,7 +42,6 @@ export default function DashboardLayout({
                 <DashboardSidebar role={userContext?.role ?? null} />
             </Box>
 
-            {/* Mobile Navigation */}
             <Box
                 className="dashboard-mobile-header"
                 sx={{ display: { xs: "block", md: "none" } }}
@@ -128,7 +126,6 @@ export default function DashboardLayout({
                 </Drawer>
             </Box>
 
-            {/* Main Content */}
             <Box
                 component="main"
                 className="dashboard-main"
@@ -137,7 +134,7 @@ export default function DashboardLayout({
                     width: "100%",
                     minWidth: 0,
                     px: { xs: 2, sm: 3 },
-                    pt: { xs: 10, sm: 3 },
+                    pt: { xs: "80px", md: 3 },
                     pb: 3,
                 }}
             >

@@ -19,6 +19,10 @@ export const tableStatusSwitchSx: SxProps<Theme> = {
                 opacity: 1,
                 border: 0,
             },
+
+            "& .MuiSwitch-thumb": {
+                backgroundColor: "#ffffff",
+            },
         },
 
         "&.Mui-disabled": {
@@ -39,6 +43,10 @@ export const tableStatusSwitchSx: SxProps<Theme> = {
         backgroundColor: "#D1D5DB",
         opacity: 1,
         transition: "background-color 200ms ease",
+    },
+
+    "& .MuiSwitch-switchBase.Mui-checked": {
+        color: "#ffffff",
     },
 };
 

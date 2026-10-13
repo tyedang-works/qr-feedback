@@ -5,6 +5,7 @@ import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
 import { FEEDBACK_STATUS, type FeedbackStatus } from "@/lib/feedback/constants";
+import { buttonBaseSx } from "@/styles/button.styles";
 import { Button, MenuItem, Stack } from "@mui/material";
 import type { FormikHelpers } from "formik";
 import { Form, Formik } from "formik";
@@ -172,22 +173,7 @@ export default function FeedbackManagementForm({
                                 type="submit"
                                 variant="contained"
                                 disabled={isSubmitting}
-                                sx={{
-                                    alignSelf: "flex-start",
-                                    minWidth: 120,
-                                    height: 40,
-                                    borderRadius: 1.5,
-                                    backgroundColor: "#193B56",
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    textTransform: "none",
-                                    boxShadow: "none",
-                                    mt: 1.25,
-                                    "&:hover": {
-                                        backgroundColor: "#142f45",
-                                        boxShadow: "none",
-                                    },
-                                }}
+                                sx={buttonBaseSx}
                             >
                                 {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
                             </Button>

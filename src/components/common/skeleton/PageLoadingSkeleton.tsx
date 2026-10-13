@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { Box, Stack } from "@mui/material";
+import type { ReactNode } from "react";
 
 import PageHeaderSkeleton from "./PageHeaderSkeleton";
 

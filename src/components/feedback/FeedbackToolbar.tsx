@@ -6,9 +6,16 @@ import { FEEDBACK_ISSUES, FEEDBACK_STATUS } from "@/lib/feedback/constants";
 import type { FeedbackSummary } from "@/lib/feedback/types";
 import type { RestaurantTableOption } from "@/lib/tables/queries";
 import {
+    buttonBaseCancelSx,
+    buttonBaseSx,
+    chipBaseSx,
+} from "@/styles/button.styles";
+
+import {
     faCheck,
     faChevronDown,
     faFilter,
+    faMagnifyingGlass,
     faRotateLeft,
     faXmark,
 } from "@fortawesome/free-solid-svg-icons";
@@ -16,9 +23,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     Box,
     Button,
+    Checkbox,
     Chip,
     Divider,
     IconButton,
+    ListItemText,
     MenuItem,
     CircularProgress as MuiCircularProgress,
     Popover,
@@ -31,12 +40,16 @@ import { useEffect, useState, useTransition } from "react";
 
 type FeedbackToolbarProps = {
     keyword: string;
-    issue: string;
+    issues: string[];
     tableId: string;
     status: string;
     tables: RestaurantTableOption[];
     summary: FeedbackSummary;
 };
+
+type FilterKey = "keyword" | "issue" | "tableId" | "status";
+
+type FilterOverrides = Partial<Record<FilterKey, string | string[] | null>>;
 
 const SEARCH_DEBOUNCE_MS = 400;
 
@@ -81,11 +94,9 @@ const STATUS_COLORS: Record<
     },
 };
 
-type FilterKey = "keyword" | "issue" | "tableId" | "status";
-
 export default function FeedbackToolbar({
     keyword,
-    issue,
+    issues,
     tableId,
     status,
     tables,
@@ -98,30 +109,28 @@ export default function FeedbackToolbar({
         useState<HTMLButtonElement | null>(null);
 
     const [isPending, startTransition] = useTransition();
-
     const [keywordValue, setKeywordValue] = useState(keyword);
     const [filterOpen, setFilterOpen] = useState(false);
 
-    const [draftIssue, setDraftIssue] = useState(issue || "all");
+    const [draftIssues, setDraftIssues] = useState<string[]>(issues);
     const [draftTableId, setDraftTableId] = useState(tableId || "all");
 
     const isLoading = isPending || keywordValue.trim() !== keyword.trim();
 
-    const issueLabel = FEEDBACK_ISSUES.find(
-        (item) => item.option === issue,
-    )?.label;
+    const selectedIssues = FEEDBACK_ISSUES.filter(({ option }) =>
+        issues.includes(option),
+    );
 
     const tableLabel = tables.find((table) => table.id === tableId)?.name;
 
-    const activeFilterCount = [Boolean(issue), Boolean(tableId)].filter(
+    // Đếm nhóm filter đang hoạt động, không đếm từng vấn đề riêng lẻ.
+    const activeFilterCount = [issues.length > 0, Boolean(tableId)].filter(
         Boolean,
     ).length;
 
     useEffect(() => {
         const nextKeyword = keywordValue.trim();
-
         const currentParams = new URLSearchParams(window.location.search);
-
         const currentKeyword = currentParams.get("keyword") ?? "";
 
         if (nextKeyword === currentKeyword) {
@@ -158,33 +167,52 @@ export default function FeedbackToolbar({
         });
     };
 
-    const buildHref = (
-        overrides: Partial<Record<FilterKey, string | null>>,
-    ) => {
+    /**
+     * Tạo URL từ bộ filter hiện tại và các giá trị được override.
+     * Riêng issue có thể là mảng và được thêm bằng params.append().
+     */
+    const buildHref = (overrides: FilterOverrides = {}) => {
         const params = new URLSearchParams();
-        const normalizedKeyword = keywordValue.trim();
 
-        if (normalizedKeyword) {
-            params.set("keyword", normalizedKeyword);
-        }
+        const values: Record<FilterKey, string | string[] | null> = {
+            keyword: keywordValue.trim() || null,
+            issue: issues,
+            tableId: tableId || null,
+            status: status || null,
+            ...overrides,
+        };
 
-        if (issue) {
-            params.set("issue", issue);
-        }
+        (Object.keys(values) as FilterKey[]).forEach((key) => {
+            const value = values[key];
 
-        if (tableId) {
-            params.set("tableId", tableId);
-        }
+            if (key === "issue") {
+                const issueValues = Array.isArray(value)
+                    ? value
+                    : typeof value === "string" && value !== "all"
+                      ? [value]
+                      : [];
 
-        if (status) {
-            params.set("status", status);
-        }
+                issueValues.forEach((issue) => {
+                    if (issue && issue !== "all") {
+                        params.append("issue", issue);
+                    }
+                });
 
-        Object.entries(overrides).forEach(([key, value]) => {
+                return;
+            }
+
+            if (Array.isArray(value)) {
+                value.forEach((item) => {
+                    if (item && item !== "all") {
+                        params.append(key, item);
+                    }
+                });
+
+                return;
+            }
+
             if (value && value !== "all") {
                 params.set(key, value);
-            } else {
-                params.delete(key);
             }
         });
 
@@ -197,7 +225,6 @@ export default function FeedbackToolbar({
 
     const applyFilters = () => {
         const params = new URLSearchParams(window.location.search);
-
         const normalizedKeyword = keywordValue.trim();
 
         if (normalizedKeyword) {
@@ -206,13 +233,14 @@ export default function FeedbackToolbar({
             params.delete("keyword");
         }
 
-        if (draftIssue !== "all") {
-            params.set("issue", draftIssue);
-        } else {
-            params.delete("issue");
-        }
+        // Xóa toàn bộ issue cũ trước khi thêm các lựa chọn mới.
+        params.delete("issue");
 
-        if (draftTableId !== "all") {
+        [...new Set(draftIssues)].forEach((issue) => {
+            params.append("issue", issue);
+        });
+
+        if (draftTableId && draftTableId !== "all") {
             params.set("tableId", draftTableId);
         } else {
             params.delete("tableId");
@@ -223,17 +251,17 @@ export default function FeedbackToolbar({
         const query = params.toString();
 
         setFilterOpen(false);
-
         navigateTo(query ? `${pathname}?${query}` : pathname);
     };
 
     const clearDraftFilters = () => {
-        setDraftIssue("all");
+        setDraftIssues([]);
         setDraftTableId("all");
     };
 
     const clearAllFilters = () => {
-        setDraftIssue("all");
+        setKeywordValue("");
+        setDraftIssues([]);
         setDraftTableId("all");
         setFilterOpen(false);
 
@@ -246,25 +274,27 @@ export default function FeedbackToolbar({
             return;
         }
 
-        if (key === "issue") {
-            setDraftIssue("all");
-        }
-
-        if (key === "tableId") {
-            setDraftTableId("all");
-        }
-
         navigateTo(buildHref({ [key]: null }));
     };
 
     const openFilters = () => {
-        setDraftIssue(issue || "all");
+        setDraftIssues([...issues]);
         setDraftTableId(tableId || "all");
         setFilterOpen(true);
     };
 
-    const isFilterUnchanged = () =>
-        draftIssue === (issue || "all") && draftTableId === (tableId || "all");
+    const isFilterUnchanged = () => {
+        const currentIssues = [...new Set(issues)].sort();
+        const nextIssues = [...new Set(draftIssues)].sort();
+
+        return (
+            currentIssues.length === nextIssues.length &&
+            currentIssues.every(
+                (issue, index) => issue === nextIssues[index],
+            ) &&
+            draftTableId === (tableId || "all")
+        );
+    };
 
     return (
         <Box
@@ -313,6 +343,23 @@ export default function FeedbackToolbar({
                             htmlInput: {
                                 "aria-label": "Tìm kiếm phản hồi",
                                 "aria-busy": isLoading,
+                            },
+                            input: {
+                                startAdornment: (
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            color: "#98A2B3",
+                                        }}
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={faMagnifyingGlass}
+                                            style={{ fontSize: 15 }}
+                                        />
+                                    </Box>
+                                ),
                             },
                         }}
                     />
@@ -394,7 +441,6 @@ export default function FeedbackToolbar({
                 </Button>
             </Stack>
 
-            {/* Filter popover */}
             <Popover
                 open={filterOpen}
                 anchorEl={filterAnchorEl}
@@ -413,9 +459,9 @@ export default function FeedbackToolbar({
                             mt: 1,
                             width: {
                                 xs: "calc(100vw - 32px)",
-                                sm: 370,
+                                sm: 320,
                             },
-                            maxWidth: 370,
+                            maxWidth: 320,
                             p: 2.5,
                             border: "1px solid #EAECF0",
                             borderRadius: 2,
@@ -465,17 +511,60 @@ export default function FeedbackToolbar({
 
                 <Divider sx={{ mb: 2.5, borderColor: "#EAECF0" }} />
 
-                <Stack spacing={2}>
-                    <QRSelect
+                <Stack sx={{ gap: 2 }}>
+                    <QRSelect<string[]>
                         label="Vấn đề"
-                        value={draftIssue}
-                        onChange={(event) => setDraftIssue(event.target.value)}
-                    >
-                        <MenuItem value="all">Tất cả vấn đề</MenuItem>
+                        multiple
+                        value={draftIssues}
+                        onChange={(event) => {
+                            const value = event.target.value;
 
+                            setDraftIssues(
+                                typeof value === "string"
+                                    ? value.split(",")
+                                    : value,
+                            );
+                        }}
+                        displayEmpty
+                        renderValue={(selected) =>
+                            selected.length === 0
+                                ? "Tất cả vấn đề"
+                                : `${selected.length} vấn đề đã chọn`
+                        }
+                        sx={{
+                            "& .MuiSelect-select": {
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                            },
+                        }}
+                    >
                         {FEEDBACK_ISSUES.map(({ option, label }) => (
                             <MenuItem key={option} value={option}>
-                                {label}
+                                <Checkbox
+                                    checked={draftIssues.includes(option)}
+                                    size="small"
+                                    sx={{
+                                        p: 0.5,
+                                        mr: 1,
+                                        color: "#98A2B3",
+                                        "&.Mui-checked": {
+                                            color: "#193B56",
+                                        },
+                                    }}
+                                />
+
+                                <ListItemText
+                                    primary={label}
+                                    slotProps={{
+                                        primary: {
+                                            sx: {
+                                                fontSize: 14,
+                                                whiteSpace: "normal",
+                                            },
+                                        },
+                                    }}
+                                />
                             </MenuItem>
                         ))}
                     </QRSelect>
@@ -499,23 +588,24 @@ export default function FeedbackToolbar({
 
                 <Divider sx={{ my: 2.5, borderColor: "#EAECF0" }} />
 
-                <Stack direction="row" spacing={1}>
+                <Stack
+                    sx={{
+                        flexDirection: "row",
+                        gap: 1,
+                    }}
+                >
                     <Button
                         fullWidth
                         variant="outlined"
                         onClick={clearDraftFilters}
                         disabled={isFilterUnchanged()}
-                        startIcon={<FontAwesomeIcon icon={faRotateLeft} />}
-                        sx={{
-                            height: 40,
-                            borderRadius: 1.5,
-                            borderColor: "#D0D5DD",
-                            color: "#475467",
-                            fontSize: 13,
-                            fontWeight: 600,
-                            textTransform: "none",
-                            whiteSpace: "nowrap",
-                        }}
+                        startIcon={
+                            <FontAwesomeIcon
+                                icon={faRotateLeft}
+                                style={{ fontSize: 14 }}
+                            />
+                        }
+                        sx={buttonBaseCancelSx}
                     >
                         Xóa bộ lọc
                     </Button>
@@ -525,28 +615,19 @@ export default function FeedbackToolbar({
                         variant="contained"
                         onClick={applyFilters}
                         disabled={isFilterUnchanged()}
-                        startIcon={<FontAwesomeIcon icon={faCheck} />}
-                        sx={{
-                            height: 40,
-                            borderRadius: 1.5,
-                            bgcolor: "#193B56",
-                            boxShadow: "none",
-                            fontSize: 13,
-                            fontWeight: 600,
-                            textTransform: "none",
-                            whiteSpace: "nowrap",
-                            "&:hover": {
-                                bgcolor: "#244E6C",
-                                boxShadow: "none",
-                            },
-                        }}
+                        startIcon={
+                            <FontAwesomeIcon
+                                icon={faCheck}
+                                style={{ fontSize: 14 }}
+                            />
+                        }
+                        sx={buttonBaseSx}
                     >
                         Áp dụng
                     </Button>
                 </Stack>
             </Popover>
 
-            {/* Quick status filters */}
             <Box sx={{ mt: 2 }}>
                 <Typography
                     sx={{
@@ -619,7 +700,7 @@ export default function FeedbackToolbar({
                 </Stack>
             </Box>
 
-            {(keywordValue.trim() || issue || tableId) && (
+            {(keywordValue.trim() || issues.length > 0 || tableId) && (
                 <>
                     <Divider
                         sx={{
@@ -651,28 +732,22 @@ export default function FeedbackToolbar({
                                 label={`Từ khóa: ${keywordValue.trim()}`}
                                 onDelete={() => removeFilter("keyword")}
                                 deleteIcon={<FontAwesomeIcon icon={faXmark} />}
-                                sx={{
-                                    maxWidth: "100%",
-                                    bgcolor: "#F2F4F7",
-                                    fontSize: 12,
-                                    "& .MuiChip-label": {
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                    },
-                                }}
+                                sx={chipBaseSx}
                             />
                         )}
 
-                        {issue && (
+                        {issues.length > 0 && (
                             <Chip
                                 size="small"
-                                label={`Vấn đề: ${issueLabel ?? issue}`}
+                                label={`Vấn đề: ${
+                                    selectedIssues
+                                        .map(({ label }) => label)
+                                        .join(", ") ||
+                                    `${issues.length} đã chọn`
+                                }`}
                                 onDelete={() => removeFilter("issue")}
                                 deleteIcon={<FontAwesomeIcon icon={faXmark} />}
-                                sx={{
-                                    bgcolor: "#F2F4F7",
-                                    fontSize: 12,
-                                }}
+                                sx={chipBaseSx}
                             />
                         )}
 
@@ -682,17 +757,20 @@ export default function FeedbackToolbar({
                                 label={`Bàn: ${tableLabel ?? "Đã chọn"}`}
                                 onDelete={() => removeFilter("tableId")}
                                 deleteIcon={<FontAwesomeIcon icon={faXmark} />}
-                                sx={{
-                                    bgcolor: "#F2F4F7",
-                                    fontSize: 12,
-                                }}
+                                sx={chipBaseSx}
                             />
                         )}
 
                         <Button
                             size="small"
                             onClick={clearAllFilters}
-                            startIcon={<FontAwesomeIcon icon={faRotateLeft} />}
+                            startIcon={
+                                <FontAwesomeIcon
+                                    icon={faRotateLeft}
+                                    size="sm"
+                                    style={{ fontSize: "12px" }}
+                                />
+                            }
                             sx={{
                                 ml: { xs: 0, sm: "auto" },
                                 minWidth: 0,

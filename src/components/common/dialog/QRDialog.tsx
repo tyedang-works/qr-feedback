@@ -139,7 +139,7 @@ export default function QRDialog({
                     sx={{
                         px: 3,
                         pb: 2.5,
-                        pt: 0,
+                        pt: 1,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "flex-end",

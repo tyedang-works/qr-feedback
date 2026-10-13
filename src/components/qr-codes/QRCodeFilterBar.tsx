@@ -168,16 +168,21 @@ export default function QRCodeFilterBar() {
                         },
                         input: {
                             startAdornment: (
-                                <InputAdornment position="start">
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        color: "#98a2b3",
+                                    }}
+                                >
                                     <FontAwesomeIcon
                                         icon={faMagnifyingGlass}
-                                        style={{
-                                            fontSize: 14,
-                                            color: "#98A2B3",
-                                        }}
+                                        style={{ fontSize: 15 }}
                                     />
-                                </InputAdornment>
+                                </Box>
                             ),
+
                             endAdornment: keyword ? (
                                 <InputAdornment position="end">
                                     <Tooltip title="Xóa từ khóa">

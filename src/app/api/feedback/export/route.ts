@@ -69,13 +69,13 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
 
         const keyword = searchParams.get("keyword") ?? "";
-        const issue = searchParams.get("issue") ?? "";
+        const issues = searchParams.getAll("issue");
         const tableId = searchParams.get("tableId") ?? "";
         const status = searchParams.get("status") ?? "";
 
         const data = await getFeedbackExport(userContext.restaurantId, {
             keyword,
-            issue,
+            issues,
             tableId,
             status,
         });

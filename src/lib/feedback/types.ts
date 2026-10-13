@@ -17,7 +17,7 @@ export type FeedbackFilters = {
     page: number;
     pageSize: number;
     keyword: string;
-    issue: string;
+    issues: string[];
     tableId: string;
     status?: string;
 };

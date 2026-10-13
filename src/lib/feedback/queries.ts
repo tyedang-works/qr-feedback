@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 import { FEEDBACK_STATUS, type FeedbackStatus } from "./constants";
+
 import type {
     FeedbackDetail,
     FeedbackFilters,
@@ -13,8 +14,15 @@ const EXPORT_BATCH_SIZE = 500;
 
 type FeedbackSearchFilters = Pick<
     FeedbackFilters,
-    "keyword" | "issue" | "tableId" | "status"
+    "keyword" | "issues" | "tableId" | "status"
 >;
+
+type NormalizedFeedbackFilters = {
+    keyword: string;
+    issues: string[];
+    tableId: string | null;
+    status: string | null;
+};
 
 type FeedbackRow = {
     id: string;
@@ -33,9 +41,6 @@ type FeedbackTable = {
     name: string;
 };
 
-/**
- * Normalize Vietnamese text for accent-insensitive search.
- */
 function normalizeFeedbackKeyword(value: string): string {
     return value
         .normalize("NFD")
@@ -45,13 +50,27 @@ function normalizeFeedbackKeyword(value: string): string {
         .trim();
 }
 
-function getSearchKeyword(keyword: string): string {
-    return normalizeFeedbackKeyword(keyword);
+function normalizeFeedbackFilters(
+    filters: FeedbackSearchFilters,
+): NormalizedFeedbackFilters {
+    return {
+        keyword: normalizeFeedbackKeyword(filters.keyword ?? ""),
+        issues: [
+            ...new Set(
+                (filters.issues ?? []).filter(
+                    (issue: string) => issue !== "" && issue !== "all",
+                ),
+            ),
+        ],
+        tableId:
+            filters.tableId && filters.tableId !== "all"
+                ? filters.tableId
+                : null,
+        status:
+            filters.status && filters.status !== "all" ? filters.status : null,
+    };
 }
 
-/**
- * Map a database row to the feedback list model.
- */
 function mapFeedbackRow(
     item: FeedbackRow,
     tableNameMap: Map<string, string>,
@@ -70,9 +89,6 @@ function mapFeedbackRow(
     };
 }
 
-/**
- * Fetch table names for the feedback records.
- */
 async function getTableNameMap(
     tableIds: string[],
     restaurantId?: string,
@@ -104,50 +120,39 @@ async function getTableNameMap(
     );
 }
 
-function getEmptyFeedbackList(pageSize: number): FeedbackListResult {
-    return {
-        data: [],
-        total: 0,
-        page: 1,
-        pageSize,
-        totalPages: 0,
-    };
-}
-
-/**
- * Get paginated feedback with filters.
- */
 export async function getFeedbackList(
     restaurantId: string,
     filters: FeedbackFilters,
 ): Promise<FeedbackListResult> {
     const supabase = await createClient();
     const { page, pageSize } = filters;
-
-    const normalizedKeyword = getSearchKeyword(filters.keyword);
+    const normalizedFilters = normalizeFeedbackFilters(filters);
 
     let countQuery = supabase
         .from("feedback")
         .select("id", { count: "exact", head: true })
         .eq("restaurant_id", restaurantId);
 
-    if (normalizedKeyword) {
+    if (normalizedFilters.keyword) {
         countQuery = countQuery.ilike(
             "feedback_search",
-            `%${normalizedKeyword}%`,
+            `%${normalizedFilters.keyword}%`,
         );
     }
 
-    if (filters.tableId && filters.tableId !== "all") {
-        countQuery = countQuery.eq("table_id", filters.tableId);
+    if (normalizedFilters.tableId) {
+        countQuery = countQuery.eq("table_id", normalizedFilters.tableId);
     }
 
-    if (filters.issue && filters.issue !== "all") {
-        countQuery = countQuery.contains("selected_options", [filters.issue]);
+    if (normalizedFilters.issues.length > 0) {
+        countQuery = countQuery.overlaps(
+            "selected_options",
+            normalizedFilters.issues,
+        );
     }
 
-    if (filters.status && filters.status !== "all") {
-        countQuery = countQuery.eq("status", filters.status);
+    if (normalizedFilters.status) {
+        countQuery = countQuery.eq("status", normalizedFilters.status);
     }
 
     const { count, error: countError } = await countQuery;
@@ -160,7 +165,13 @@ export async function getFeedbackList(
     const total = count ?? 0;
 
     if (total === 0) {
-        return getEmptyFeedbackList(pageSize);
+        return {
+            data: [],
+            total: 0,
+            page: 1,
+            pageSize,
+            totalPages: 0,
+        };
     }
 
     const totalPages = Math.ceil(total / pageSize);
@@ -185,25 +196,26 @@ export async function getFeedbackList(
         )
         .eq("restaurant_id", restaurantId);
 
-    if (normalizedKeyword) {
+    if (normalizedFilters.keyword) {
         feedbackQuery = feedbackQuery.ilike(
             "feedback_search",
-            `%${normalizedKeyword}%`,
+            `%${normalizedFilters.keyword}%`,
         );
     }
 
-    if (filters.tableId && filters.tableId !== "all") {
-        feedbackQuery = feedbackQuery.eq("table_id", filters.tableId);
+    if (normalizedFilters.tableId) {
+        feedbackQuery = feedbackQuery.eq("table_id", normalizedFilters.tableId);
     }
 
-    if (filters.issue && filters.issue !== "all") {
-        feedbackQuery = feedbackQuery.contains("selected_options", [
-            filters.issue,
-        ]);
+    if (normalizedFilters.issues.length > 0) {
+        feedbackQuery = feedbackQuery.overlaps(
+            "selected_options",
+            normalizedFilters.issues,
+        );
     }
 
-    if (filters.status && filters.status !== "all") {
-        feedbackQuery = feedbackQuery.eq("status", filters.status);
+    if (normalizedFilters.status) {
+        feedbackQuery = feedbackQuery.eq("status", normalizedFilters.status);
     }
 
     const { data, error } = await feedbackQuery
@@ -240,9 +252,6 @@ export async function getFeedbackList(
     };
 }
 
-/**
- * Get one feedback record by its public ID.
- */
 export async function getFeedbackDetail(
     restaurantId: string,
     feedbackPublicId: string,
@@ -303,17 +312,14 @@ export async function getFeedbackDetail(
     };
 }
 
-/**
- * Export all feedback matching the supplied filters.
- */
 export async function getFeedbackExport(
     restaurantId: string,
     filters: FeedbackSearchFilters,
 ): Promise<FeedbackListItem[]> {
     const supabase = await createClient();
     const result: FeedbackListItem[] = [];
+    const normalizedFilters = normalizeFeedbackFilters(filters);
 
-    const normalizedKeyword = getSearchKeyword(filters.keyword);
     let from = 0;
 
     while (true) {
@@ -334,20 +340,26 @@ export async function getFeedbackExport(
             )
             .eq("restaurant_id", restaurantId);
 
-        if (normalizedKeyword) {
-            query = query.ilike("feedback_search", `%${normalizedKeyword}%`);
+        if (normalizedFilters.keyword) {
+            query = query.ilike(
+                "feedback_search",
+                `%${normalizedFilters.keyword}%`,
+            );
         }
 
-        if (filters.tableId && filters.tableId !== "all") {
-            query = query.eq("table_id", filters.tableId);
+        if (normalizedFilters.tableId) {
+            query = query.eq("table_id", normalizedFilters.tableId);
         }
 
-        if (filters.issue && filters.issue !== "all") {
-            query = query.contains("selected_options", [filters.issue]);
+        if (normalizedFilters.issues.length > 0) {
+            query = query.overlaps(
+                "selected_options",
+                normalizedFilters.issues,
+            );
         }
 
-        if (filters.status && filters.status !== "all") {
-            query = query.eq("status", filters.status);
+        if (normalizedFilters.status) {
+            query = query.eq("status", normalizedFilters.status);
         }
 
         const { data, error } = await query
@@ -385,9 +397,6 @@ export async function getFeedbackExport(
     return result;
 }
 
-/**
- * Get restaurant-wide feedback statistics.
- */
 export async function getFeedbackSummary(
     restaurantId: string,
 ): Promise<FeedbackSummary> {

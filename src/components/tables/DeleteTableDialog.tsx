@@ -1,14 +1,12 @@
 "use client";
 
-import { useState } from "react";
-
-import { Box, Button, Tooltip, Typography } from "@mui/material";
-
-import { Form, Formik, type FormikHelpers } from "formik";
-
 import { deleteTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
+import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
+import { Form, Formik, type FormikHelpers } from "formik";
+import { useState } from "react";
 
 type DeleteTableDialogProps = {
     tableId: string;
@@ -179,17 +177,10 @@ export default function DeleteTableDialog({
                                 <>
                                     <Button
                                         type="button"
+                                        variant="outlined"
                                         onClick={handleClose}
                                         disabled={isSubmitting}
-                                        sx={{
-                                            minWidth: 80,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            color: "#667085",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                        }}
+                                        sx={buttonBaseCancelSx}
                                     >
                                         Hủy
                                     </Button>
@@ -200,14 +191,8 @@ export default function DeleteTableDialog({
                                         variant="contained"
                                         disabled={isSubmitting}
                                         sx={{
-                                            minWidth: 80,
-                                            height: 40,
-                                            borderRadius: 1.5,
+                                            ...buttonBaseSx,
                                             backgroundColor: "#d92d20",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                            boxShadow: "none",
                                             "&:hover": {
                                                 backgroundColor: "#b42318",
                                                 boxShadow: "none",

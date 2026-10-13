@@ -47,8 +47,6 @@ export default async function DashboardPage() {
                 todayFeedback={summary.todayFeedback}
                 activeTables={summary.activeTables}
             />
-
-            {/* Hàng 1: Xu hướng phản hồi và trạng thái xử lý */}
             <Box
                 sx={{
                     display: "grid",
@@ -62,11 +60,9 @@ export default async function DashboardPage() {
                 }}
             >
                 <FeedbackTrend data={feedbackTrend} />
-
                 <FeedbackStatusChart data={feedbackStatusDistribution} />
             </Box>
 
-            {/* Hàng 2: Phân bố vấn đề và phản hồi gần đây */}
             <Box
                 sx={{
                     display: "grid",
@@ -80,7 +76,6 @@ export default async function DashboardPage() {
                 }}
             >
                 <IssueDistribution data={issueDistribution} />
-
                 <RecentFeedback data={recentFeedback} />
             </Box>
         </Stack>

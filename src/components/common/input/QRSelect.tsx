@@ -49,6 +49,9 @@ export default function QRSelect<Value = string>({
                         borderRadius: 1,
                         backgroundColor: "#ffffff",
 
+                        display: "flex",
+                        alignItems: "center",
+
                         "& .MuiOutlinedInput-notchedOutline": {
                             borderColor: "#d0d5dd",
                         },
@@ -66,22 +69,20 @@ export default function QRSelect<Value = string>({
                             borderColor: "#d92d20",
                         },
 
-                        "&.Mui-error.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                                borderColor: "#d92d20",
-                            },
-
                         "& .MuiSelect-select": {
-                            height: "auto",
-                            minHeight: "0 !important",
-                            boxSizing: "border-box",
-                            px: 1.5,
-                            py: 0,
                             display: "flex",
                             alignItems: "center",
+                            height: "42px",
+                            minHeight: "0 !important",
+                            boxSizing: "border-box",
+                            padding: "0 36px 0 12px",
                             fontSize: 14,
-                            lineHeight: 1.5,
-                            color: "#344054",
+                            lineHeight: "20px",
+                        },
+
+                        "& .MuiSelect-icon": {
+                            top: "50%",
+                            transform: "translateY(-50%)",
                         },
                     },
                     ...(Array.isArray(sx) ? sx : [sx]),

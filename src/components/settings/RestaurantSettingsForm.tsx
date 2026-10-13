@@ -1,6 +1,6 @@
 "use client";
 
-import { faBuilding, faSave, faStore } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faStore } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     Box,
@@ -397,12 +397,6 @@ export default function RestaurantSettingsForm({
                                                 isSaving ||
                                                 isSubmitting
                                             }
-                                            startIcon={
-                                                <FontAwesomeIcon
-                                                    icon={faSave}
-                                                    style={{ fontSize: 14 }}
-                                                />
-                                            }
                                             sx={buttonBaseSx}
                                         >
                                             Lưu thay đổi
@@ -443,25 +437,21 @@ export default function RestaurantSettingsForm({
                                             onClick={() =>
                                                 handleConfirmSave(setSubmitting)
                                             }
-                                            startIcon={
-                                                isSaving ? (
+
+                                            sx={buttonBaseSx}
+                                        >
+                                            {isSaving ? (
+                                                <>
                                                     <CircularProgress
                                                         size={16}
                                                         thickness={5}
                                                         color="inherit"
                                                     />
-                                                ) : (
-                                                    <FontAwesomeIcon
-                                                        icon={faSave}
-                                                        style={{ fontSize: 14 }}
-                                                    />
-                                                )
-                                            }
-                                            sx={buttonBaseSx}
-                                        >
-                                            {isSaving
-                                                ? "Đang lưu..."
-                                                : "Xác nhận và lưu"}
+                                                    &nbsp; Đang lưu...
+                                                </>
+                                            ) : (
+                                                "Xác nhận và lưu"
+                                            )}
                                         </Button>
                                     </>
                                 }

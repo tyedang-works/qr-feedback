@@ -7,6 +7,7 @@ import { updateTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
+import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import { Form, Formik, type FormikHelpers } from "formik";
 import * as yup from "yup";
 
@@ -202,17 +203,10 @@ export default function EditTableDialog({
                                 <>
                                     <Button
                                         type="button"
+                                        variant="outlined"
                                         onClick={handleClose}
                                         disabled={isSubmitting}
-                                        sx={{
-                                            minWidth: 80,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            color: "#667085",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                        }}
+                                        sx={buttonBaseCancelSx}
                                     >
                                         Hủy
                                     </Button>
@@ -222,20 +216,7 @@ export default function EditTableDialog({
                                         form="edit-table-form"
                                         variant="contained"
                                         disabled={isSubmitting}
-                                        sx={{
-                                            minWidth: 120,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            backgroundColor: "#193B56",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                            boxShadow: "none",
-                                            "&:hover": {
-                                                backgroundColor: "#142f45",
-                                                boxShadow: "none",
-                                            },
-                                        }}
+                                        sx={buttonBaseSx}
                                     >
                                         {isSubmitting ? (
                                             <>

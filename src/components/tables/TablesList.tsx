@@ -4,6 +4,7 @@ import DeleteTableDialog from "@/components/tables/DeleteTableDialog";
 import EditTableDialog from "@/components/tables/EditTableDialog";
 import TableStatusSwitch from "@/components/tables/TableStatusSwitch";
 import type { RestaurantTable } from "@/lib/tables/types";
+import { tableColumnHeaderSx } from "@/styles/table.styles";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Divider, MenuItem, Stack, Typography } from "@mui/material";
@@ -30,12 +31,6 @@ const cardSx = {
     border: "1px solid #eaecf0",
     borderRadius: 2,
     boxShadow: "0 1px 2px rgba(16, 24, 40, 0.04)",
-};
-
-const headerCellSx = {
-    fontSize: 14,
-    fontWeight: 700,
-    color: "#1a202e",
 };
 
 export default function TablesList({ data, canManageTables }: TablesListProps) {
@@ -299,21 +294,24 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                     backgroundColor: "#f8fafc",
                                 }}
                             >
-                                <Typography sx={headerCellSx}>Bàn</Typography>
+                                <Typography sx={tableColumnHeaderSx}>
+                                    Bàn
+                                </Typography>
 
-                                <Typography sx={headerCellSx}>
+                                <Typography sx={tableColumnHeaderSx}>
                                     Định danh QR
                                 </Typography>
 
-                                <Typography sx={headerCellSx}>
+                                <Typography sx={tableColumnHeaderSx}>
                                     Trạng thái hoạt động
                                 </Typography>
 
                                 {canManageTables && (
                                     <Typography
                                         sx={{
-                                            ...headerCellSx,
-                                            textAlign: "center",
+                                            ...tableColumnHeaderSx,
+                                            textAlign: "left",
+                                            color: "#667085",
                                         }}
                                     >
                                         Thao tác
@@ -404,7 +402,6 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                             ))}
                         </Box>
 
-                        {/* Mobile */}
                         <Stack sx={{ display: { xs: "flex", sm: "none" } }}>
                             {filteredTables.map((table, index) => (
                                 <Box key={table.id}>

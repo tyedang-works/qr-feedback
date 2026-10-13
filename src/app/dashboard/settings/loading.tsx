@@ -1,9 +1,10 @@
 import { Box, Skeleton, Stack } from "@mui/material";
 
+import PageLoadingSkeleton from "@/components/common/skeleton/PageLoadingSkeleton";
+
 function SettingsSectionSkeleton() {
     return (
         <Stack sx={{ gap: 2 }}>
-            {/* Section heading */}
             <Stack
                 sx={{
                     flexDirection: "row",
@@ -13,21 +14,20 @@ function SettingsSectionSkeleton() {
             >
                 <Skeleton
                     variant="rounded"
-                    width={38}
-                    height={38}
                     sx={{
+                        width: 38,
+                        height: 38,
                         borderRadius: 2,
                         flexShrink: 0,
                     }}
                 />
 
                 <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Skeleton variant="text" width={145} height={22} />
-                    <Skeleton variant="text" width={220} height={18} />
+                    <Skeleton variant="text" sx={{ width: 145, height: 22 }} />
+                    <Skeleton variant="text" sx={{ width: 220, height: 18 }} />
                 </Box>
             </Stack>
 
-            {/* Form fields */}
             <Box
                 sx={{
                     display: "grid",
@@ -35,24 +35,25 @@ function SettingsSectionSkeleton() {
                         xs: "minmax(0, 1fr)",
                         md: "repeat(2, minmax(0, 1fr))",
                     },
-                    gap: {
-                        xs: 2.5,
-                        md: 3,
-                    },
+                    gap: { xs: 2.5, md: 3 },
                 }}
             >
                 {[1, 2].map((item) => (
                     <Stack key={item} sx={{ gap: 0.75 }}>
                         <Skeleton
                             variant="text"
-                            width={item === 1 ? 105 : 115}
-                            height={20}
+                            sx={{
+                                width: item === 1 ? 105 : 115,
+                                height: 20,
+                            }}
                         />
                         <Skeleton
                             variant="rounded"
-                            width="100%"
-                            height={40}
-                            sx={{ borderRadius: 1 }}
+                            sx={{
+                                width: "100%",
+                                height: 40,
+                                borderRadius: 1,
+                            }}
                         />
                     </Stack>
                 ))}
@@ -63,51 +64,7 @@ function SettingsSectionSkeleton() {
 
 export default function SettingsLoading() {
     return (
-        <Stack
-            aria-label="Đang tải cài đặt nhà hàng"
-            sx={{
-                gap: { xs: 3, md: 4 },
-                width: "100%",
-                minWidth: 0,
-            }}
-        >
-            {/* Page header */}
-            <Stack
-                sx={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 2,
-                }}
-            >
-                <Skeleton
-                    variant="rounded"
-                    width={48}
-                    height={48}
-                    sx={{
-                        borderRadius: 2.5,
-                        flexShrink: 0,
-                    }}
-                />
-
-                <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Skeleton
-                        variant="text"
-                        sx={{
-                            width: { xs: 200, sm: 260 },
-                            height: 34,
-                        }}
-                    />
-                    <Skeleton
-                        variant="text"
-                        sx={{
-                            width: { xs: 250, sm: 340 },
-                            height: 22,
-                        }}
-                    />
-                </Box>
-            </Stack>
-
-            {/* Settings card */}
+        <PageLoadingSkeleton titleWidth={260} subtitleWidth={340} gap={3}>
             <Box
                 sx={{
                     width: "100%",
@@ -118,7 +75,6 @@ export default function SettingsLoading() {
                     boxShadow: "0 2px 8px rgba(16, 24, 40, 0.03)",
                 }}
             >
-                {/* Form content: match page.tsx padding */}
                 <Stack
                     sx={{
                         gap: 3,
@@ -128,7 +84,6 @@ export default function SettingsLoading() {
                 >
                     <SettingsSectionSkeleton />
 
-                    {/* Section divider */}
                     <Box
                         sx={{
                             height: "1px",
@@ -150,9 +105,9 @@ export default function SettingsLoading() {
                             variant="rounded"
                             sx={{
                                 width: { xs: "100%", sm: 160 },
+                                height: 42,
                                 borderRadius: 2,
                             }}
-                            height={42}
                         />
                     </Box>
                 </Stack>
@@ -170,9 +125,11 @@ export default function SettingsLoading() {
                 >
                     <Skeleton
                         variant="circular"
-                        width={14}
-                        height={14}
-                        sx={{ flexShrink: 0 }}
+                        sx={{
+                            width: 14,
+                            height: 14,
+                            flexShrink: 0,
+                        }}
                     />
 
                     <Skeleton
@@ -184,6 +141,6 @@ export default function SettingsLoading() {
                     />
                 </Box>
             </Box>
-        </Stack>
+        </PageLoadingSkeleton>
     );
 }

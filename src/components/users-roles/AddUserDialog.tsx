@@ -10,9 +10,10 @@ import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
 
 import { USER_ROLE_OPTIONS } from "@/lib/auth/constants";
+import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import QRSnackbar from "../common/feedback/QRSnackbar";
-import { useRouter } from "next/navigation";
 
 type SnackbarState = {
     open: boolean;
@@ -39,7 +40,6 @@ const initialValues: AddUserFormValues = {
 
 const validationSchema = yup.object({
     fullName: yup.string().trim().required("Vui lòng nhập tên."),
-
     email: yup
         .string()
         .trim()
@@ -167,17 +167,10 @@ export default function AddUserDialog({ open, onClose }: AddUserDialogProps) {
                                 <>
                                     <Button
                                         type="button"
+                                        variant="outlined"
                                         onClick={handleClose}
                                         disabled={isSubmitting}
-                                        sx={{
-                                            minWidth: 80,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            color: "#667085",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                        }}
+                                        sx={buttonBaseCancelSx}
                                     >
                                         Hủy
                                     </Button>
@@ -187,20 +180,7 @@ export default function AddUserDialog({ open, onClose }: AddUserDialogProps) {
                                         form="add-user-form"
                                         variant="contained"
                                         disabled={isSubmitting}
-                                        sx={{
-                                            minWidth: 100,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            backgroundColor: "#193B56",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                            boxShadow: "none",
-                                            "&:hover": {
-                                                backgroundColor: "#142f45",
-                                                boxShadow: "none",
-                                            },
-                                        }}
+                                        sx={buttonBaseSx}
                                     >
                                         {isSubmitting ? (
                                             <>

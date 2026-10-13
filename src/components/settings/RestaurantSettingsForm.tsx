@@ -18,7 +18,7 @@ import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
 import { VIETNAM_PHONE_REGEX } from "@/constants/validation.constants";
 import type { RestaurantSettings } from "@/lib/restaurant/types";
-import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/form.styles";
+import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import QRDialog from "../common/dialog/QRDialog";
 
 type RestaurantSettingsFormProps = {

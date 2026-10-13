@@ -3,6 +3,7 @@
 import { deleteUserAction } from "@/app/dashboard/users-roles/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
+import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import { Button, CircularProgress, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -97,17 +98,17 @@ export default function DeleteUserDialog({
                 onClick={() => setOpen(true)}
                 disabled={isDeleting}
                 sx={{
-                    minWidth: 52,
-                    height: 34,
-                    px: 1.25,
-                    borderRadius: 1.5,
                     color: "#d92d20",
-                    fontSize: 13,
-                    fontWeight: 600,
                     textTransform: "none",
                     "&:hover": {
                         backgroundColor: "#fef3f2",
                     },
+                    minWidth: 0,
+                    px: 1.25,
+                    py: 0.75,
+                    borderRadius: 1.5,
+                    fontSize: 13,
+                    fontWeight: 600,
                 }}
             >
                 Xóa
@@ -121,21 +122,10 @@ export default function DeleteUserDialog({
                     <>
                         <Button
                             type="button"
+                            variant="outlined"
                             onClick={handleClose}
                             disabled={isDeleting}
-                            sx={{
-                                minWidth: 72,
-                                height: 40,
-                                px: 2,
-                                borderRadius: 1.5,
-                                color: "#667085",
-                                fontSize: 14,
-                                fontWeight: 600,
-                                textTransform: "none",
-                                "&:hover": {
-                                    backgroundColor: "#f8fafc",
-                                },
-                            }}
+                            sx={buttonBaseCancelSx}
                         >
                             Hủy
                         </Button>
@@ -146,15 +136,8 @@ export default function DeleteUserDialog({
                             onClick={handleDelete}
                             disabled={isDeleting}
                             sx={{
-                                minWidth: 88,
-                                height: 40,
-                                px: 2,
-                                borderRadius: 1.5,
+                                ...buttonBaseSx,
                                 backgroundColor: "#d92d20",
-                                fontSize: 14,
-                                fontWeight: 600,
-                                textTransform: "none",
-                                boxShadow: "none",
                                 "&:hover": {
                                     backgroundColor: "#b42318",
                                     boxShadow: "none",

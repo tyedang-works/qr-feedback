@@ -1,3 +1,4 @@
+import PageHeader from "@/components/common/layout/PageHeader";
 import RestaurantSettingsForm from "@/components/settings/RestaurantSettingsForm";
 import { canManageSettings } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
@@ -28,53 +29,11 @@ export default async function SettingsPage() {
                 minWidth: 0,
             }}
         >
-            <Stack
-                sx={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 2,
-                }}
-            >
-                <Box
-                    sx={{
-                        width: 48,
-                        height: 48,
-                        flexShrink: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: 2.5,
-                        bgcolor: "#EAF3F0",
-                        color: "#237A62",
-                    }}
-                >
-                    <FontAwesomeIcon icon={faGear} style={{ fontSize: 22 }} />
-                </Box>
-
-                <Box sx={{ minWidth: 0 }}>
-                    <Typography
-                        sx={{
-                            fontSize: { xs: 22, sm: 26 },
-                            lineHeight: 1.35,
-                            fontWeight: 700,
-                            color: "#193B56",
-                        }}
-                    >
-                        Cài đặt nhà hàng
-                    </Typography>
-
-                    <Typography
-                        sx={{
-                            mt: 0.5,
-                            fontSize: 14,
-                            lineHeight: 1.6,
-                            color: "#667085",
-                        }}
-                    >
-                        Quản lý thông tin và thông tin liên hệ của nhà hàng.
-                    </Typography>
-                </Box>
-            </Stack>
+            <PageHeader
+                title="Cài đặt nhà hàng"
+                subtitle="Quản lý thông tin và thông tin liên hệ của nhà hàng."
+                icon={faGear}
+            />
 
             <Box
                 sx={{

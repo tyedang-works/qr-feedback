@@ -5,6 +5,7 @@ import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRSelect from "@/components/common/input/QRSelect";
 import { USER_ROLE_OPTIONS, type UserRole } from "@/lib/auth/constants";
+import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import {
     Button,
     CircularProgress,
@@ -184,17 +185,10 @@ export default function ChangeRoleDialog({
                                 <>
                                     <Button
                                         type="button"
+                                        variant="outlined"
                                         onClick={handleClose}
                                         disabled={isSubmitting}
-                                        sx={{
-                                            minWidth: 80,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            color: "#667085",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                        }}
+                                        sx={buttonBaseCancelSx}
                                     >
                                         Hủy
                                     </Button>
@@ -206,24 +200,7 @@ export default function ChangeRoleDialog({
                                         disabled={
                                             isSubmitting || !hasRoleChanged
                                         }
-                                        sx={{
-                                            minWidth: 130,
-                                            height: 40,
-                                            borderRadius: 1.5,
-                                            backgroundColor: "#193B56",
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                            boxShadow: "none",
-                                            "&:hover": {
-                                                backgroundColor: "#142f45",
-                                                boxShadow: "none",
-                                            },
-                                            "&.Mui-disabled": {
-                                                backgroundColor: "#e4e7ec",
-                                                color: "#98a2b3",
-                                            },
-                                        }}
+                                        sx={buttonBaseSx}
                                     >
                                         {isSubmitting ? (
                                             <CircularProgress

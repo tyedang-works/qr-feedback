@@ -35,7 +35,7 @@ export const tableStatusSwitchSx: SxProps<Theme> = {
     },
 
     "& .MuiSwitch-track": {
-        borderRadius: 11,
+        borderRadius: "11px",
         backgroundColor: "#D1D5DB",
         opacity: 1,
         transition: "background-color 200ms ease",
@@ -43,9 +43,15 @@ export const tableStatusSwitchSx: SxProps<Theme> = {
 };
 
 export const getTableStatusLabelSx = (isActive: boolean): SxProps<Theme> => ({
-    fontSize: 12,
+    fontSize: "12px",
     fontWeight: 500,
     lineHeight: 1.5,
     color: isActive ? "#027A48" : "#667085",
     whiteSpace: "nowrap",
 });
+
+export const tableColumnHeaderSx: SxProps<Theme> = {
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#1a202e",
+};

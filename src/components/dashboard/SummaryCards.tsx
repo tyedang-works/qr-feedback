@@ -1,48 +1,251 @@
-import {
-    faCalendarCheck,
-    faList,
-    faTableCells,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+"use client";
+
+import type { FeedbackTrendItem } from "@/lib/dashboard/types";
 import { Box, Card, Stack, Typography } from "@mui/material";
+import { Minus, TrendingDown, TrendingUp } from "lucide-react";
+import type { ReactNode } from "react";
 
 type SummaryCardsProps = {
     totalFeedback: number;
     todayFeedback: number;
     activeTables: number;
+    inactiveTables: number;
+    feedbackTrend: FeedbackTrendItem[];
+    last7DaysFeedback: number;
+    previous7DaysFeedback: number;
+    yesterdayFeedback: number;
 };
+
+type MiniBarChartProps = {
+    data: number[];
+    color: string;
+};
+
+function MiniBarChart({ data, color }: MiniBarChartProps) {
+    const maxValue = Math.max(...data, 1);
+
+    return (
+        <Stack
+            sx={{
+                flexDirection: "row",
+                alignItems: "flex-end",
+                justifyContent: "flex-end",
+                gap: "3px",
+                width: 60,
+                height: 36,
+                flexShrink: 0,
+            }}
+            aria-hidden="true"
+        >
+            {data.map((value, index) => (
+                <Box
+                    key={index}
+                    sx={{
+                        flex: "1 1 0",
+                        minWidth: 3,
+                        maxWidth: 5,
+                        height: `${Math.max((value / maxValue) * 100, 5)}%`,
+                        borderRadius: "2px 2px 0 0",
+                        bgcolor: color,
+                    }}
+                />
+            ))}
+        </Stack>
+    );
+}
+
+function formatNumber(value: number) {
+    return value.toLocaleString("vi-VN");
+}
+
+function getChange(current: number, previous: number) {
+    if (previous === 0) {
+        if (current === 0) {
+            return { value: 0, direction: "neutral" as const };
+        }
+
+        return { value: null, direction: "up" as const };
+    }
+
+    const difference = Math.round(((current - previous) / previous) * 100);
+
+    return {
+        value: Math.abs(difference),
+        direction:
+            difference > 0
+                ? ("up" as const)
+                : difference < 0
+                  ? ("down" as const)
+                  : ("neutral" as const),
+    };
+}
+
+function ComparisonText({
+    current,
+    previous,
+    suffix,
+}: {
+    current: number;
+    previous: number;
+    suffix: string;
+}) {
+    const change = getChange(current, previous);
+
+    const color =
+        change.direction === "neutral"
+            ? "var(--color-text-secondary, #6B7280)"
+            : change.direction === "up"
+              ? "#DC4545"
+              : "#059669";
+
+    const Icon =
+        change.direction === "up"
+            ? TrendingUp
+            : change.direction === "down"
+              ? TrendingDown
+              : Minus;
+
+    const sign =
+        change.direction === "up"
+            ? "+"
+            : change.direction === "down"
+              ? "-"
+              : "";
+
+    const value =
+        change.value === null
+            ? `+${formatNumber(current)}`
+            : `${sign}${change.value}%`;
+
+    return (
+        <Stack
+            sx={{
+                flexDirection: "row",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 0.5,
+                minWidth: 0,
+            }}
+        >
+            <Icon size={16} strokeWidth={2} color={color} aria-hidden="true" />
+
+            <Typography
+                component="span"
+                sx={{
+                    fontSize: 12,
+                    lineHeight: 1.5,
+                    fontWeight: 500,
+                    color,
+                    fontVariantNumeric: "tabular-nums",
+                }}
+            >
+                {value}
+            </Typography>
+
+            <Typography
+                component="span"
+                sx={{
+                    fontSize: 12,
+                    lineHeight: 1.5,
+                    color: "var(--color-text-secondary, #6B7280)",
+                }}
+            >
+                {suffix}
+            </Typography>
+        </Stack>
+    );
+}
+
+type SummaryCardItemProps = {
+    label: string;
+    value: string;
+    comparison: ReactNode;
+    chartData: number[];
+    chartColor: string;
+};
+
+function SummaryCardItem({
+    label,
+    value,
+    comparison,
+    chartData,
+    chartColor,
+}: SummaryCardItemProps) {
+    return (
+        <Card
+            elevation={0}
+            sx={{
+                height: "100%",
+                minWidth: 0,
+                boxSizing: "border-box",
+                p: { xs: 2, sm: 2.5 },
+                border: "1px solid var(--color-border, #F0F2F5)",
+                borderRadius: "16px",
+                bgcolor: "var(--color-surface, #FFFFFF)",
+                boxShadow: "var(--shadow-card)",
+            }}
+        >
+            <Stack
+                sx={{
+                    height: "100%",
+                    minWidth: 0,
+                    justifyContent: "space-between",
+                    gap: 1.5,
+                }}
+            >
+                <Typography
+                    sx={{
+                        fontSize: 13,
+                        lineHeight: 1.5,
+                        fontWeight: 400,
+                        color: "var(--color-text-primary, #111827)",
+                    }}
+                >
+                    {label}
+                </Typography>
+
+                <Stack
+                    sx={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 2,
+                        minWidth: 0,
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            minWidth: 0,
+                            fontSize: { xs: 27, sm: 30 },
+                            lineHeight: 1.2,
+                            fontWeight: 700,
+                            letterSpacing: "-0.7px",
+                            color: "var(--color-text-primary, #111827)",
+                            fontVariantNumeric: "tabular-nums",
+                        }}
+                    >
+                        {value}
+                    </Typography>
+
+                    <MiniBarChart data={chartData} color={chartColor} />
+                </Stack>
+                <Box sx={{ minWidth: 0, minHeight: 18 }}>{comparison}</Box>
+            </Stack>
+        </Card>
+    );
+}
 
 export default function SummaryCards({
     totalFeedback,
     todayFeedback,
     activeTables,
+    inactiveTables,
+    feedbackTrend,
+    last7DaysFeedback,
+    previous7DaysFeedback,
+    yesterdayFeedback,
 }: SummaryCardsProps) {
-    const summaryItems = [
-        {
-            label: "Tổng phản hồi",
-            value: totalFeedback,
-            color: "#193B56",
-            backgroundColor: "#EEF4F8",
-            indicator: "#193B56",
-            icon: faList,
-        },
-        {
-            label: "Hôm nay",
-            value: todayFeedback,
-            color: "#193B56",
-            backgroundColor: "#FFF5E8",
-            indicator: "#E89A42",
-            icon: faCalendarCheck,
-        },
-        {
-            label: "Bàn đang hoạt động",
-            value: activeTables,
-            color: "#193B56",
-            backgroundColor: "#ECFDF3",
-            indicator: "#12B76A",
-            icon: faTableCells,
-        },
-    ];
+    const trendData = feedbackTrend.map((item) => item.count);
 
     return (
         <Box
@@ -50,84 +253,73 @@ export default function SummaryCards({
                 display: "grid",
                 gridTemplateColumns: {
                     xs: "minmax(0, 1fr)",
-                    sm: "repeat(3, minmax(0, 1fr))",
+                    sm: "repeat(2, minmax(0, 1fr))",
+                    lg: "repeat(3, minmax(0, 1fr))",
                 },
                 gap: 2,
+                minWidth: 0,
+                alignItems: "stretch",
             }}
         >
-            {summaryItems.map((item) => {
-                return (
-                    <Card
-                        key={item.label}
-                        elevation={0}
+            <SummaryCardItem
+                label="Tổng phản hồi"
+                value={formatNumber(totalFeedback)}
+                chartData={trendData}
+                chartColor="#10B981"
+                comparison={
+                    <ComparisonText
+                        current={last7DaysFeedback}
+                        previous={previous7DaysFeedback}
+                        suffix="so với 7 ngày trước"
+                    />
+                }
+            />
+
+            <SummaryCardItem
+                label="Hôm nay"
+                value={formatNumber(todayFeedback)}
+                chartData={trendData}
+                chartColor="#06B6D4"
+                comparison={
+                    <ComparisonText
+                        current={todayFeedback}
+                        previous={yesterdayFeedback}
+                        suffix="so với hôm qua"
+                    />
+                }
+            />
+
+            <SummaryCardItem
+                label="Bàn đang hoạt động"
+                value={`${formatNumber(activeTables)}/${formatNumber(
+                    activeTables + inactiveTables,
+                )}`}
+                chartData={[activeTables, inactiveTables]}
+                chartColor="#F97316"
+                comparison={
+                    <Typography
+                        component="p"
                         sx={{
-                            p: { xs: 2, sm: 2.5 },
-                            border: "1px solid #E5E7EB",
-                            borderRadius: 2.5,
-                            backgroundColor: item.backgroundColor,
-                            minWidth: 0,
+                            m: 0,
+                            fontSize: 12,
+                            lineHeight: 1.5,
+                            color: "var(--color-text-secondary, #6B7280)",
                         }}
                     >
-                        <Stack
+                        <Box
+                            component="span"
                             sx={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                gap: 1.5,
+                                color: "#059669",
+                                fontWeight: 500,
                             }}
                         >
-                            <Box
-                                sx={{
-                                    width: 44,
-                                    height: 44,
-                                    flexShrink: 0,
-                                    borderRadius: "50%",
-                                    backgroundColor:
-                                        item.label === "Tổng phản hồi"
-                                            ? "transparent"
-                                            : "#FFFFFF",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    border: "none",
-                                }}
-                            >
-                                <FontAwesomeIcon
-                                    icon={item.icon}
-                                    size="sm"
-                                    style={{
-                                        color: item.indicator,
-                                        fontSize: "18px",
-                                    }}
-                                />
-                            </Box>
-
-                            <Box sx={{ minWidth: 0, flex: 1 }}>
-                                <Typography
-                                    sx={{
-                                        fontSize: 13,
-                                        color: "#667085",
-                                        mb: 0.5,
-                                    }}
-                                >
-                                    {item.label}
-                                </Typography>
-
-                                <Typography
-                                    sx={{
-                                        fontSize: { xs: 25, sm: 28 },
-                                        lineHeight: 1.2,
-                                        fontWeight: 700,
-                                        color: item.color,
-                                        fontVariantNumeric: "tabular-nums",
-                                    }}
-                                >
-                                    {item.value.toLocaleString("vi-VN")}
-                                </Typography>
-                            </Box>
-                        </Stack>
-                    </Card>
-                );
-            })}
+                            {formatNumber(activeTables)} đang hoạt động
+                        </Box>
+                        {" · "}
+                        {formatNumber(inactiveTables)} đã tắt
+                    </Typography>
+                }
+            />
         </Box>
     );
 }

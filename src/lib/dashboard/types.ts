@@ -28,3 +28,19 @@ export type RecentFeedbackItem = {
     status: FeedbackStatus;
     createdAt: string;
 };
+
+export type IssueComparisonPeriod = "week" | "month";
+
+export type IssueWeeklyComparisonItem = {
+    option: string;
+    label: string;
+    currentCount: number;
+    previousCount: number;
+};
+
+export type IssueComparisonResult = {
+    period: IssueComparisonPeriod;
+    currentLabel: string;
+    previousLabel: string;
+    data: IssueWeeklyComparisonItem[];
+};

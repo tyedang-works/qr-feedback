@@ -3,7 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import type {
     FeedbackStatusDistributionItem,
     FeedbackTrendItem,
+    IssueComparisonPeriod,
+    IssueComparisonResult,
     IssueDistributionItem,
+    IssueWeeklyComparisonItem,
     RecentFeedbackItem,
 } from "./types";
 
@@ -348,4 +351,291 @@ export async function getFeedbackStatusDistribution(
             percentage: total > 0 ? Math.round((count / total) * 100) : 0,
         };
     });
+}
+
+export type SummaryComparison = {
+    last7DaysFeedback: number;
+    previous7DaysFeedback: number;
+    yesterdayFeedback: number;
+};
+
+function shiftVietnamDate(dateString: string, days: number) {
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day + days));
+
+    return [
+        date.getUTCFullYear(),
+        String(date.getUTCMonth() + 1).padStart(2, "0"),
+        String(date.getUTCDate()).padStart(2, "0"),
+    ].join("-");
+}
+
+export async function getSummaryComparison(
+    restaurantId: string,
+): Promise<SummaryComparison> {
+    const supabase = await createClient();
+
+    const today = getVietnamDateString();
+    const yesterday = shiftVietnamDate(today, -1);
+    const last7DaysStart = shiftVietnamDate(today, -6);
+    const previous7DaysStart = shiftVietnamDate(today, -13);
+
+    const startOfToday = `${today}T00:00:00+07:00`;
+    const startOfYesterday = `${yesterday}T00:00:00+07:00`;
+    const startOfLast7Days = `${last7DaysStart}T00:00:00+07:00`;
+    const startOfPrevious7Days = `${previous7DaysStart}T00:00:00+07:00`;
+
+    const [last7DaysResult, previous7DaysResult, yesterdayResult] =
+        await Promise.all([
+            supabase
+                .from("feedback")
+                .select("id", { count: "exact", head: true })
+                .eq("restaurant_id", restaurantId)
+                .gte("created_at", startOfLast7Days)
+                .lt("created_at", new Date(startOfToday).toISOString()),
+
+            supabase
+                .from("feedback")
+                .select("id", { count: "exact", head: true })
+                .eq("restaurant_id", restaurantId)
+                .gte("created_at", startOfPrevious7Days)
+                .lt("created_at", startOfLast7Days),
+
+            supabase
+                .from("feedback")
+                .select("id", { count: "exact", head: true })
+                .eq("restaurant_id", restaurantId)
+                .gte("created_at", startOfYesterday)
+                .lt("created_at", startOfToday),
+        ]);
+
+    if (
+        last7DaysResult.error ||
+        previous7DaysResult.error ||
+        yesterdayResult.error
+    ) {
+        console.error("Failed to get summary comparison:", {
+            last7DaysError: last7DaysResult.error,
+            previous7DaysError: previous7DaysResult.error,
+            yesterdayError: yesterdayResult.error,
+        });
+
+        throw new Error("Không thể tải dữ liệu so sánh Dashboard.");
+    }
+
+    return {
+        last7DaysFeedback: last7DaysResult.count ?? 0,
+        previous7DaysFeedback: previous7DaysResult.count ?? 0,
+        yesterdayFeedback: yesterdayResult.count ?? 0,
+    };
+}
+
+export async function getWeeklyIssueComparison(
+    restaurantId: string,
+): Promise<IssueWeeklyComparisonItem[]> {
+    const supabase = await createClient();
+
+    const today = getVietnamDateString();
+    const currentPeriodStart = shiftVietnamDate(today, -6);
+    const previousPeriodStart = shiftVietnamDate(today, -13);
+    const tomorrow = shiftVietnamDate(today, 1);
+
+    const currentStart = `${currentPeriodStart}T00:00:00+07:00`;
+    const previousStart = `${previousPeriodStart}T00:00:00+07:00`;
+    const endOfPeriod = `${tomorrow}T00:00:00+07:00`;
+
+    const { data, error } = await supabase
+        .from("feedback")
+        .select("selected_options, created_at")
+        .eq("restaurant_id", restaurantId)
+        .gte("created_at", previousStart)
+        .lt("created_at", endOfPeriod);
+
+    if (error) {
+        console.error("Failed to get weekly issue comparison:", error);
+        throw new Error("Không thể tải dữ liệu so sánh vấn đề theo tuần.");
+    }
+
+    const currentCounts = new Map<string, number>();
+    const previousCounts = new Map<string, number>();
+
+    FEEDBACK_ISSUES.forEach(({ option }) => {
+        currentCounts.set(option, 0);
+        previousCounts.set(option, 0);
+    });
+
+    const currentStartTime = new Date(currentStart).getTime();
+
+    data.forEach((feedback) => {
+        const createdAt = new Date(feedback.created_at).getTime();
+
+        const targetCounts =
+            createdAt >= currentStartTime ? currentCounts : previousCounts;
+
+        (feedback.selected_options ?? []).forEach((option: string) => {
+            if (targetCounts.has(option)) {
+                targetCounts.set(option, (targetCounts.get(option) ?? 0) + 1);
+            }
+        });
+    });
+
+    return FEEDBACK_ISSUES.map((issue) => ({
+        option: issue.option,
+        label: issue.label,
+        currentCount: currentCounts.get(issue.option) ?? 0,
+        previousCount: previousCounts.get(issue.option) ?? 0,
+    })).sort((a, b) => b.currentCount - a.currentCount);
+}
+
+function formatDateKey(date: Date) {
+    return [
+        date.getUTCFullYear(),
+        String(date.getUTCMonth() + 1).padStart(2, "0"),
+        String(date.getUTCDate()).padStart(2, "0"),
+    ].join("-");
+}
+
+function getVietnamTodayUTC() {
+    const [year, month, day] = getVietnamDateString().split("-").map(Number);
+
+    return new Date(Date.UTC(year, month - 1, day));
+}
+
+function getDateOffset(date: Date, offset: number) {
+    const result = new Date(date);
+    result.setUTCDate(result.getUTCDate() + offset);
+    return result;
+}
+
+function getMonthStart(year: number, month: number) {
+    return new Date(Date.UTC(year, month - 1, 1));
+}
+
+function toVietnamDateTime(date: Date) {
+    return `${formatDateKey(date)}T00:00:00+07:00`;
+}
+
+export async function getIssueComparison(
+    restaurantId: string,
+    period: IssueComparisonPeriod = "week",
+    year?: number,
+    month?: number,
+): Promise<IssueComparisonResult> {
+    const supabase = await createClient();
+
+    const today = getVietnamTodayUTC();
+
+    let currentStart: Date;
+    let currentEnd: Date;
+    let previousStart: Date;
+    let previousEnd: Date;
+    let currentLabel: string;
+    let previousLabel: string;
+
+    if (period === "month") {
+        const selectedYear = year ?? today.getUTCFullYear();
+        const selectedMonth = month ?? today.getUTCMonth() + 1;
+
+        if (
+            !Number.isInteger(selectedYear) ||
+            selectedYear < 2000 ||
+            selectedYear > today.getUTCFullYear() ||
+            !Number.isInteger(selectedMonth) ||
+            selectedMonth < 1 ||
+            selectedMonth > 12 ||
+            getMonthStart(selectedYear, selectedMonth).getTime() >
+                getMonthStart(
+                    today.getUTCFullYear(),
+                    today.getUTCMonth() + 1,
+                ).getTime()
+        ) {
+            throw new Error("Tháng hoặc năm không hợp lệ.");
+        }
+
+        currentStart = getMonthStart(selectedYear, selectedMonth);
+        currentEnd = getMonthStart(selectedYear, selectedMonth + 1);
+
+        previousStart = getMonthStart(selectedYear, selectedMonth - 1);
+        previousEnd = currentStart;
+
+        currentLabel = `Tháng ${String(selectedMonth).padStart(2, "0")}/${selectedYear}`;
+        previousLabel = `Tháng ${String(
+            previousStart.getUTCMonth() + 1,
+        ).padStart(2, "0")}/${previousStart.getUTCFullYear()}`;
+    } else {
+        currentStart = getDateOffset(today, -6);
+        currentEnd = getDateOffset(today, 1);
+        previousStart = getDateOffset(today, -13);
+        previousEnd = currentStart;
+
+        currentLabel = "7 ngày gần nhất";
+        previousLabel = "7 ngày trước đó";
+    }
+
+    const { data, error } = await supabase
+        .from("feedback")
+        .select("selected_options, created_at")
+        .eq("restaurant_id", restaurantId)
+        .gte("created_at", toVietnamDateTime(previousStart))
+        .lt("created_at", toVietnamDateTime(currentEnd));
+
+    if (error) {
+        console.error("Failed to get issue comparison:", error);
+        throw new Error("Không thể tải dữ liệu so sánh vấn đề.");
+    }
+
+    const currentCounts = new Map<string, number>();
+    const previousCounts = new Map<string, number>();
+
+    FEEDBACK_ISSUES.forEach(({ option }) => {
+        currentCounts.set(option, 0);
+        previousCounts.set(option, 0);
+    });
+
+    const currentStartTime = new Date(
+        toVietnamDateTime(currentStart),
+    ).getTime();
+
+    const currentEndTime = new Date(toVietnamDateTime(currentEnd)).getTime();
+
+    const previousEndTime = new Date(toVietnamDateTime(previousEnd)).getTime();
+
+    data.forEach((feedback) => {
+        const createdAt = new Date(feedback.created_at).getTime();
+
+        const targetCounts =
+            createdAt >= currentStartTime && createdAt < currentEndTime
+                ? currentCounts
+                : createdAt < previousEndTime
+                  ? previousCounts
+                  : null;
+
+        if (!targetCounts) {
+            return;
+        }
+
+        (feedback.selected_options ?? []).forEach((option: string) => {
+            if (targetCounts.has(option)) {
+                targetCounts.set(option, (targetCounts.get(option) ?? 0) + 1);
+            }
+        });
+    });
+
+    const comparisonData = FEEDBACK_ISSUES.map((issue) => ({
+        option: issue.option,
+        label: issue.label,
+        currentCount: currentCounts.get(issue.option) ?? 0,
+        previousCount: previousCounts.get(issue.option) ?? 0,
+    })).sort(
+        (a, b) =>
+            b.currentCount - a.currentCount ||
+            b.previousCount - a.previousCount,
+    );
+
+    return {
+        period,
+        currentLabel,
+        previousLabel,
+        data: comparisonData,
+    };
 }

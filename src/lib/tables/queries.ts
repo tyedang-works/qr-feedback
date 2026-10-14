@@ -307,3 +307,41 @@ export async function deleteRestaurantTable(
 
     return Boolean(data);
 }
+
+export type TableStatusSummary = {
+    totalTables: number;
+    activeTables: number;
+};
+
+export async function getTableStatusSummary(
+    restaurantId: string,
+): Promise<TableStatusSummary> {
+    const supabase = await createClient();
+
+    const [totalResult, activeResult] = await Promise.all([
+        supabase
+            .from("tables")
+            .select("id", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantId),
+
+        supabase
+            .from("tables")
+            .select("id", { count: "exact", head: true })
+            .eq("restaurant_id", restaurantId)
+            .eq("is_active", true),
+    ]);
+
+    if (totalResult.error || activeResult.error) {
+        console.error("Failed to get table status summary:", {
+            totalError: totalResult.error,
+            activeError: activeResult.error,
+        });
+
+        throw new Error("Không thể tải thống kê tình trạng bàn.");
+    }
+
+    return {
+        totalTables: totalResult.count ?? 0,
+        activeTables: activeResult.count ?? 0,
+    };
+}

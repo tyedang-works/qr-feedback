@@ -4,6 +4,7 @@ import DeleteTableDialog from "@/components/tables/DeleteTableDialog";
 import EditTableDialog from "@/components/tables/EditTableDialog";
 import TableStatusSwitch from "@/components/tables/TableStatusSwitch";
 import type { RestaurantTable } from "@/lib/tables/types";
+import { cardSx } from "@/styles/card.styles";
 import { tableColumnHeaderSx } from "@/styles/table.styles";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,14 +25,6 @@ const STATUS_FILTER_OPTIONS = [
     { value: "active", label: "Đang hoạt động" },
     { value: "inactive", label: "Đã tắt" },
 ] as const;
-
-const cardSx = {
-    width: "100%",
-    backgroundColor: "#ffffff",
-    border: "1px solid #eaecf0",
-    borderRadius: 2,
-    boxShadow: "0 1px 2px rgba(16, 24, 40, 0.04)",
-};
 
 export default function TablesList({ data, canManageTables }: TablesListProps) {
     const [search, setSearch] = useState("");
@@ -67,12 +60,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
     return (
         <Stack sx={{ gap: 2 }}>
             {data.length > 0 && (
-                <Box
-                    sx={{
-                        ...cardSx,
-                        p: { xs: 2, sm: 2.5 },
-                    }}
-                >
+                <Box sx={{ ...cardSx, p: { xs: 2, sm: 2.5 } }}>
                     <Stack
                         sx={{
                             flexDirection: { xs: "column", sm: "row" },
@@ -274,7 +262,6 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                     </Box>
                 ) : (
                     <>
-                        {/* Desktop */}
                         <Box
                             sx={{
                                 display: { xs: "none", sm: "block" },

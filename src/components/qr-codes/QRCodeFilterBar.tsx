@@ -10,6 +10,7 @@ import type {
 } from "@/lib/qr-codes/types";
 import {
     Box,
+    Card,
     IconButton,
     InputAdornment,
     MenuItem,
@@ -20,6 +21,7 @@ import { faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { cardSx } from "@/styles/card.styles";
 
 const PAGE_SIZES: QRCodePageSize[] = [10, 25, 50];
 
@@ -128,16 +130,11 @@ export default function QRCodeFilterBar() {
     }, [debouncedKeyword, keywordParam, updateParams]);
 
     return (
-        <Box
+        <Card
             component="section"
             aria-label="Bộ lọc bàn"
-            sx={{
-                p: { xs: 1.5, sm: 2 },
-                backgroundColor: "#FFFFFF",
-                border: "1px solid #EAECF0",
-                borderRadius: 2,
-                boxShadow: "0 1px 3px rgba(16, 24, 40, 0.04)",
-            }}
+            elevation={0}
+            sx={cardSx}
         >
             <Box
                 sx={{
@@ -255,6 +252,6 @@ export default function QRCodeFilterBar() {
                     ))}
                 </QRSelect>
             </Box>
-        </Box>
+        </Card>
     );
 }

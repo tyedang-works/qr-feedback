@@ -1,4 +1,5 @@
 import PageHeader from "@/components/common/layout/PageHeader";
+import ExportFeedbackButton from "@/components/feedback/ExportFeedbackButton";
 import FeedbackList from "@/components/feedback/FeedbackList";
 import FeedbackPagination from "@/components/feedback/FeedbackPagination";
 import FeedbackSummary from "@/components/feedback/FeedbackSummary";
@@ -8,10 +9,8 @@ import { getUserContext } from "@/lib/auth/queries";
 import { FEEDBACK_ISSUES, FEEDBACK_PAGE_SIZE } from "@/lib/feedback/constants";
 import { getFeedbackList, getFeedbackSummary } from "@/lib/feedback/queries";
 import { getRestaurantTables } from "@/lib/tables/queries";
-import { faComments, faFileExcel } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, Button, Stack, Typography } from "@mui/material";
-import Link from "next/link";
+import { Stack } from "@mui/material";
+import { MessageCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 
 type FeedbackPageProps = {
@@ -112,7 +111,7 @@ export default async function FeedbackPage({
             <PageHeader
                 title="Feedback"
                 subtitle="Theo dõi và xử lý phản hồi của khách hàng."
-                icon={faComments}
+                icon={MessageCircle}
             />
 
             <FeedbackSummary data={summary} />
@@ -131,57 +130,15 @@ export default async function FeedbackPage({
                 sx={{
                     flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "space-between",
+                    justifyContent: "flex-end",
                     flexWrap: "wrap",
                     gap: 1.5,
                 }}
             >
-                <Typography sx={{ fontSize: 13, color: "#667085" }}>
-                    Tổng số phản hồi{" "}
-                    <Box
-                        component="span"
-                        sx={{
-                            fontWeight: 700,
-                            color: "#193B56",
-                        }}
-                    >
-                        {feedback.total}
-                    </Box>
-                </Typography>
-
-                <Link
+                <ExportFeedbackButton
                     href={exportUrl}
-                    aria-disabled={feedback.total === 0}
-                    tabIndex={feedback.total === 0 ? -1 : undefined}
-                    style={{
-                        textDecoration: "none",
-                        pointerEvents:
-                            feedback.total === 0 ? "none" : undefined,
-                    }}
-                >
-                    <Button
-                        variant="outlined"
-                        disabled={feedback.total === 0}
-                        startIcon={<FontAwesomeIcon icon={faFileExcel} />}
-                        sx={{
-                            height: 38,
-                            px: 2,
-                            borderRadius: 1.5,
-                            borderColor: "#193B56",
-                            color: "#193B56",
-                            fontSize: 13,
-                            fontWeight: 600,
-                            textTransform: "none",
-                            whiteSpace: "nowrap",
-                            "&:hover": {
-                                borderColor: "#193B56",
-                                backgroundColor: "#F0F6FA",
-                            },
-                        }}
-                    >
-                        Xuất Excel
-                    </Button>
-                </Link>
+                    disabled={feedback.total === 0}
+                />
             </Stack>
 
             <FeedbackList data={feedback.data} />

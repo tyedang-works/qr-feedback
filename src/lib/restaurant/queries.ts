@@ -8,7 +8,7 @@ export async function getRestaurantSettings(
 
     const { data, error } = await supabase
         .from("restaurants")
-        .select("id, name, phone, email, address")
+        .select("id, name, phone, email, address, logo_url, favicon_url")
         .eq("id", restaurantId)
         .single();
 

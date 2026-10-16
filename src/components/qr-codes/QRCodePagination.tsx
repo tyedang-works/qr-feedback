@@ -1,8 +1,8 @@
 "use client";
 
-import { Pagination, Stack, Typography } from "@mui/material";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { QRCodePageSize } from "@/lib/qr-codes/types";
+import { Box, Pagination, Stack, Typography } from "@mui/material";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type QRCodePaginationProps = {
     page: number;
@@ -40,41 +40,103 @@ export default function QRCodePagination({
     const to = Math.min(page * pageSize, total);
 
     return (
-        <Stack
-            sx={{
-                flexDirection: {
-                    xs: "column",
-                    sm: "row",
-                },
-                alignItems: {
-                    xs: "flex-start",
-                    sm: "center",
-                },
-                justifyContent: "space-between",
-                gap: 2,
-                px: 1,
-            }}
-        >
-            <Typography
-                variant="body2"
-                color="text.secondary"
+        <Box sx={{ width: "100%", pt: 1 }}>
+            <Stack
                 sx={{
-                    fontSize: 14,
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: "center",
+                    justifyContent: {
+                        xs: "center",
+                        sm: "space-between",
+                    },
+                    gap: 1.5,
+                    minWidth: 0,
                 }}
             >
-                {from}–{to} trong {total} bàn
-            </Typography>
+                <Typography
+                    sx={{
+                        fontSize: 13,
+                        lineHeight: 1.5,
+                        color: "#667085",
+                        textAlign: "center",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    Hiển thị{" "}
+                    <Box
+                        component="span"
+                        sx={{
+                            fontWeight: 600,
+                            color: "var(--color-text-primary, #193B56)",
+                        }}
+                    >
+                        {from}–{to}
+                    </Box>{" "}
+                    trong{" "}
+                    <Box
+                        component="span"
+                        sx={{
+                            fontWeight: 600,
+                            color: "var(--color-text-primary, #193B56)",
+                        }}
+                    >
+                        {total}
+                    </Box>{" "}
+                    bàn
+                </Typography>
 
-            <Pagination
-                count={totalPages}
-                page={Math.min(page, totalPages)}
-                onChange={handlePageChange}
-                size="small"
-                shape="rounded"
-                color="primary"
-                siblingCount={1}
-                boundaryCount={1}
-            />
-        </Stack>
+                <Pagination
+                    count={totalPages}
+                    page={Math.min(page, totalPages)}
+                    onChange={handlePageChange}
+                    size="small"
+                    shape="rounded"
+                    color="primary"
+                    siblingCount={1}
+                    boundaryCount={1}
+
+                    sx={{
+                        "& .MuiPagination-ul": {
+                            justifyContent: {
+                                xs: "center",
+                                sm: "flex-end",
+                            },
+                            flexWrap: "nowrap",
+                        },
+
+                        "& .MuiPaginationItem-root": {
+                            minWidth: 36,
+                            height: 36,
+                            margin: "0 2px",
+                            borderRadius: 1.5,
+                            fontSize: 13,
+                            color: "#344054",
+                        },
+
+                        "& .MuiPaginationItem-root:hover": {
+                            backgroundColor: "#F2F4F7",
+                        },
+
+                        "& .MuiPaginationItem-root.Mui-selected": {
+                            backgroundColor: "#193B56",
+                            color: "#FFFFFF",
+                        },
+
+                        "& .MuiPaginationItem-root.Mui-selected:hover": {
+                            backgroundColor: "#193B56",
+                        },
+
+                        "& .MuiPaginationItem-previousNext": {
+                            border: "1px solid #D0D5DD",
+                        },
+
+                        "& .MuiPaginationItem-previousNext.Mui-disabled": {
+                            borderColor: "#EAECF0",
+                            color: "#D0D5DD",
+                        },
+                    }}
+                />
+            </Stack>
+        </Box>
     );
 }

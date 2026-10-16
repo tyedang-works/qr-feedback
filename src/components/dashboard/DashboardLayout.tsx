@@ -23,11 +23,13 @@ export default function DashboardLayout({
     const role = userContext?.role ?? null;
     const fullName = userContext?.fullName ?? null;
     const restaurantName = userContext?.restaurantName ?? null;
+    const logoUrl = userContext?.logoUrl ?? null;
 
     const sidebarProps = {
         role,
         fullName,
         restaurantName,
+        logoUrl,
     };
 
     return (

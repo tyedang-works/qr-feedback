@@ -1,9 +1,9 @@
-import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
-import Link from "next/link";
-
 import FeedbackManagementForm from "@/components/feedback/FeedbackManagementForm";
 import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
 import type { FeedbackDetail as FeedbackDetailData } from "@/lib/feedback/types";
+import { cardSx } from "@/styles/card.styles";
+import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
+import Link from "next/link";
 
 type FeedbackDetailProps = {
     data: FeedbackDetailData;
@@ -45,19 +45,7 @@ function formatDateTime(dateString: string) {
 }
 
 function SectionCard({ children }: { children: React.ReactNode }) {
-    return (
-        <Box
-            sx={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #eaecf0",
-                borderRadius: 2.5,
-                boxShadow: "0 1px 3px rgba(16, 24, 40, 0.04)",
-                overflow: "hidden",
-            }}
-        >
-            {children}
-        </Box>
-    );
+    return <Box sx={cardSx}>{children}</Box>;
 }
 
 function SectionHeading({
@@ -100,7 +88,6 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
 
     return (
         <Stack sx={{ width: "100%", gap: 3 }}>
-            {/* Page heading */}
             <Box>
                 <Link
                     href="/dashboard/feedback"
@@ -130,7 +117,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                     <Box>
                         <Typography
                             sx={{
-                                fontSize: { xs: 23, sm: 26 },
+                                fontSize: { xs: 20, sm: 24 },
                                 lineHeight: 1.3,
                                 fontWeight: 700,
                                 color: "#193B56",
@@ -167,7 +154,6 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                 </Stack>
             </Box>
 
-            {/* Two-column content */}
             <Box
                 sx={{
                     display: "grid",
@@ -179,7 +165,6 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                     gap: { xs: 2, md: 2.5 },
                 }}
             >
-                {/* Left column: customer feedback */}
                 <Stack sx={{ minWidth: 0, gap: 2.5 }}>
                     <SectionCard>
                         <Stack sx={{ p: { xs: 2, sm: 2.5 }, gap: 2.5 }}>
@@ -379,8 +364,6 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                         </Box>
                     </SectionCard>
                 </Stack>
-
-                {/* Right column: feedback management */}
                 <Box sx={{ minWidth: 0 }}>
                     <SectionCard>
                         <Box

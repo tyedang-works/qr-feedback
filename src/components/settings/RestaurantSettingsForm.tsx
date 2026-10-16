@@ -1,8 +1,7 @@
 "use client";
 
-import { faBuilding, faStore } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+    Avatar,
     Box,
     Button,
     CircularProgress,
@@ -10,16 +9,18 @@ import {
     Typography,
 } from "@mui/material";
 import { Formik } from "formik";
+import { Store } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 import * as Yup from "yup";
 
 import { updateRestaurantSettings } from "@/app/dashboard/settings/actions";
+import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
 import { VIETNAM_PHONE_REGEX } from "@/constants/validation.constants";
 import type { RestaurantSettings } from "@/lib/restaurant/types";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
-import QRDialog from "../common/dialog/QRDialog";
 
 type RestaurantSettingsFormProps = {
     initialSettings: RestaurantSettings;
@@ -72,25 +73,10 @@ const validationSchema = Yup.object({
         .max(500, "Địa chỉ không được vượt quá 500 ký tự."),
 });
 
-const sectionTitleSx = {
-    fontSize: 14,
-    lineHeight: 1.5,
-    fontWeight: 600,
-    color: "#193B56",
-};
-
-const sectionDescriptionSx = {
-    mt: 0.25,
-    fontSize: 12,
-    lineHeight: 1.6,
-    color: "#667085",
-};
-
 async function saveRestaurantSettings(
     values: RestaurantSettingsFormValues,
-    setSubmitting: (isSubmitting: boolean) => void,
-    setSnackbar: React.Dispatch<React.SetStateAction<SnackbarState>>,
-) {
+    setSnackbar: Dispatch<SetStateAction<SnackbarState>>,
+): Promise<boolean> {
     try {
         const result = await updateRestaurantSettings({
             name: values.name.trim(),
@@ -104,6 +90,8 @@ async function saveRestaurantSettings(
             message: result.message,
             severity: result.success ? "success" : "error",
         });
+
+        return result.success;
     } catch (error) {
         console.error("Failed to save restaurant settings:", error);
 
@@ -112,8 +100,8 @@ async function saveRestaurantSettings(
             message: "Đã xảy ra lỗi khi lưu thông tin nhà hàng.",
             severity: "error",
         });
-    } finally {
-        setSubmitting(false);
+
+        return false;
     }
 }
 
@@ -125,35 +113,13 @@ export default function RestaurantSettingsForm({
         message: "",
         severity: "success",
     });
+
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [pendingValues, setPendingValues] =
         useState<RestaurantSettingsFormValues | null>(null);
     const [isSaving, setIsSaving] = useState(false);
 
     const initialValues = createInitialValues(initialSettings);
-
-    const handleConfirmSave = async (
-        setSubmitting: (isSubmitting: boolean) => void,
-    ) => {
-        if (!pendingValues || isSaving) {
-            return;
-        }
-
-        setConfirmOpen(false);
-        setIsSaving(true);
-        setSubmitting(true);
-
-        await saveRestaurantSettings(
-            pendingValues,
-            (submitting) => {
-                setSubmitting(submitting);
-                setIsSaving(submitting);
-            },
-            setSnackbar,
-        );
-
-        setPendingValues(null);
-    };
 
     return (
         <>
@@ -162,6 +128,7 @@ export default function RestaurantSettingsForm({
                 validationSchema={validationSchema}
                 validateOnChange
                 validateOnBlur
+                enableReinitialize
                 onSubmit={(values, { setSubmitting }) => {
                     setPendingValues({
                         name: values.name,
@@ -169,6 +136,7 @@ export default function RestaurantSettingsForm({
                         email: values.email,
                         address: values.address,
                     });
+
                     setConfirmOpen(true);
                     setSubmitting(false);
                 }}
@@ -182,8 +150,12 @@ export default function RestaurantSettingsForm({
                     handleSubmit,
                     isSubmitting,
                     setSubmitting,
+                    resetForm,
                     dirty,
+                    isValid,
                 }) => {
+                    const isFormBusy = isSaving || isSubmitting;
+
                     const getErrorMessage = (
                         field: keyof RestaurantSettingsFormValues,
                     ): string => {
@@ -194,6 +166,43 @@ export default function RestaurantSettingsForm({
                             : "";
                     };
 
+                    const handleConfirmSave = async () => {
+                        if (!pendingValues || isFormBusy) {
+                            return;
+                        }
+
+                        setConfirmOpen(false);
+                        setIsSaving(true);
+                        setSubmitting(true);
+
+                        const success = await saveRestaurantSettings(
+                            pendingValues,
+                            setSnackbar,
+                        );
+
+                        if (success) {
+                            resetForm({
+                                values: {
+                                    name: pendingValues.name.trim(),
+                                    phone: pendingValues.phone.trim(),
+                                    email: pendingValues.email.trim(),
+                                    address: pendingValues.address.trim(),
+                                },
+                            });
+                        }
+
+                        setPendingValues(null);
+                        setSubmitting(false);
+                        setIsSaving(false);
+                    };
+
+                    const handleCancelConfirmation = () => {
+                        if (isFormBusy) return;
+
+                        setConfirmOpen(false);
+                        setPendingValues(null);
+                    };
+
                     return (
                         <>
                             <Box
@@ -202,58 +211,141 @@ export default function RestaurantSettingsForm({
                                 noValidate
                                 sx={{ width: "100%", minWidth: 0 }}
                             >
-                                <Stack sx={{ gap: 3 }}>
-                                    <Box>
-                                        <Stack
+                                <Box
+                                    sx={{
+                                        display: "grid",
+                                        gridTemplateColumns: {
+                                            xs: "minmax(0, 1fr)",
+                                            md: "minmax(200px, 1fr) minmax(0, 2fr)",
+                                        },
+                                        alignItems: "stretch",
+                                        gap: {
+                                            xs: 3,
+                                            md: 4,
+                                        },
+                                    }}
+                                >
+                                    <Stack
+                                        sx={{
+                                            gap: 2,
+                                            minWidth: 0,
+                                            alignItems: "center",
+                                            textAlign: "center",
+                                            pb: { xs: 3, md: 0 },
+                                            pr: { xs: 0, md: 4 },
+                                            borderRight: {
+                                                xs: "none",
+                                                md: "1px dashed var(--color-border)",
+                                            },
+                                        }}
+                                    >
+                                        <Avatar
+                                            src={
+                                                initialSettings.logo_url ??
+                                                undefined
+                                            }
+                                            alt={`Logo ${initialSettings.name}`}
+                                            variant="circular"
                                             sx={{
-                                                flexDirection: "row",
-                                                alignItems: "center",
-                                                gap: 1.5,
-                                                mb: 2,
+                                                width: 200,
+                                                height: 200,
+                                                flexShrink: 0,
+                                                bgcolor: "var(--color-surface)",
+                                                color: "var(--color-text-muted)",
+                                                border: "1px solid var(--color-border)",
+                                                "& .MuiAvatar-img": {
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "contain",
+                                                    padding: 0,
+                                                },
                                             }}
                                         >
-                                            <Box
-                                                sx={{
-                                                    width: 38,
-                                                    height: 38,
-                                                    flexShrink: 0,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                    borderRadius: 2,
-                                                    bgcolor: "#EAF3F0",
-                                                    color: "#237A62",
-                                                }}
-                                            >
-                                                <FontAwesomeIcon
-                                                    icon={faStore}
-                                                    style={{ fontSize: 16 }}
-                                                />
-                                            </Box>
-
-                                            <Box>
-                                                <Typography sx={sectionTitleSx}>
-                                                    Thông tin cơ bản
-                                                </Typography>
-                                                <Typography
-                                                    sx={sectionDescriptionSx}
-                                                >
-                                                    Tên và số điện thoại nhà
-                                                    hàng.
-                                                </Typography>
-                                            </Box>
-                                        </Stack>
+                                            <Store
+                                                size={40}
+                                                strokeWidth={1.4}
+                                            />
+                                        </Avatar>
 
                                         <Box
                                             sx={{
-                                                display: "grid",
-                                                gridTemplateColumns: {
-                                                    xs: "minmax(0, 1fr)",
-                                                    md: "repeat(2, minmax(0, 1fr))",
-                                                },
-                                                gap: { xs: 2.5, md: 3 },
+                                                minWidth: 0,
+                                                width: "100%",
                                             }}
                                         >
+                                            <Typography
+                                                sx={{
+                                                    fontSize: 18,
+                                                    fontWeight: 600,
+                                                    lineHeight: 1.5,
+                                                    color: "var(--color-text-primary)",
+                                                    overflowWrap: "anywhere",
+                                                }}
+                                            >
+                                                {initialSettings.name}
+                                            </Typography>
+
+                                            <Typography
+                                                sx={{
+                                                    mt: 0.5,
+                                                    fontSize: 12,
+                                                    lineHeight: 1.6,
+                                                    color: "var(--color-text-muted)",
+                                                }}
+                                            >
+                                                Tên nhà hàng
+                                            </Typography>
+                                        </Box>
+
+                                        <Typography
+                                            sx={{
+                                                maxWidth: 220,
+                                                fontSize: 11,
+                                                lineHeight: 1.6,
+                                                color: "var(--color-text-secondary)",
+                                                fontStyle: "italic",
+                                            }}
+                                        >
+                                            Logo chỉ xem tại đây. Để thay đổi
+                                            logo, hãy sử dụng tab Nhận diện
+                                            thương hiệu.
+                                        </Typography>
+                                    </Stack>
+
+                                    {/* edit form */}
+                                    <Stack
+                                        sx={{
+                                            gap: 2.5,
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <Box>
+                                            <Typography
+                                                component="h2"
+                                                sx={{
+                                                    fontSize: 16,
+                                                    lineHeight: 1.5,
+                                                    fontWeight: 600,
+                                                    color: "var(--color-text-primary)",
+                                                }}
+                                            >
+                                                Thông tin nhà hàng
+                                            </Typography>
+
+                                            <Typography
+                                                sx={{
+                                                    mt: 0.25,
+                                                    fontSize: 12,
+                                                    lineHeight: 1.6,
+                                                    color: "var(--color-text-secondary)",
+                                                }}
+                                            >
+                                                Cập nhật thông tin liên hệ và
+                                                thông tin hiển thị của nhà hàng.
+                                            </Typography>
+                                        </Box>
+
+                                        <Stack sx={{ gap: 3 }}>
                                             <QRTextField
                                                 name="name"
                                                 label="Tên nhà hàng"
@@ -265,103 +357,51 @@ export default function RestaurantSettingsForm({
                                                 )}
                                                 required
                                                 placeholder="Nhập tên nhà hàng"
-                                                disabled={
-                                                    isSaving || isSubmitting
-                                                }
+                                                autoComplete="organization"
+                                                disabled={isFormBusy}
                                             />
 
-                                            <QRTextField
-                                                name="phone"
-                                                label="Số điện thoại"
-                                                type="tel"
-                                                value={values.phone}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                errorMessage={getErrorMessage(
-                                                    "phone",
-                                                )}
-                                                placeholder="Ví dụ: 0912345678"
-                                                autoComplete="tel"
-                                                disabled={
-                                                    isSaving || isSubmitting
-                                                }
-                                            />
-                                        </Box>
-                                    </Box>
-
-                                    <Box
-                                        sx={{
-                                            height: "1px",
-                                            bgcolor: "#EAECF0",
-                                        }}
-                                    />
-
-                                    <Box>
-                                        <Stack
-                                            sx={{
-                                                flexDirection: "row",
-                                                alignItems: "center",
-                                                gap: 1.5,
-                                                mb: 2,
-                                            }}
-                                        >
                                             <Box
                                                 sx={{
-                                                    width: 38,
-                                                    height: 38,
-                                                    flexShrink: 0,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                    borderRadius: 2,
-                                                    bgcolor: "#F2F4F7",
-                                                    color: "#475467",
+                                                    display: "grid",
+                                                    gridTemplateColumns: {
+                                                        xs: "minmax(0, 1fr)",
+                                                        sm: "repeat(2, minmax(0, 1fr))",
+                                                    },
+                                                    gap: 2,
+                                                    minWidth: 0,
                                                 }}
                                             >
-                                                <FontAwesomeIcon
-                                                    icon={faBuilding}
-                                                    style={{ fontSize: 16 }}
+                                                <QRTextField
+                                                    name="phone"
+                                                    label="Số điện thoại"
+                                                    type="tel"
+                                                    value={values.phone}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    errorMessage={getErrorMessage(
+                                                        "phone",
+                                                    )}
+                                                    placeholder="Ví dụ: 0912345678"
+                                                    autoComplete="tel"
+                                                    disabled={isFormBusy}
+                                                />
+
+                                                <QRTextField
+                                                    name="email"
+                                                    label="Email"
+                                                    type="email"
+                                                    value={values.email}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    errorMessage={getErrorMessage(
+                                                        "email",
+                                                    )}
+                                                    placeholder="Nhập email liên hệ"
+                                                    autoComplete="email"
+                                                    disabled={isFormBusy}
                                                 />
                                             </Box>
-
-                                            <Box>
-                                                <Typography sx={sectionTitleSx}>
-                                                    Thông tin liên hệ
-                                                </Typography>
-                                                <Typography
-                                                    sx={sectionDescriptionSx}
-                                                >
-                                                    Email và địa chỉ nhà hàng.
-                                                </Typography>
-                                            </Box>
-                                        </Stack>
-
-                                        <Box
-                                            sx={{
-                                                display: "grid",
-                                                gridTemplateColumns: {
-                                                    xs: "minmax(0, 1fr)",
-                                                    md: "repeat(2, minmax(0, 1fr))",
-                                                },
-                                                gap: { xs: 2.5, md: 3 },
-                                            }}
-                                        >
-                                            <QRTextField
-                                                name="email"
-                                                label="Email"
-                                                type="email"
-                                                value={values.email}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                errorMessage={getErrorMessage(
-                                                    "email",
-                                                )}
-                                                placeholder="Nhập email liên hệ"
-                                                autoComplete="email"
-                                                disabled={
-                                                    isSaving || isSubmitting
-                                                }
-                                            />
 
                                             <QRTextField
                                                 name="address"
@@ -374,56 +414,61 @@ export default function RestaurantSettingsForm({
                                                 )}
                                                 placeholder="Nhập địa chỉ nhà hàng"
                                                 autoComplete="street-address"
-                                                disabled={
-                                                    isSaving || isSubmitting
-                                                }
+                                                disabled={isFormBusy}
                                             />
-                                        </Box>
-                                    </Box>
+                                        </Stack>
 
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            justifyContent: "flex-end",
-                                            pt: 2,
-                                            borderTop: "1px solid #EAECF0",
-                                        }}
-                                    >
-                                        <Button
-                                            type="submit"
-                                            variant="contained"
-                                            disabled={
-                                                !dirty ||
-                                                isSaving ||
-                                                isSubmitting
-                                            }
-                                            sx={buttonBaseSx}
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                justifyContent: "flex-end",
+                                                pt: 1,
+                                            }}
                                         >
-                                            Lưu thay đổi
-                                        </Button>
-                                    </Box>
-                                </Stack>
+                                            <Button
+                                                type="submit"
+                                                variant="contained"
+                                                disabled={
+                                                    !dirty ||
+                                                    !isValid ||
+                                                    isFormBusy
+                                                }
+                                                sx={{
+                                                    ...buttonBaseSx,
+                                                    minWidth: 140,
+                                                    minHeight: 40,
+                                                }}
+                                            >
+                                                {isFormBusy ? (
+                                                    <>
+                                                        <CircularProgress
+                                                            size={16}
+                                                            thickness={5}
+                                                            color="inherit"
+                                                            sx={{ mr: 1 }}
+                                                        />
+                                                        Đang xử lý...
+                                                    </>
+                                                ) : (
+                                                    "Lưu thay đổi"
+                                                )}
+                                            </Button>
+                                        </Box>
+                                    </Stack>
+                                </Box>
                             </Box>
 
                             <QRDialog
                                 open={confirmOpen}
-                                onClose={() => {
-                                    if (!isSaving) {
-                                        setConfirmOpen(false);
-                                        setPendingValues(null);
-                                    }
-                                }}
+                                onClose={handleCancelConfirmation}
                                 title="Xác nhận thay đổi"
                                 maxWidth="xs"
                                 actions={
                                     <>
                                         <Button
                                             variant="outlined"
-                                            disabled={isSaving}
-                                            onClick={() => {
-                                                setConfirmOpen(false);
-                                                setPendingValues(null);
-                                            }}
+                                            disabled={isFormBusy}
+                                            onClick={handleCancelConfirmation}
                                             sx={buttonBaseCancelSx}
                                         >
                                             Hủy
@@ -432,22 +477,20 @@ export default function RestaurantSettingsForm({
                                         <Button
                                             variant="contained"
                                             disabled={
-                                                isSaving || !pendingValues
+                                                isFormBusy || !pendingValues
                                             }
-                                            onClick={() =>
-                                                handleConfirmSave(setSubmitting)
-                                            }
-
+                                            onClick={handleConfirmSave}
                                             sx={buttonBaseSx}
                                         >
-                                            {isSaving ? (
+                                            {isFormBusy ? (
                                                 <>
                                                     <CircularProgress
                                                         size={16}
                                                         thickness={5}
                                                         color="inherit"
+                                                        sx={{ mr: 1 }}
                                                     />
-                                                    &nbsp; Đang lưu...
+                                                    Đang lưu...
                                                 </>
                                             ) : (
                                                 "Xác nhận và lưu"
@@ -461,7 +504,7 @@ export default function RestaurantSettingsForm({
                                         sx={{
                                             fontSize: 14,
                                             lineHeight: 1.7,
-                                            color: "#475467",
+                                            color: "var(--color-text-secondary)",
                                         }}
                                     >
                                         Bạn có chắc chắn muốn cập nhật thông tin
@@ -472,8 +515,9 @@ export default function RestaurantSettingsForm({
                                         sx={{
                                             p: 2,
                                             borderRadius: 2,
-                                            border: "1px solid #EAECF0",
-                                            bgcolor: "#F9FAFB",
+                                            border: "1px solid var(--color-border)",
+                                            bgcolor:
+                                                "var(--color-surface-hover)",
                                         }}
                                     >
                                         <Typography
@@ -481,7 +525,7 @@ export default function RestaurantSettingsForm({
                                                 mb: 1.5,
                                                 fontSize: 13,
                                                 fontWeight: 600,
-                                                color: "#344054",
+                                                color: "var(--color-text-primary)",
                                             }}
                                         >
                                             Thông tin sẽ được cập nhật
@@ -521,7 +565,7 @@ export default function RestaurantSettingsForm({
                                                         sx={{
                                                             flexShrink: 0,
                                                             fontSize: 12,
-                                                            color: "#667085",
+                                                            color: "var(--color-text-secondary)",
                                                         }}
                                                     >
                                                         {item.label}
@@ -532,7 +576,7 @@ export default function RestaurantSettingsForm({
                                                             minWidth: 0,
                                                             fontSize: 12,
                                                             fontWeight: 500,
-                                                            color: "#344054",
+                                                            color: "var(--color-text-primary)",
                                                             textAlign: "right",
                                                             overflowWrap:
                                                                 "anywhere",
@@ -550,12 +594,12 @@ export default function RestaurantSettingsForm({
                                         sx={{
                                             fontSize: 12,
                                             lineHeight: 1.6,
-                                            color: "#667085",
+                                            color: "var(--color-text-secondary)",
                                         }}
                                     >
                                         Vui lòng kiểm tra thông tin trước khi
-                                        xác nhận. Thao tác này sẽ gửi dữ liệu
-                                        mới lên hệ thống.
+                                        xác nhận. Dữ liệu sẽ được cập nhật sau
+                                        khi hệ thống xử lý thành công.
                                     </Typography>
                                 </Stack>
                             </QRDialog>

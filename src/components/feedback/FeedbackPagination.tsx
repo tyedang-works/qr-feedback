@@ -2,6 +2,7 @@
 
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { ChangeEvent } from "react";
 
 type FeedbackPaginationProps = {
     page: number;
@@ -28,7 +29,7 @@ export default function FeedbackPagination({
     const to = Math.min(page * pageSize, total);
 
     const handlePageChange = (
-        _event: React.ChangeEvent<unknown>,
+        _event: ChangeEvent<unknown>,
         nextPage: number,
     ) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -41,32 +42,26 @@ export default function FeedbackPagination({
     };
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                pt: 1,
-            }}
-        >
-            <Box
+        <Box sx={{ width: "100%", pt: 1 }}>
+            <Stack
                 sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                        xs: "1fr",
-                        sm: "1fr auto 1fr",
-                    },
+                    flexDirection: { xs: "column", sm: "row" },
                     alignItems: "center",
-                    gap: 2,
+                    justifyContent: {
+                        xs: "center",
+                        sm: "space-between",
+                    },
+                    gap: 1.5,
+                    minWidth: 0,
                 }}
             >
-                {/* Result count */}
                 <Typography
                     sx={{
                         fontSize: 13,
+                        lineHeight: 1.5,
                         color: "#667085",
-                        textAlign: {
-                            xs: "center",
-                            sm: "left",
-                        },
+                        textAlign: "center",
+                        whiteSpace: "nowrap",
                     }}
                 >
                     Hiển thị{" "}
@@ -74,7 +69,7 @@ export default function FeedbackPagination({
                         component="span"
                         sx={{
                             fontWeight: 600,
-                            color: "#344054",
+                            color: "var(--color-text-primary, #193B56)",
                         }}
                     >
                         {from}–{to}
@@ -84,7 +79,7 @@ export default function FeedbackPagination({
                         component="span"
                         sx={{
                             fontWeight: 600,
-                            color: "#344054",
+                            color: "var(--color-text-primary, #193B56)",
                         }}
                     >
                         {total}
@@ -92,70 +87,56 @@ export default function FeedbackPagination({
                     phản hồi
                 </Typography>
 
-                {/* MUI Pagination */}
-                <Stack
+                <Pagination
+                    page={page}
+                    count={totalPages}
+                    onChange={handlePageChange}
+                    siblingCount={0}
+                    boundaryCount={1}
+                    size="small"
+                    shape="rounded"
                     sx={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Pagination
-                        page={page}
-                        count={totalPages}
-                        onChange={handlePageChange}
-                        siblingCount={0}
-                        boundaryCount={1}
-                        size="small"
-                        shape="rounded"
-                        sx={{
-                            "& .MuiPagination-ul": {
-                                justifyContent: "center",
+                        "& .MuiPagination-ul": {
+                            justifyContent: {
+                                xs: "center",
+                                sm: "flex-end",
                             },
+                            flexWrap: "nowrap",
+                        },
 
-                            "& .MuiPaginationItem-root": {
-                                minWidth: 36,
-                                height: 36,
-                                margin: "0 2px",
-                                borderRadius: 1.5,
-                                fontSize: 13,
-                                color: "#344054",
-                            },
+                        "& .MuiPaginationItem-root": {
+                            minWidth: 36,
+                            height: 36,
+                            margin: "0 2px",
+                            borderRadius: 1.5,
+                            fontSize: 13,
+                            color: "#344054",
+                        },
 
-                            "& .MuiPaginationItem-root:hover": {
-                                backgroundColor: "#f2f4f7",
-                            },
+                        "& .MuiPaginationItem-root:hover": {
+                            backgroundColor: "#F2F4F7",
+                        },
 
-                            "& .MuiPaginationItem-root.Mui-selected": {
-                                backgroundColor: "#193B56",
-                                color: "#ffffff",
-                            },
+                        "& .MuiPaginationItem-root.Mui-selected": {
+                            backgroundColor: "#193B56",
+                            color: "#FFFFFF",
+                        },
 
-                            "& .MuiPaginationItem-root.Mui-selected:hover": {
-                                backgroundColor: "#193B56",
-                            },
+                        "& .MuiPaginationItem-root.Mui-selected:hover": {
+                            backgroundColor: "#193B56",
+                        },
 
-                            "& .MuiPaginationItem-previousNext": {
-                                border: "1px solid #d0d5dd",
-                            },
+                        "& .MuiPaginationItem-previousNext": {
+                            border: "1px solid #D0D5DD",
+                        },
 
-                            "& .MuiPaginationItem-previousNext.Mui-disabled": {
-                                borderColor: "#eaecf0",
-                                color: "#d0d5dd",
-                            },
-                        }}
-                    />
-                </Stack>
-
-                {/* Desktop spacer */}
-                <Box
-                    sx={{
-                        display: {
-                            xs: "none",
-                            sm: "block",
+                        "& .MuiPaginationItem-previousNext.Mui-disabled": {
+                            borderColor: "#EAECF0",
+                            color: "#D0D5DD",
                         },
                     }}
                 />
-            </Box>
+            </Stack>
         </Box>
     );
 }

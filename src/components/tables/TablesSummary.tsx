@@ -1,122 +1,178 @@
-import {
-    faCircleCheck,
-    faCirclePause,
-    faTableCellsLarge,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, Typography } from "@mui/material";
+"use client";
 
+import MiniDonutChart from "@/components/common/charts/MiniDonutChart";
 import type { RestaurantTableSummary } from "@/lib/tables/queries";
+import { cardSx } from "@/styles/card.styles";
+import { Box, Card, Stack, Typography } from "@mui/material";
 
 type TablesSummaryProps = {
     data: RestaurantTableSummary;
 };
 
-const summaryItems = [
+const SUMMARY_ITEMS = [
     {
         key: "total",
         label: "Tổng số bàn",
-        icon: faTableCellsLarge,
-        iconColor: "#193B56",
-        iconBackground: "#dceaf4",
-        backgroundColor: "#f5f9fc",
-        borderColor: "#e0eaf2",
+        color: "#2563EB",
+        description: "Toàn bộ bàn của nhà hàng",
     },
     {
         key: "active",
         label: "Đang hoạt động",
-        icon: faCircleCheck,
-        iconColor: "#067647",
-        iconBackground: "#d1fadf",
-        backgroundColor: "#f3fcf6",
-        borderColor: "#d9f0e1",
+        color: "#039855",
+        description: "bàn đang hoạt động",
     },
     {
         key: "inactive",
         label: "Đã tắt",
-        icon: faCirclePause,
-        iconColor: "#c2410c",
-        iconBackground: "#ffead5",
-        backgroundColor: "#fff9f3",
-        borderColor: "#f5e7d8",
+        color: "#EA580C",
+        description: "bàn đã tắt",
     },
 ] as const;
 
+function formatNumber(value: number): string {
+    return value.toLocaleString("vi-VN");
+}
+
+function getPercentage(value: number, total: number): number {
+    if (total <= 0) {
+        return 0;
+    }
+
+    return Math.round((value / total) * 100);
+}
+
 export default function TablesSummary({ data }: TablesSummaryProps) {
+    const total = data.total;
+
+    const totalDonutData = [
+        {
+            name: "Đang hoạt động",
+            value: data.active,
+            color: "#039855",
+        },
+        {
+            name: "Đã tắt",
+            value: data.inactive,
+            color: "#EA580C",
+        },
+    ];
+
     return (
         <Box
             sx={{
                 display: "grid",
                 gridTemplateColumns: {
-                    xs: "1fr",
-                    sm: "repeat(3, minmax(0, 1fr))",
+                    xs: "repeat(2, minmax(0, 1fr))",
+                    md: "repeat(3, minmax(0, 1fr))",
                 },
-                gap: 2,
+                gap: { xs: 1.25, sm: 2 },
                 width: "100%",
+                minWidth: 0,
+                alignItems: "stretch",
             }}
         >
-            {summaryItems.map((item) => (
-                <Box
-                    key={item.key}
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: 2,
-                        minWidth: 0,
-                        backgroundColor: item.backgroundColor,
-                        border: `1px solid ${item.borderColor}`,
-                        borderRadius: 2,
-                        px: { xs: 2, sm: 2.5 },
-                        py: { xs: 2, sm: 2.5 },
-                        boxShadow: "0 1px 2px rgba(16, 24, 40, 0.04)",
-                    }}
-                >
-                    <Box sx={{ minWidth: 0 }}>
-                        <Typography
+            {SUMMARY_ITEMS.map((item) => {
+                const value = data[item.key];
+                const isTotal = item.key === "total";
+                const percentage = getPercentage(value, total);
+
+                const chartData = isTotal
+                    ? totalDonutData
+                    : [
+                          {
+                              name: item.label,
+                              value,
+                              color: item.color,
+                          },
+                          {
+                              name: "Còn lại",
+                              value: Math.max(total - value, 0),
+                              color: "#F2F4F7",
+                          },
+                      ];
+
+                return (
+                    <Card key={item.key} elevation={0} sx={cardSx}>
+                        <Stack
                             sx={{
-                                fontSize: 13,
-                                color: "#667085",
-                                lineHeight: 1.5,
+                                height: "100%",
+                                minWidth: 0,
+                                justifyContent: "space-between",
+                                gap: 0.5,
                             }}
                         >
-                            {item.label}
-                        </Typography>
+                            <Stack
+                                sx={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    gap: 1.5,
+                                    minWidth: 0,
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        minWidth: 0,
+                                        fontSize: { xs: 13, sm: 15 },
+                                        lineHeight: 1.5,
+                                        fontWeight: 600,
+                                        color: "#193B56",
+                                    }}
+                                >
+                                    {item.label}
+                                </Typography>
 
-                        <Typography
-                            sx={{
-                                mt: 0.75,
-                                fontSize: { xs: 26, sm: 30 },
-                                lineHeight: 1.2,
-                                fontWeight: 700,
-                                color: "#193B56",
-                                fontVariantNumeric: "tabular-nums",
-                            }}
-                        >
-                            {data[item.key]}
-                        </Typography>
-                    </Box>
+                                <MiniDonutChart
+                                    data={chartData}
+                                    size={60}
+                                    centerLabel={
+                                        isTotal
+                                            ? formatNumber(total)
+                                            : `${percentage}%`
+                                    }
+                                />
+                            </Stack>
 
-                    <Box
-                        sx={{
-                            width: 46,
-                            height: 46,
-                            flexShrink: 0,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            borderRadius: 2,
-                            backgroundColor: item.iconBackground,
-                            color: item.iconColor,
-                        }}
-                    >
-                        <FontAwesomeIcon
-                            icon={item.icon}
-                            style={{ fontSize: 21 }}
-                        />
-                    </Box>
-                </Box>
-            ))}
+                            <Stack
+                                sx={{
+                                    flexDirection: "row",
+                                    alignItems: "baseline",
+                                    flexWrap: "wrap",
+                                    gap: 1,
+                                    minWidth: 0,
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        minWidth: 0,
+                                        fontSize: { xs: 27, sm: 30 },
+                                        lineHeight: 1.2,
+                                        fontWeight: 700,
+                                        letterSpacing: "-0.7px",
+                                        color: "#193B56",
+                                        fontVariantNumeric: "tabular-nums",
+                                    }}
+                                >
+                                    {formatNumber(value)}
+                                </Typography>
+                            </Stack>
+
+                            <Typography
+                                sx={{
+                                    fontSize: 12,
+                                    lineHeight: 1.5,
+                                    color: "#667085",
+                                }}
+                            >
+                                {isTotal
+                                    ? item.description
+                                    : `${formatNumber(value)} trên ${formatNumber(total)} bàn`}
+                            </Typography>
+                        </Stack>
+                    </Card>
+                );
+            })}
         </Box>
     );
 }

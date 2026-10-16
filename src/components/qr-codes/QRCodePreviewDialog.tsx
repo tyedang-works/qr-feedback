@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Box, Button, Stack, Typography } from "@mui/material";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import { APP_URL } from "@/lib/config/app";
-import { faCircleDown } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { QRCodeSVG } from "qrcode.react";
 import { buttonBaseSx } from "@/styles/button.styles";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { CloudDownload } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { useState } from "react";
 
 type QRCodePreviewDialogProps = {
     open: boolean;
@@ -194,7 +193,7 @@ export default function QRCodePreviewDialog({
                         variant="contained"
                         onClick={handleDownload}
                         disabled={downloading}
-                        startIcon={<FontAwesomeIcon icon={faCircleDown} />}
+                        startIcon={<CloudDownload size={18} strokeWidth={2} />}
                         sx={buttonBaseSx}
                     >
                         {downloading ? "Đang tải..." : "Tải xuống"}

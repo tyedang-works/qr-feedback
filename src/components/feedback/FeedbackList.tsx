@@ -285,15 +285,19 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                 elevation={0}
                 sx={{
                     minWidth: 0,
-                    border: "1px solid #EAECF0",
-                    borderRadius: 2,
                     backgroundColor: "#FFFFFF",
                     overflow: "hidden",
+
+                    boxSizing: "border-box",
+                    p: { xs: 2, sm: 2.5 },
+                    border: "1px solid var(--color-border, #F0F2F5)",
+                    borderRadius: "16px",
+                    bgcolor: "var(--color-surface, #FFFFFF)",
+                    boxShadow: "var(--shadow-card)",
                 }}
             >
                 <Box
                     sx={{
-                        px: 2,
                         py: 1.75,
                         borderBottom: "1px solid #EAECF0",
                     }}

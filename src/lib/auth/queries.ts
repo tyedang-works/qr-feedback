@@ -9,6 +9,7 @@ export type UserContext = {
     role: UserRole;
     restaurantId: string;
     restaurantName: string;
+    logoUrl: string | null;
 };
 
 export async function getUserContext(): Promise<UserContext | null> {
@@ -30,19 +31,17 @@ export async function getUserContext(): Promise<UserContext | null> {
 
     if (profileError || !profile) {
         console.error("Failed to get user profile:", profileError);
-
         return null;
     }
 
     const { data: restaurant, error: restaurantError } = await supabase
         .from("restaurants")
-        .select("name")
+        .select("name, logo_url")
         .eq("id", profile.restaurant_id)
         .single();
 
     if (restaurantError || !restaurant) {
         console.error("Failed to get restaurant:", restaurantError);
-
         return null;
     }
 
@@ -52,6 +51,7 @@ export async function getUserContext(): Promise<UserContext | null> {
         role: profile.role as UserRole,
         restaurantId: profile.restaurant_id,
         restaurantName: restaurant.name,
+        logoUrl: restaurant.logo_url,
     };
 }
 

@@ -34,6 +34,7 @@ type DashboardSidebarProps = {
     role: UserRole | null;
     fullName: string | null;
     restaurantName: string | null;
+    logoUrl: string | null;
     onNavigate?: () => void;
 };
 
@@ -101,6 +102,7 @@ export default function DashboardSidebar({
     fullName,
     restaurantName,
     onNavigate,
+    logoUrl,
 }: DashboardSidebarProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -208,7 +210,6 @@ export default function DashboardSidebar({
                     borderRight: "1px solid var(--color-border, #F0F1F3)",
                 }}
             >
-                {/* Restaurant identity */}
                 <Stack
                     sx={{
                         flexDirection: "row",
@@ -227,9 +228,24 @@ export default function DashboardSidebar({
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            overflow: "hidden",
+                            borderRadius: 1.5,
                         }}
                     >
-                        <Logo size={36} />
+                        {logoUrl ? (
+                            <Box
+                                component="img"
+                                src={logoUrl}
+                                alt={`Logo ${displayRestaurantName}`}
+                                sx={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "contain",
+                                }}
+                            />
+                        ) : (
+                            <Logo size={36} />
+                        )}
                     </Box>
 
                     <Box sx={{ minWidth: 0, flex: 1 }}>
@@ -270,7 +286,6 @@ export default function DashboardSidebar({
                         borderColor: "var(--color-border, #F0F1F3)",
                     }}
                 />
-                {/* Navigation */}
                 <Stack
                     component="nav"
                     aria-label="Dashboard navigation"
@@ -379,7 +394,7 @@ export default function DashboardSidebar({
                         </Stack>
                     ))}
                 </Stack>
-                {/* Account area pinned to bottom */}
+
                 <Divider
                     sx={{
                         mt: 2,
@@ -471,7 +486,6 @@ export default function DashboardSidebar({
                     </IconButton>
                 </Stack>
 
-                {/* account popup */}
                 <Menu
                     id="account-menu"
                     anchorEl={accountAnchor}
@@ -501,7 +515,6 @@ export default function DashboardSidebar({
                         },
                     }}
                 >
-                    {/* account information */}
                     <Box sx={{ px: 2, pt: 2, pb: 1.75 }}>
                         <Stack
                             sx={{
@@ -563,63 +576,6 @@ export default function DashboardSidebar({
 
                     <Divider sx={{ borderColor: "#E5E7EB" }} />
 
-                    {/* restaurant information */}
-                    <Box sx={{ px: 2, py: 1.75 }}>
-                        <Stack
-                            sx={{
-                                flexDirection: "row",
-                                alignItems: "flex-start",
-                                gap: 1.25,
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    width: 34,
-                                    height: 34,
-                                    flexShrink: 0,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    bgcolor: "transparent",
-                                }}
-                            >
-                                <Logo size={34} />
-                            </Box>
-
-                            <Box sx={{ minWidth: 0, flex: 1 }}>
-                                <Typography
-                                    sx={{
-                                        mb: 0.5,
-                                        fontSize: 11,
-                                        lineHeight: 1.5,
-                                        fontWeight: 600,
-                                        color: "#9CA3AF",
-                                        textTransform: "uppercase",
-                                        letterSpacing: "0.5px",
-                                    }}
-                                >
-                                    Nhà hàng
-                                </Typography>
-
-                                <Typography
-                                    title={displayRestaurantName}
-                                    sx={{
-                                        fontSize: 13,
-                                        lineHeight: 1.6,
-                                        fontWeight: 500,
-                                        color: "#111827",
-                                        overflowWrap: "anywhere",
-                                    }}
-                                >
-                                    {displayRestaurantName}
-                                </Typography>
-                            </Box>
-                        </Stack>
-                    </Box>
-
-                    <Divider sx={{ borderColor: "#E5E7EB" }} />
-
-                    {/* Logout */}
                     <Box sx={{ p: 1 }}>
                         <MenuItem
                             onClick={handleLogout}

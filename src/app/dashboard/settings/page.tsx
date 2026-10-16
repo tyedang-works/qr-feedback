@@ -1,11 +1,11 @@
 import PageHeader from "@/components/common/layout/PageHeader";
-import RestaurantSettingsForm from "@/components/settings/RestaurantSettingsForm";
+import RestaurantSettingsContent from "@/components/settings/RestaurantSettingsContent";
 import { canManageSettings } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import { getRestaurantSettings } from "@/lib/restaurant/queries";
-import { faBell, faGear } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, Stack, Typography } from "@mui/material";
+import { cardSx } from "@/styles/card.styles";
+import { Box, Card, Stack, Typography } from "@mui/material";
+import { Bell, Settings } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {
@@ -23,53 +23,47 @@ export default async function SettingsPage() {
 
     return (
         <Stack
+            component="main"
             sx={{
-                gap: { xs: 3, md: 4 },
                 width: "100%",
                 minWidth: 0,
+                gap: { xs: 2.5, md: 3 },
             }}
         >
             <PageHeader
                 title="Cài đặt nhà hàng"
-                subtitle="Quản lý thông tin và thông tin liên hệ của nhà hàng."
-                icon={faGear}
+                subtitle="Quản lý thông tin và nhận diện thương hiệu của nhà hàng."
+                icon={Settings}
             />
 
-            <Box
-                sx={{
-                    width: "100%",
-                    border: "1px solid #E4E7EC",
-                    borderRadius: 3,
-                    bgcolor: "#FFFFFF",
-                    overflow: "hidden",
-                    boxShadow: "0 2px 8px rgba(16, 24, 40, 0.03)",
-                }}
-            >
+            <Card sx={cardSx}>
                 <Box
                     sx={{
-                        px: { xs: 2.5, sm: 3.5 },
-                        py: { xs: 3, sm: 3.5 },
+                        minWidth: 0,
+                        p: { xs: 2, sm: 3 },
                     }}
                 >
-                    <RestaurantSettingsForm initialSettings={restaurant} />
+                    <RestaurantSettingsContent initialSettings={restaurant} />
                 </Box>
 
                 <Box
+                    component="aside"
                     sx={{
                         display: "flex",
                         alignItems: "flex-start",
                         gap: 1,
-                        px: { xs: 2.5, sm: 3.5 },
-                        py: 2,
-                        borderTop: "1px solid #EAECF0",
-                        bgcolor: "#FCFCFD",
+                        px: { xs: 2, sm: 3 },
+                        py: 1.5,
+                        borderTop: "1px solid var(--color-border)",
+                        bgcolor: "var(--color-surface-hover)",
                     }}
                 >
-                    <FontAwesomeIcon
-                        icon={faBell}
-                        size="sm"
+                    <Bell
+                        size={15}
+                        strokeWidth={1.8}
+                        aria-hidden="true"
+                        color="var(--color-text-muted)"
                         style={{
-                            color: "#98A2B3",
                             flexShrink: 0,
                             marginTop: 2,
                         }}
@@ -78,19 +72,17 @@ export default async function SettingsPage() {
                     <Typography
                         sx={{
                             minWidth: 0,
-                            flex: 1,
                             fontSize: 12,
                             lineHeight: 1.6,
-                            color: "#667085",
-                            fontStyle: "italic",
+                            color: "var(--color-text-secondary)",
                             overflowWrap: "anywhere",
                         }}
                     >
-                        Thông tin nhà hàng được sử dụng trong quá trình quản lý
-                        và hỗ trợ khách hàng.
+                        Thông tin nhà hàng được sử dụng để quản lý hoạt động và
+                        hỗ trợ khách hàng.
                     </Typography>
                 </Box>
-            </Box>
+            </Card>
         </Stack>
     );
 }

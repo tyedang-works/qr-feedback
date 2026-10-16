@@ -1,14 +1,12 @@
 "use client";
 
-import { faQrcode } from "@fortawesome/free-solid-svg-icons";
-import { Stack } from "@mui/material";
-import { useState } from "react";
-
 import PageHeader from "@/components/common/layout/PageHeader";
+import type { QRCodeFilters, QRCodeListResult } from "@/lib/qr-codes/types";
+import { Stack } from "@mui/material";
+import { QrCode } from "lucide-react";
+import { useState } from "react";
 import QRCodeFilterBar from "./QRCodeFilterBar";
 import QRCodeList from "./QRCodeList";
-
-import type { QRCodeFilters, QRCodeListResult } from "@/lib/qr-codes/types";
 
 type QRCodePageClientProps = {
     result: QRCodeListResult;
@@ -22,13 +20,13 @@ export default function QRCodePageClient({
     const [isPrintMode, setIsPrintMode] = useState(false);
 
     return (
-        <Stack sx={{ gap: 3, width: "100%", minWidth: 0 }}>
+        <Stack sx={{ gap: 2, width: "100%", minWidth: 0 }}>
             {!isPrintMode && (
                 <>
                     <PageHeader
                         title="QR Codes"
                         subtitle="Quản lý mã QR và trạng thái bàn của nhà hàng."
-                        icon={faQrcode}
+                        icon={QrCode}
                     />
 
                     <QRCodeFilterBar />

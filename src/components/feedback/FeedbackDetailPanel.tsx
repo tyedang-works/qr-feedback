@@ -3,7 +3,8 @@
 import FeedbackManagementForm from "@/components/feedback/FeedbackManagementForm";
 import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
 import type { FeedbackListItem } from "@/lib/feedback/types";
-import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
+import { cardSx } from "@/styles/card.styles";
+import { Box, Card, Chip, Divider, Stack, Typography } from "@mui/material";
 
 type FeedbackDetailPanelProps = {
     data: FeedbackListItem;
@@ -61,18 +62,8 @@ export default function FeedbackDetailPanel({
     const status = STATUS_CONFIG[data.status];
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                minWidth: 0,
-                backgroundColor: "#FFFFFF",
-                border: "1px solid #EAECF0",
-                borderRadius: 2.5,
-                overflow: "hidden",
-            }}
-        >
+        <Card elevation={0} sx={cardSx}>
             <Stack sx={{ gap: 0 }}>
-                {/* Panel header */}
                 <Stack
                     sx={{
                         px: { xs: 2, md: 2.5 },
@@ -189,7 +180,6 @@ export default function FeedbackDetailPanel({
 
                 <Divider sx={{ borderColor: "#EAECF0" }} />
 
-                {/* Feedback content */}
                 <Stack
                     sx={{
                         px: { xs: 2, md: 2.5 },
@@ -307,7 +297,6 @@ export default function FeedbackDetailPanel({
 
                 <Divider sx={{ borderColor: "#EAECF0" }} />
 
-                {/* Feedback management */}
                 <Stack
                     sx={{
                         px: { xs: 2, md: 2.5 },
@@ -346,6 +335,6 @@ export default function FeedbackDetailPanel({
                     />
                 </Stack>
             </Stack>
-        </Box>
+        </Card>
     );
 }

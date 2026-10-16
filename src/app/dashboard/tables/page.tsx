@@ -8,8 +8,8 @@ import {
     getRestaurantTableList,
     getRestaurantTableSummary,
 } from "@/lib/tables/queries";
-import { faTableCellsLarge } from "@fortawesome/free-solid-svg-icons";
 import { Box, Stack } from "@mui/material";
+import { Table2 } from "lucide-react";
 
 export default async function TablesPage() {
     const userContext = await getUserContext();
@@ -28,7 +28,7 @@ export default async function TablesPage() {
     return (
         <Stack
             sx={{
-                gap: { xs: 2.5, sm: 3 },
+                gap: 2,
                 width: "100%",
                 minWidth: 0,
             }}
@@ -50,7 +50,7 @@ export default async function TablesPage() {
                 <PageHeader
                     title="Quản lý bàn"
                     subtitle="Quản lý bàn và mã QR của nhà hàng."
-                    icon={faTableCellsLarge}
+                    icon={Table2}
                 />
 
                 {canManageTables && (

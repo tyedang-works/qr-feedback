@@ -2,6 +2,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata } from "next";
 
 import MuiThemeProvider from "@/components/common/providers/MuiThemeProvider";
+
 import { momoTrustSans } from "./fonts";
 import "./globals.css";
 

@@ -10,6 +10,7 @@ import {
     buttonBaseSx,
     chipBaseSx,
 } from "@/styles/button.styles";
+import { cardSx } from "@/styles/card.styles";
 
 import {
     faCheck,
@@ -23,6 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     Box,
     Button,
+    Card,
     Checkbox,
     Chip,
     Divider,
@@ -123,7 +125,6 @@ export default function FeedbackToolbar({
 
     const tableLabel = tables.find((table) => table.id === tableId)?.name;
 
-    // Đếm nhóm filter đang hoạt động, không đếm từng vấn đề riêng lẻ.
     const activeFilterCount = [issues.length > 0, Boolean(tableId)].filter(
         Boolean,
     ).length;
@@ -167,10 +168,6 @@ export default function FeedbackToolbar({
         });
     };
 
-    /**
-     * Tạo URL từ bộ filter hiện tại và các giá trị được override.
-     * Riêng issue có thể là mảng và được thêm bằng params.append().
-     */
     const buildHref = (overrides: FilterOverrides = {}) => {
         const params = new URLSearchParams();
 
@@ -233,7 +230,6 @@ export default function FeedbackToolbar({
             params.delete("keyword");
         }
 
-        // Xóa toàn bộ issue cũ trước khi thêm các lựa chọn mới.
         params.delete("issue");
 
         [...new Set(draftIssues)].forEach((issue) => {
@@ -297,17 +293,7 @@ export default function FeedbackToolbar({
     };
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                minWidth: 0,
-                p: { xs: 1.5, sm: 2 },
-                bgcolor: "#FFFFFF",
-                border: "1px solid #EAECF0",
-                borderRadius: 2,
-                boxShadow: "0 1px 3px rgba(16, 24, 40, 0.04)",
-            }}
-        >
+        <Card elevation={0} sx={cardSx}>
             <Stack
                 sx={{
                     flexDirection: "row",
@@ -785,6 +771,6 @@ export default function FeedbackToolbar({
                     </Stack>
                 </>
             )}
-        </Box>
+        </Card>
     );
 }

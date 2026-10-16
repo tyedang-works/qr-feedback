@@ -6,7 +6,7 @@ import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
 import { FEEDBACK_STATUS, type FeedbackStatus } from "@/lib/feedback/constants";
 import { buttonBaseSx } from "@/styles/button.styles";
-import { Button, MenuItem, Stack } from "@mui/material";
+import { Box, Button, MenuItem, Stack } from "@mui/material";
 import type { FormikHelpers } from "formik";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/navigation";
@@ -154,6 +154,7 @@ export default function FeedbackManagementForm({
 
                             <QRTextField
                                 name="internalNote"
+                                required
                                 label="Ghi chú nội bộ"
                                 placeholder="Nhập ghi chú xử lý..."
                                 multiline
@@ -169,14 +170,29 @@ export default function FeedbackManagementForm({
                                 }
                             />
 
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                disabled={isSubmitting}
-                                sx={buttonBaseSx}
+                            <Box
+                                sx={{
+                                    width: "100%",
+                                    display: "flex",
+                                    justifyContent: "flex-end",
+                                }}
                             >
-                                {isSubmitting ? "Đang lưu..." : "Lưu thay đổi"}
-                            </Button>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    disabled={isSubmitting}
+                                    sx={{
+                                        ...buttonBaseSx,
+                                        width: "130px",
+                                        maxWidth: "130px",
+                                        marginTop: "10px",
+                                    }}
+                                >
+                                    {isSubmitting
+                                        ? "Đang lưu..."
+                                        : "Lưu thay đổi"}
+                                </Button>
+                            </Box>
                         </Stack>
                     </Form>
                 )}

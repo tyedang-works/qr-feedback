@@ -49,3 +49,11 @@ export type FeedbackSummary = {
     inProgress: number;
     resolved: number;
 };
+
+export type FeedbackSummaryTrendItem = {
+    date: string;
+    total: number;
+    new: number;
+    inProgress: number;
+    resolved: number;
+};

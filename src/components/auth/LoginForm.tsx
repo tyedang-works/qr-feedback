@@ -117,7 +117,6 @@ export default function LoginForm() {
                     boxShadow: "0 8px 30px rgba(0, 0, 0, 0.08)",
                 }}
             >
-                {/* Content */}
                 <Box
                     sx={{
                         position: "relative",
@@ -130,7 +129,6 @@ export default function LoginForm() {
                         pb: 4,
                     }}
                 >
-                    {/* Header */}
                     <Grid container spacing={2}>
                         <Grid size={12}>
                             <Box
@@ -181,7 +179,6 @@ export default function LoginForm() {
                         </Grid>
                     </Grid>
 
-                    {/* Form */}
                     <Box
                         component="form"
                         onSubmit={handleSubmit}
@@ -320,7 +317,6 @@ export default function LoginForm() {
                             {isSubmitting ? "Signing in..." : "Sign in"}
                         </Button>
 
-                        {/* Divider */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -342,8 +338,6 @@ export default function LoginForm() {
 
                             <Divider sx={{ flex: 1 }} />
                         </Box>
-
-                        {/* Social login placeholder */}
                         <Button
                             fullWidth
                             variant="outlined"
@@ -359,7 +353,6 @@ export default function LoginForm() {
                             Continue with Google
                         </Button>
 
-                        {/* Sign up */}
                         <Typography
                             sx={{
                                 mt: 4,

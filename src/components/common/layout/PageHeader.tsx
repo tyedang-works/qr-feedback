@@ -1,23 +1,19 @@
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Stack, Typography } from "@mui/material";
+import type { LucideIcon } from "lucide-react";
 
 type PageHeaderProps = {
     title: string;
     subtitle: string;
-    icon: IconDefinition;
-    className?: string;
+    icon: LucideIcon;
 };
 
 export default function PageHeader({
     title,
     subtitle,
-    icon,
-    className,
+    icon: Icon,
 }: PageHeaderProps) {
     return (
         <Stack
-            className={className}
             sx={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -34,12 +30,13 @@ export default function PageHeader({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    borderRadius: 2.5,
-                    bgcolor: "#EAF3F0",
-                    color: "#237A62",
+                    border: "1px solid var(--color-border, #F0F2F5)",
+                    borderRadius: "16px",
+                    bgcolor: "var(--color-surface, #FFFFFF)",
+                    boxShadow: "var(--shadow-card)",
                 }}
             >
-                <FontAwesomeIcon icon={icon} style={{ fontSize: 21 }} />
+                <Icon size={21} strokeWidth={2} aria-hidden="true" />
             </Box>
 
             <Box sx={{ minWidth: 0 }}>
@@ -57,7 +54,6 @@ export default function PageHeader({
 
                 <Typography
                     sx={{
-                        mt: 0.5,
                         fontSize: 14,
                         lineHeight: 1.6,
                         color: "#667085",

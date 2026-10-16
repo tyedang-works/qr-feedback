@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Checkbox, Divider, Stack, Typography } from "@mui/material";
+import { Box, Card, Checkbox, Divider, Stack, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -22,6 +22,7 @@ import QRCodePreviewButton from "./QRCodePreviewButton";
 import QRCodePreviewDialog from "./QRCodePreviewDialog";
 import QRCodePrintView from "./QRCodePrintView";
 import QRCodeSelectionToolbar from "./QRCodeSelectionToolbar";
+import { cardSx } from "@/styles/card.styles";
 
 function getStatusStyles(isActive: boolean) {
     if (isActive) {
@@ -324,15 +325,7 @@ export default function QRCodeList({
 
     if (total === 0) {
         return (
-            <Box
-                sx={{
-                    border: "1px solid #eaecf0",
-                    borderRadius: 2,
-                    backgroundColor: "#ffffff",
-                    py: 8,
-                    px: 3,
-                }}
-            >
+            <Card elevation={0} sx={cardSx}>
                 <Stack
                     sx={{
                         alignItems: "center",
@@ -360,7 +353,7 @@ export default function QRCodeList({
                         Không có bàn nào phù hợp với bộ lọc hiện tại.
                     </Typography>
                 </Stack>
-            </Box>
+            </Card>
         );
     }
 
@@ -509,17 +502,25 @@ export default function QRCodeList({
                                         sx={{
                                             display: "inline-flex",
                                             alignItems: "center",
-                                            px: 1.25,
-                                            py: 0.5,
-                                            borderRadius: 999,
-                                            border: `1px solid ${status.borderColor}`,
-                                            backgroundColor:
-                                                status.backgroundColor,
+                                            gap: 1,
                                             color: status.color,
-                                            fontSize: 12,
+                                            fontSize: 13,
                                             fontWeight: 500,
+                                            lineHeight: 1.5,
+                                            whiteSpace: "nowrap",
                                         }}
                                     >
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                width: 8,
+                                                height: 8,
+                                                flexShrink: 0,
+                                                borderRadius: "50%",
+                                                bgcolor: status.color,
+                                            }}
+                                        />
+
                                         {status.label}
                                     </Box>
                                 </Box>
@@ -611,24 +612,33 @@ export default function QRCodeList({
                                             </Typography>
                                         </Stack>
 
-                                        <Box
-                                            component="span"
-                                            sx={{
-                                                flexShrink: 0,
-                                                display: "inline-flex",
-                                                alignItems: "center",
-                                                px: 1,
-                                                py: 0.5,
-                                                borderRadius: 999,
-                                                border: `1px solid ${status.borderColor}`,
-                                                backgroundColor:
-                                                    status.backgroundColor,
-                                                color: status.color,
-                                                fontSize: 11,
-                                                fontWeight: 500,
-                                            }}
-                                        >
-                                            {status.label}
+                                        <Box>
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    display: "inline-flex",
+                                                    alignItems: "center",
+                                                    gap: 1,
+                                                    color: status.color,
+                                                    fontSize: 13,
+                                                    fontWeight: 500,
+                                                    lineHeight: 1.5,
+                                                    whiteSpace: "nowrap",
+                                                }}
+                                            >
+                                                <Box
+                                                    component="span"
+                                                    sx={{
+                                                        width: 8,
+                                                        height: 8,
+                                                        flexShrink: 0,
+                                                        borderRadius: "50%",
+                                                        bgcolor: status.color,
+                                                    }}
+                                                />
+
+                                                {status.label}
+                                            </Box>
                                         </Box>
                                     </Stack>
 

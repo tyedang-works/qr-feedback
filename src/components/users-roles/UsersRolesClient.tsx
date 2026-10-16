@@ -5,9 +5,8 @@ import { USER_ROLES } from "@/lib/auth/constants";
 import type { UserRoleMember } from "@/lib/auth/user-roles.types";
 import { buttonBaseSx } from "@/styles/button.styles";
 import { tableColumnHeaderSx } from "@/styles/table.styles";
-import { faPlus, faUsers } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
+import { UserRoundCog } from "lucide-react";
 import { useState } from "react";
 import PageHeader from "../common/layout/PageHeader";
 import AddUserDialog from "./AddUserDialog";
@@ -163,11 +162,8 @@ function UsersTable({ members }: UsersRolesClientProps) {
                 }}
             >
                 <Typography sx={tableColumnHeaderSx}>Người dùng</Typography>
-
                 <Typography sx={tableColumnHeaderSx}>Email</Typography>
-
                 <Typography sx={tableColumnHeaderSx}>Role</Typography>
-
                 <Typography
                     sx={{
                         ...tableColumnHeaderSx,
@@ -304,18 +300,12 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                     <PageHeader
                         title="Users & Roles"
                         subtitle="Quản lý người dùng và quyền truy cập của nhà hàng."
-                        icon={faUsers}
+                        icon={UserRoundCog}
                     />
 
                     <Button
                         variant="contained"
                         onClick={() => setIsAddDialogOpen(true)}
-                        startIcon={
-                            <FontAwesomeIcon
-                                icon={faPlus}
-                                style={{ fontSize: 13 }}
-                            />
-                        }
                         sx={{
                             ...buttonBaseSx,
                             width: { xs: "100%", sm: "auto" },

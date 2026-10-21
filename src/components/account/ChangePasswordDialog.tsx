@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Form, Formik, type FormikHelpers } from "formik";
+import { useState } from "react";
 import * as yup from "yup";
 
 import {
@@ -11,14 +11,13 @@ import {
     IconButton,
     InputAdornment,
 } from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 import QRDialog from "@/components/common/dialog/QRDialog";
-import QRTextField from "@/components/common/input/QRTextField";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
+import QRTextField from "@/components/common/input/QRTextField";
 import { createClient } from "@/lib/supabase/browser";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
+import { Eye, EyeOff } from "lucide-react";
 
 type ChangePasswordDialogProps = {
     open: boolean;
@@ -176,10 +175,7 @@ export default function ChangePasswordDialog({
                 aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                 onClick={onToggle}
             >
-                <FontAwesomeIcon
-                    icon={visible ? faEyeSlash : faEye}
-                    style={{ fontSize: 15 }}
-                />
+                {visible ? <Eye size={14} /> : <EyeOff size={14} />}
             </IconButton>
         </InputAdornment>
     );

@@ -13,15 +13,6 @@ import {
 import { cardSx } from "@/styles/card.styles";
 
 import {
-    faCheck,
-    faChevronDown,
-    faFilter,
-    faMagnifyingGlass,
-    faRotateLeft,
-    faXmark,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
     Box,
     Button,
     Card,
@@ -36,7 +27,14 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import { RotateCcw } from "lucide-react";
+import {
+    ChevronDown,
+    CircleCheckBig,
+    Funnel,
+    RotateCcw,
+    Search,
+    X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -341,10 +339,7 @@ export default function FeedbackToolbar({
                                             color: "#98A2B3",
                                         }}
                                     >
-                                        <FontAwesomeIcon
-                                            icon={faMagnifyingGlass}
-                                            style={{ fontSize: 15 }}
-                                        />
+                                        <Search size={16} />
                                     </Box>
                                 ),
                             },
@@ -379,12 +374,11 @@ export default function FeedbackToolbar({
                             openFilters();
                         }
                     }}
-                    startIcon={<FontAwesomeIcon icon={faFilter} />}
+                    startIcon={<Funnel size={16} />}
                     endIcon={
-                        <FontAwesomeIcon
-                            icon={faChevronDown}
+                        <ChevronDown
+                            size={16}
                             style={{
-                                fontSize: 11,
                                 transform: filterOpen
                                     ? "rotate(180deg)"
                                     : "none",
@@ -492,7 +486,7 @@ export default function FeedbackToolbar({
                         aria-label="Đóng bộ lọc"
                         onClick={() => setFilterOpen(false)}
                     >
-                        <FontAwesomeIcon icon={faXmark} />
+                        <X size={20} />
                     </IconButton>
                 </Stack>
 
@@ -586,12 +580,7 @@ export default function FeedbackToolbar({
                         variant="outlined"
                         onClick={clearDraftFilters}
                         disabled={isFilterUnchanged()}
-                        startIcon={
-                            <FontAwesomeIcon
-                                icon={faRotateLeft}
-                                style={{ fontSize: 14 }}
-                            />
-                        }
+                        startIcon={<RotateCcw size={14} />}
                         sx={buttonBaseCancelSx}
                     >
                         Xóa bộ lọc
@@ -602,12 +591,7 @@ export default function FeedbackToolbar({
                         variant="contained"
                         onClick={applyFilters}
                         disabled={isFilterUnchanged()}
-                        startIcon={
-                            <FontAwesomeIcon
-                                icon={faCheck}
-                                style={{ fontSize: 14 }}
-                            />
-                        }
+                        startIcon={<CircleCheckBig size={16} />}
                         sx={buttonBaseSx}
                     >
                         Áp dụng
@@ -718,7 +702,7 @@ export default function FeedbackToolbar({
                                 size="small"
                                 label={`Từ khóa: ${keywordValue.trim()}`}
                                 onDelete={() => removeFilter("keyword")}
-                                deleteIcon={<FontAwesomeIcon icon={faXmark} />}
+                                deleteIcon={<X size={16} />}
                                 sx={chipBaseSx}
                             />
                         )}
@@ -733,7 +717,7 @@ export default function FeedbackToolbar({
                                     `${issues.length} đã chọn`
                                 }`}
                                 onDelete={() => removeFilter("issue")}
-                                deleteIcon={<FontAwesomeIcon icon={faXmark} />}
+                                deleteIcon={<X size={16} />}
                                 sx={chipBaseSx}
                             />
                         )}
@@ -743,7 +727,7 @@ export default function FeedbackToolbar({
                                 size="small"
                                 label={`Bàn: ${tableLabel ?? "Đã chọn"}`}
                                 onDelete={() => removeFilter("tableId")}
-                                deleteIcon={<FontAwesomeIcon icon={faXmark} />}
+                                deleteIcon={<X size={16} />}
                                 sx={chipBaseSx}
                             />
                         )}

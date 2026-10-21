@@ -26,9 +26,9 @@ import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
 import { createCroppedImageFile } from "@/lib/images/crop-image";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
+import { cardSx } from "@/styles/card.styles";
 import PageHeader from "../common/layout/PageHeader";
 import RoleChip from "../common/RoleChip";
-import { cardSx } from "@/styles/card.styles";
 
 const MAX_AVATAR_SIZE = 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];

@@ -1,9 +1,8 @@
 "use client";
 
 import { buttonBaseSx } from "@/styles/button.styles";
-import { faPrint, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, Typography } from "@mui/material";
+import { Printer, X } from "lucide-react";
 
 type QRCodeSelectionToolbarProps = {
     selectedCount: number;
@@ -125,7 +124,7 @@ export default function QRCodeSelectionToolbar({
                 <Button
                     type="button"
                     variant="contained"
-                    startIcon={<FontAwesomeIcon icon={faPrint} />}
+                    startIcon={<Printer size={18} />}
                     onClick={onPrint}
                     sx={buttonBaseSx}
                 >
@@ -156,7 +155,7 @@ export default function QRCodeSelectionToolbar({
                         },
                     }}
                 >
-                    <FontAwesomeIcon icon={faXmark} />
+                    <X size={18} />
                 </Box>
             </Box>
         </Box>

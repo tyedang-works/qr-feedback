@@ -13,8 +13,7 @@ import {
     type SlideProps,
 } from "@mui/material";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { X } from "lucide-react";
 
 type QRDialogProps = Omit<DialogProps, "title" | "children"> & {
     title: string;
@@ -109,12 +108,7 @@ export default function QRDialog({
                         },
                     }}
                 >
-                    <FontAwesomeIcon
-                        icon={faXmark}
-                        style={{
-                            fontSize: 16,
-                        }}
-                    />
+                    <X size={16} />
                 </IconButton>
             </DialogTitle>
 

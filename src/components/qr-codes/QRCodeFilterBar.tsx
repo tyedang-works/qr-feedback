@@ -8,6 +8,7 @@ import type {
     QRCodeSort,
     QRCodeStatusFilter,
 } from "@/lib/qr-codes/types";
+import { cardSx } from "@/styles/card.styles";
 import {
     Box,
     Card,
@@ -17,11 +18,9 @@ import {
     Tooltip,
 } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
-import { faMagnifyingGlass, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { cardSx } from "@/styles/card.styles";
 
 const PAGE_SIZES: QRCodePageSize[] = [10, 25, 50];
 
@@ -173,10 +172,7 @@ export default function QRCodeFilterBar() {
                                         color: "#98a2b3",
                                     }}
                                 >
-                                    <FontAwesomeIcon
-                                        icon={faMagnifyingGlass}
-                                        style={{ fontSize: 15 }}
-                                    />
+                                    <Search size={16} />
                                 </Box>
                             ),
 
@@ -189,13 +185,14 @@ export default function QRCodeFilterBar() {
                                             aria-label="Xóa từ khóa tìm kiếm"
                                             onClick={handleClearKeyword}
                                             edge="end"
+                                            sx={{
+                                                paddingLeft: "2px",
+                                                paddingRight: "2px",
+                                                paddingTop: "3px",
+                                                paddingBottom: "3px",
+                                            }}
                                         >
-                                            <FontAwesomeIcon
-                                                icon={faXmark}
-                                                style={{
-                                                    fontSize: 14,
-                                                }}
-                                            />
+                                            <X size={16} />
                                         </IconButton>
                                     </Tooltip>
                                 </InputAdornment>

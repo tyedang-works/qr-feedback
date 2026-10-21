@@ -6,9 +6,8 @@ import TableStatusSwitch from "@/components/tables/TableStatusSwitch";
 import type { RestaurantTable } from "@/lib/tables/types";
 import { cardSx } from "@/styles/card.styles";
 import { tableColumnHeaderSx } from "@/styles/table.styles";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Divider, MenuItem, Stack, Typography } from "@mui/material";
+import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import QRSelect from "../common/input/QRSelect";
 import QRTextField from "../common/input/QRTextField";
@@ -84,10 +83,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                 color: "#98a2b3",
                                             }}
                                         >
-                                            <FontAwesomeIcon
-                                                icon={faMagnifyingGlass}
-                                                style={{ fontSize: 15 }}
-                                            />
+                                            <Search size={16} />
                                         </Box>
                                     ),
                                 },

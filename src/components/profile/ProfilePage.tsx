@@ -4,6 +4,7 @@ import {
     Avatar,
     Box,
     Button,
+    Card,
     CircularProgress,
     Slider,
     Stack,
@@ -27,6 +28,7 @@ import { createCroppedImageFile } from "@/lib/images/crop-image";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import PageHeader from "../common/layout/PageHeader";
 import RoleChip from "../common/RoleChip";
+import { cardSx } from "@/styles/card.styles";
 
 const MAX_AVATAR_SIZE = 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -322,20 +324,15 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                     }}
                                 >
                                     {/* avatar */}
-                                    <Box
+                                    <Card
                                         sx={{
+                                            ...cardSx,
                                             width: {
                                                 xs: "100%",
                                                 lg: 320,
                                             },
                                             flexShrink: 0,
                                             p: { xs: 3, sm: 4 },
-                                            border: "1px solid",
-                                            borderColor: "divider",
-                                            borderRadius: 2,
-                                            bgcolor: "background.paper",
-                                            boxShadow:
-                                                "0 4px 16px rgba(16, 24, 40, 0.04)",
                                         }}
                                     >
                                         <Stack
@@ -540,20 +537,15 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                 </Box>
                                             )}
                                         </Stack>
-                                    </Box>
+                                    </Card>
 
                                     {/* form */}
-                                    <Box
+                                    <Card
                                         sx={{
+                                            ...cardSx,
                                             flex: 1,
                                             minWidth: 0,
                                             p: { xs: 2.5, sm: 3 },
-                                            border: "1px solid",
-                                            borderColor: "divider",
-                                            borderRadius: 2,
-                                            bgcolor: "background.paper",
-                                            boxShadow:
-                                                "0 4px 16px rgba(16, 24, 40, 0.04)",
                                         }}
                                     >
                                         <Typography
@@ -652,7 +644,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                     : "Lưu thay đổi"}
                                             </Button>
                                         </Stack>
-                                    </Box>
+                                    </Card>
                                 </Stack>
                             </Form>
                         );

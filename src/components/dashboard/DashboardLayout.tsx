@@ -5,15 +5,18 @@ import { Box, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import { Menu as MenuIcon } from "lucide-react";
 import { useState } from "react";
 import DashboardSidebar from "./DashboardSidebar";
+import DashboardFooter from "./DashboardFooter";
 
 type DashboardLayoutProps = {
     children: React.ReactNode;
     userContext: UserContext | null;
+    feedbackEmail: string;
 };
 
 export default function DashboardLayout({
     children,
     userContext,
+    feedbackEmail,
 }: DashboardLayoutProps) {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -169,6 +172,8 @@ export default function DashboardLayout({
                     width: 0,
                     minWidth: 0,
                     minHeight: "100dvh",
+                    display: "flex",
+                    flexDirection: "column",
                     bgcolor: "var(--color-background, #FFFFFF)",
                     px: {
                         xs: 2,
@@ -186,7 +191,9 @@ export default function DashboardLayout({
                     },
                 }}
             >
-                {children}
+                <Box sx={{ flex: 1, minWidth: 0 }}>{children}</Box>
+
+                <DashboardFooter email={feedbackEmail} />
             </Box>
         </Box>
     );

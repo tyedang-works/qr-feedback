@@ -46,8 +46,14 @@ export default async function DashboardRouteLayout({
     children,
 }: DashboardRouteLayoutProps) {
     const userContext = await getUserContext();
+    const feedbackEmail = process.env.FEEDBACK_EMAIL ?? "";
 
     return (
-        <DashboardLayout userContext={userContext}>{children}</DashboardLayout>
+        <DashboardLayout
+            userContext={userContext}
+            feedbackEmail={feedbackEmail}
+        >
+            {children}
+        </DashboardLayout>
     );
 }

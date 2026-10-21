@@ -2,8 +2,8 @@ import { Box, Skeleton, Stack } from "@mui/material";
 
 import PageLoadingSkeleton from "@/components/common/skeleton/PageLoadingSkeleton";
 
-const GRID_COLUMNS = "1.5fr 1.5fr 1fr 150px";
-const SKELETON_ROW_COUNT = 3;
+const GRID_COLUMNS = "1.5fr 1.5fr 1fr 180px";
+const SKELETON_ROW_COUNT = 5;
 
 const TABLE_HEADER_WIDTHS = [150, 100, 50, 65];
 
@@ -25,10 +25,7 @@ function UserRowSkeleton() {
                     xs: "1px solid #EAECF0",
                     md: "none",
                 },
-                borderBottom: {
-                    xs: "1px solid #EAECF0",
-                    md: "1px solid #EAECF0",
-                },
+                borderBottom: "1px solid #EAECF0",
                 borderRadius: { xs: 2, md: 0 },
                 bgcolor: "#FFFFFF",
                 boxShadow: {
@@ -37,17 +34,36 @@ function UserRowSkeleton() {
                 },
             }}
         >
-            <Stack sx={{ gap: 0.5, minWidth: 0 }}>
-                <Skeleton variant="text" sx={{ width: 150, height: 22 }} />
-
+            <Stack
+                sx={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 1.5,
+                    minWidth: 0,
+                }}
+            >
                 <Skeleton
-                    variant="text"
-                    sx={{
-                        display: { xs: "block", md: "none" },
-                        width: "75%",
-                        height: 20,
-                    }}
+                    variant="circular"
+                    width={40}
+                    height={40}
+                    sx={{ flexShrink: 0 }}
                 />
+
+                <Stack sx={{ flex: 1, minWidth: 0, gap: 0.5 }}>
+                    <Skeleton
+                        variant="text"
+                        sx={{ width: 120, maxWidth: "85%", height: 22 }}
+                    />
+
+                    <Skeleton
+                        variant="text"
+                        sx={{
+                            display: { xs: "block", md: "none" },
+                            width: "75%",
+                            height: 20,
+                        }}
+                    />
+                </Stack>
             </Stack>
 
             <Skeleton
@@ -63,7 +79,7 @@ function UserRowSkeleton() {
                 variant="text"
                 sx={{
                     display: { xs: "none", md: "block" },
-                    width: 75,
+                    width: 55,
                     height: 22,
                 }}
             />
@@ -73,11 +89,28 @@ function UserRowSkeleton() {
                     display: { xs: "none", md: "flex" },
                     flexDirection: "row",
                     alignItems: "center",
-                    gap: 2,
+                    gap: 1.5,
                 }}
             >
-                <Skeleton variant="text" sx={{ width: 45, height: 22 }} />
-                <Skeleton variant="text" sx={{ width: 30, height: 22 }} />
+                <Skeleton
+                    variant="text"
+                    animation="wave"
+                    sx={{
+                        width: 55,
+                        height: 22,
+                        transform: "none",
+                    }}
+                />
+
+                <Skeleton
+                    variant="text"
+                    animation="wave"
+                    sx={{
+                        width: 48,
+                        height: 22,
+                        transform: "none",
+                    }}
+                />
             </Stack>
 
             <Stack
@@ -94,7 +127,7 @@ function UserRowSkeleton() {
                 <Skeleton
                     variant="rounded"
                     sx={{
-                        width: 70,
+                        width: 55,
                         height: 24,
                         borderRadius: 1,
                     }}
@@ -107,8 +140,25 @@ function UserRowSkeleton() {
                         gap: 1.5,
                     }}
                 >
-                    <Skeleton variant="text" sx={{ width: 45, height: 22 }} />
-                    <Skeleton variant="text" sx={{ width: 30, height: 22 }} />
+                    <Skeleton
+                        variant="text"
+                        animation="wave"
+                        sx={{
+                            width: 55,
+                            height: 22,
+                            transform: "none",
+                        }}
+                    />
+
+                    <Skeleton
+                        variant="text"
+                        animation="wave"
+                        sx={{
+                            width: 30,
+                            height: 22,
+                            transform: "none",
+                        }}
+                    />
                 </Stack>
             </Stack>
         </Box>

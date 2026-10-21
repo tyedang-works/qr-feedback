@@ -62,13 +62,12 @@ export async function getRestaurantMembers(
 
     const { data: profiles, error: profilesError } = await adminSupabase
         .from("profiles")
-        .select("id, full_name, role")
+        .select("id, full_name, role, avatar_url")
         .eq("restaurant_id", restaurantId)
         .order("created_at", { ascending: true });
 
     if (profilesError) {
         console.error("Failed to get restaurant members:", profilesError);
-
         return [];
     }
 
@@ -99,10 +98,9 @@ export async function getRestaurantMembers(
             fullName: profile.full_name,
             email: user.email ?? "",
             role: profile.role as UserRoleMember["role"],
+            avatarUrl: profile.avatar_url,
         });
     }
-
-    console.log("Restaurant members:", members);
 
     return members;
 }

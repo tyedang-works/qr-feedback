@@ -1,26 +1,28 @@
 "use client";
 
+import { Avatar, Box, Button, Chip, Stack, Typography } from "@mui/material";
+import { UserRoundCog } from "lucide-react";
+import { useState } from "react";
+
+import PageHeader from "@/components/common/layout/PageHeader";
+import AddUserDialog from "@/components/users-roles/AddUserDialog";
 import DeleteUserDialog from "@/components/users-roles/DeleteUserDialog";
+import EditUserDialog from "@/components/users-roles/EditUserDialog";
 import { USER_ROLES } from "@/lib/auth/constants";
 import type { UserRoleMember } from "@/lib/auth/user-roles.types";
 import { buttonBaseSx } from "@/styles/button.styles";
 import { tableColumnHeaderSx } from "@/styles/table.styles";
-import { Box, Button, Chip, Stack, Typography } from "@mui/material";
-import { UserRoundCog } from "lucide-react";
-import { useState } from "react";
-import PageHeader from "../common/layout/PageHeader";
-import AddUserDialog from "./AddUserDialog";
-import ChangeRoleDialog from "./ChangeRoleDialog";
 
 type UsersRolesClientProps = {
     members: UserRoleMember[];
 };
 
-type UserRoleCardProps = {
+type UserRoleItemProps = {
     member: UserRoleMember;
+    onEdit: (member: UserRoleMember) => void;
 };
 
-const GRID_COLUMNS = "1.5fr 1.5fr 1fr 150px";
+const GRID_COLUMNS = "1.5fr 1.5fr 1fr 180px";
 
 function getRoleLabel(role: UserRoleMember["role"]) {
     switch (role) {
@@ -33,9 +35,8 @@ function getRoleLabel(role: UserRoleMember["role"]) {
     }
 }
 
-function UserRoleCard({ member }: UserRoleCardProps) {
+function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
     const isOwner = member.role === USER_ROLES.OWNER;
-    const roleLabel = getRoleLabel(member.role);
 
     return (
         <Box
@@ -83,7 +84,7 @@ function UserRoleCard({ member }: UserRoleCardProps) {
                     </Box>
 
                     <Chip
-                        label={roleLabel}
+                        label={getRoleLabel(member.role)}
                         size="small"
                         sx={{
                             flexShrink: 0,
@@ -121,12 +122,24 @@ function UserRoleCard({ member }: UserRoleCardProps) {
                             borderTop: "1px solid #EAECF0",
                         }}
                     >
-                        <ChangeRoleDialog
-                            userId={member.id}
-                            fullName={member.fullName}
-                            email={member.email}
-                            currentRole={member.role}
-                        />
+                        <Button
+                            size="small"
+                            variant="text"
+                            onClick={() => onEdit(member)}
+                            sx={{
+                                minWidth: 0,
+                                minHeight: 32,
+                                px: 0.5,
+                                color: "#344054",
+                                textTransform: "none",
+                                fontWeight: 600,
+                                "&:hover": {
+                                    bgcolor: "rgba(52, 64, 84, 0.06)",
+                                },
+                            }}
+                        >
+                            Chỉnh sửa
+                        </Button>
 
                         <DeleteUserDialog
                             userId={member.id}
@@ -139,7 +152,12 @@ function UserRoleCard({ member }: UserRoleCardProps) {
     );
 }
 
-function UsersTable({ members }: UsersRolesClientProps) {
+function UsersTable({
+    members,
+    onEdit,
+}: UsersRolesClientProps & {
+    onEdit: (member: UserRoleMember) => void;
+}) {
     return (
         <Box
             sx={{
@@ -177,85 +195,133 @@ function UsersTable({ members }: UsersRolesClientProps) {
             {members.length === 0 ? (
                 <EmptyUsersState />
             ) : (
-                members.map((member) => (
-                    <Box
-                        key={member.id}
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: GRID_COLUMNS,
-                            alignItems: "center",
-                            minHeight: 64,
-                            px: 3,
-                            borderBottom: "1px solid #EAECF0",
-                            "&:last-child": {
-                                borderBottom: 0,
-                            },
-                        }}
-                    >
-                        <Typography
-                            sx={{
-                                minWidth: 0,
-                                pr: 2,
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "#1A202E",
-                                overflowWrap: "anywhere",
-                            }}
-                        >
-                            {member.fullName || "Chưa cập nhật"}
-                        </Typography>
+                members.map((member) => {
+                    const isOwner = member.role === USER_ROLES.OWNER;
 
-                        <Typography
+                    return (
+                        <Box
+                            key={member.id}
                             sx={{
-                                minWidth: 0,
-                                pr: 2,
-                                fontSize: 14,
-                                color: "#667085",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                            }}
-                            title={member.email}
-                        >
-                            {member.email}
-                        </Typography>
-
-                        <Typography
-                            sx={{
-                                fontSize: 13,
-                                fontWeight: 600,
-                                color: "#193B56",
-                            }}
-                        >
-                            {getRoleLabel(member.role)}
-                        </Typography>
-
-                        <Stack
-                            sx={{
-                                flexDirection: "row",
+                                display: "grid",
+                                gridTemplateColumns: GRID_COLUMNS,
                                 alignItems: "center",
-                                gap: 1,
-                                whiteSpace: "nowrap",
+                                minHeight: 64,
+                                px: 3,
+                                borderBottom: "1px solid #EAECF0",
+                                "&:last-child": {
+                                    borderBottom: 0,
+                                },
                             }}
                         >
-                            {member.role !== USER_ROLES.OWNER && (
-                                <>
-                                    <ChangeRoleDialog
-                                        userId={member.id}
-                                        fullName={member.fullName}
-                                        email={member.email}
-                                        currentRole={member.role}
-                                    />
+                            <Stack
+                                sx={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: 1.5,
+                                    minWidth: 0,
+                                    pr: 2,
+                                }}
+                            >
+                                <Avatar
+                                    src={member.avatarUrl || undefined}
+                                    alt={member.fullName || "Người dùng"}
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        flexShrink: 0,
+                                        fontSize: 14,
+                                        fontWeight: 600,
+                                        bgcolor: "#EAF0F6",
+                                        color: "#193B56",
+                                    }}
+                                >
+                                    {(member.fullName || member.email || "?")
+                                        .trim()
+                                        .charAt(0)
+                                        .toUpperCase()}
+                                </Avatar>
 
-                                    <DeleteUserDialog
-                                        userId={member.id}
-                                        fullName={member.fullName}
-                                    />
-                                </>
-                            )}
-                        </Stack>
-                    </Box>
-                ))
+                                <Typography
+                                    sx={{
+                                        minWidth: 0,
+                                        fontSize: 14,
+                                        fontWeight: 600,
+                                        color: "#1A202E",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        whiteSpace: "nowrap",
+                                    }}
+                                    title={member.fullName || "Chưa cập nhật"}
+                                >
+                                    {member.fullName || "Chưa cập nhật"}
+                                </Typography>
+                            </Stack>
+
+                            <Typography
+                                sx={{
+                                    minWidth: 0,
+                                    pr: 2,
+                                    fontSize: 14,
+                                    color: "#667085",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                }}
+                                title={member.email}
+                            >
+                                {member.email}
+                            </Typography>
+
+                            <Typography
+                                sx={{
+                                    fontSize: 13,
+                                    fontWeight: 600,
+                                    color: "#193B56",
+                                }}
+                            >
+                                {getRoleLabel(member.role)}
+                            </Typography>
+
+                            <Stack
+                                sx={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: 1.5,
+                                    whiteSpace: "nowrap",
+                                }}
+                            >
+                                {!isOwner && (
+                                    <>
+                                        <Button
+                                            size="small"
+                                            variant="text"
+                                            onClick={() => onEdit(member)}
+                                            sx={{
+                                                minWidth: 0,
+                                                minHeight: 32,
+                                                px: 0.5,
+                                                color: "#344054",
+                                                textTransform: "none",
+                                                fontWeight: 600,
+                                                "&:hover": {
+                                                    bgcolor:
+                                                        "rgba(52, 64, 84, 0.06)",
+                                                },
+                                            }}
+                                        >
+                                            Chỉnh sửa
+                                        </Button>
+
+                                        <DeleteUserDialog
+                                            userId={member.id}
+                                            fullName={member.fullName}
+                                        />
+                                    </>
+                                )}
+                            </Stack>
+                        </Box>
+                    );
+                })
             )}
         </Box>
     );
@@ -279,6 +345,33 @@ function EmptyUsersState() {
 
 export default function UsersRolesClient({ members }: UsersRolesClientProps) {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<UserRoleMember | null>(
+        null,
+    );
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+    const handleEditUser = (member: UserRoleMember) => {
+        setSelectedUser(member);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleCloseEditDialog = () => {
+        setIsEditDialogOpen(false);
+    };
+
+    const currentSelectedUser =
+        members.find((member) => member.id === selectedUser?.id) ?? null;
+
+    const handleUserUpdated = (avatarUrl: string | null) => {
+        setSelectedUser((current) =>
+            current
+                ? {
+                      ...current,
+                      avatarUrl,
+                  }
+                : current,
+        );
+    };
 
     return (
         <>
@@ -317,7 +410,7 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                     </Button>
                 </Stack>
 
-                <UsersTable members={members} />
+                <UsersTable members={members} onEdit={handleEditUser} />
 
                 <Stack
                     sx={{
@@ -348,7 +441,11 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                         </Box>
                     ) : (
                         members.map((member) => (
-                            <UserRoleCard key={member.id} member={member} />
+                            <UserRoleCard
+                                key={member.id}
+                                member={member}
+                                onEdit={handleEditUser}
+                            />
                         ))
                     )}
                 </Stack>
@@ -358,6 +455,21 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                 open={isAddDialogOpen}
                 onClose={() => setIsAddDialogOpen(false)}
             />
+
+            {currentSelectedUser && (
+                <EditUserDialog
+                    open={isEditDialogOpen}
+                    user={{
+                        id: currentSelectedUser.id,
+                        full_name: currentSelectedUser.fullName ?? "",
+                        email: currentSelectedUser.email,
+                        role: currentSelectedUser.role,
+                        avatar_url: currentSelectedUser.avatarUrl,
+                    }}
+                    onClose={handleCloseEditDialog}
+                    onUserUpdated={handleUserUpdated}
+                />
+            )}
         </>
     );
 }

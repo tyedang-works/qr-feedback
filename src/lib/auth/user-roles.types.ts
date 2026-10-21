@@ -10,4 +10,5 @@ export type UserRoleMember = {
     fullName: string | null;
     email: string;
     role: UserRole;
+    avatarUrl: string | null;
 };

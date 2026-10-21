@@ -102,6 +102,15 @@ export default function QRTextField({
                             color: "#98a2b3",
                             opacity: 1,
                         },
+
+                        "& input::-ms-reveal, & input::-ms-clear": {
+                            display: "none",
+                        },
+                        "& input::-webkit-credentials-auto-fill-button": {
+                            visibility: "hidden",
+                            display: "none !important",
+                            pointerEvents: "none",
+                        },
                     },
                     ...(Array.isArray(sx) ? sx : [sx]),
                 ]}

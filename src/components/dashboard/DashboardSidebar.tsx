@@ -30,6 +30,8 @@ import type { MouseEvent } from "react";
 import { useState, useTransition } from "react";
 import Logo from "../common/Logo";
 import RoleChip from "../common/RoleChip";
+import { LockKeyhole } from "lucide-react";
+import ChangePasswordDialog from "@/components/account/ChangePasswordDialog";
 
 type DashboardSidebarProps = {
     role: UserRole | null;
@@ -119,6 +121,7 @@ export default function DashboardSidebar({
     const displayName = fullName?.trim() || "Admin";
     const displayRestaurantName = restaurantName?.trim() || "Restaurant";
     const initial = displayName.charAt(0).toUpperCase();
+    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
     const isActive = (href: string) => {
         if (href === "/dashboard") {
@@ -551,6 +554,28 @@ export default function DashboardSidebar({
 
                     <Box sx={{ p: 1 }}>
                         <MenuItem
+                            onClick={() => {
+                                handleCloseAccountMenu();
+                                setIsChangePasswordOpen(true);
+                            }}
+                            sx={{
+                                minHeight: 42,
+                                px: 1.25,
+                                py: 1,
+                                gap: 1.25,
+                                borderRadius: 1.5,
+                                color: "#344054",
+                                fontSize: 13.5,
+                                fontWeight: 550,
+                                "&:hover": {
+                                    bgcolor: "#F9FAFB",
+                                },
+                            }}
+                        >
+                            <LockKeyhole size={17} strokeWidth={1.8} />
+                            Đổi mật khẩu
+                        </MenuItem>
+                        <MenuItem
                             onClick={handleLogout}
                             disabled={isLoggingOut}
                             sx={{
@@ -589,6 +614,10 @@ export default function DashboardSidebar({
                     </Box>
                 </Menu>
             </Box>
+            <ChangePasswordDialog
+                open={isChangePasswordOpen}
+                onClose={() => setIsChangePasswordOpen(false)}
+            />
         </>
     );
 }

@@ -10,6 +10,7 @@ export type UserContext = {
     restaurantId: string;
     restaurantName: string;
     logoUrl: string | null;
+    avatarUrl?: string | null;
 };
 
 export async function getUserContext(): Promise<UserContext | null> {
@@ -25,7 +26,7 @@ export async function getUserContext(): Promise<UserContext | null> {
 
     const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, role, restaurant_id")
+        .select("full_name, role, restaurant_id, avatar_url")
         .eq("id", user.id)
         .single();
 
@@ -52,6 +53,7 @@ export async function getUserContext(): Promise<UserContext | null> {
         restaurantId: profile.restaurant_id,
         restaurantName: restaurant.name,
         logoUrl: restaurant.logo_url,
+        avatarUrl: profile.avatar_url,
     };
 }
 

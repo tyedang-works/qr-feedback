@@ -80,7 +80,7 @@ function UserRowSkeleton() {
                 sx={{
                     display: { xs: "none", md: "block" },
                     width: 55,
-                    height: 22,
+                    height: 26,
                 }}
             />
 

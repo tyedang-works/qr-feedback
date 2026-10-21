@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Box, Button, Chip, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
 import { UserRoundCog } from "lucide-react";
 import { useState } from "react";
 
@@ -12,6 +12,7 @@ import { USER_ROLES } from "@/lib/auth/constants";
 import type { UserRoleMember } from "@/lib/auth/user-roles.types";
 import { buttonBaseSx } from "@/styles/button.styles";
 import { tableColumnHeaderSx } from "@/styles/table.styles";
+import RoleChip from "../common/RoleChip";
 
 type UsersRolesClientProps = {
     members: UserRoleMember[];
@@ -23,17 +24,6 @@ type UserRoleItemProps = {
 };
 
 const GRID_COLUMNS = "1.5fr 1.5fr 1fr 180px";
-
-function getRoleLabel(role: UserRoleMember["role"]) {
-    switch (role) {
-        case USER_ROLES.OWNER:
-            return "Owner";
-        case USER_ROLES.MANAGER:
-            return "Manager";
-        default:
-            return "Staff";
-    }
-}
 
 function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
     const isOwner = member.role === USER_ROLES.OWNER;
@@ -83,32 +73,7 @@ function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
                         </Typography>
                     </Box>
 
-                    <Chip
-                        label={getRoleLabel(member.role)}
-                        size="small"
-                        sx={{
-                            flexShrink: 0,
-                            height: 26,
-                            borderRadius: 1.5,
-                            bgcolor:
-                                member.role === USER_ROLES.OWNER
-                                    ? "#EAF3F0"
-                                    : member.role === USER_ROLES.MANAGER
-                                      ? "#EEF4FF"
-                                      : "#F2F4F7",
-                            color:
-                                member.role === USER_ROLES.OWNER
-                                    ? "#237A62"
-                                    : member.role === USER_ROLES.MANAGER
-                                      ? "#315EA8"
-                                      : "#475467",
-                            fontSize: 12,
-                            fontWeight: 600,
-                            "& .MuiChip-label": {
-                                px: 1,
-                            },
-                        }}
-                    />
+                    {member?.role && <RoleChip role={member.role} />}
                 </Stack>
 
                 {!isOwner && (
@@ -272,15 +237,7 @@ function UsersTable({
                                 {member.email}
                             </Typography>
 
-                            <Typography
-                                sx={{
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    color: "#193B56",
-                                }}
-                            >
-                                {getRoleLabel(member.role)}
-                            </Typography>
+                            {member?.role && <RoleChip role={member.role} />}
 
                             <Stack
                                 sx={{

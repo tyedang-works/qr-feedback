@@ -24,12 +24,14 @@ export default function DashboardLayout({
     const fullName = userContext?.fullName ?? null;
     const restaurantName = userContext?.restaurantName ?? null;
     const logoUrl = userContext?.logoUrl ?? null;
+    const avatarUrl = userContext?.avatarUrl ?? null;
 
     const sidebarProps = {
         role,
         fullName,
         restaurantName,
         logoUrl,
+        avatarUrl,
     };
 
     return (

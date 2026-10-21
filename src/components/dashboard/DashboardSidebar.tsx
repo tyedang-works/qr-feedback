@@ -29,12 +29,14 @@ import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
 import { useState, useTransition } from "react";
 import Logo from "../common/Logo";
+import RoleChip from "../common/RoleChip";
 
 type DashboardSidebarProps = {
     role: UserRole | null;
     fullName: string | null;
     restaurantName: string | null;
     logoUrl: string | null;
+    avatarUrl: string | null;
     onNavigate?: () => void;
 };
 
@@ -103,6 +105,7 @@ export default function DashboardSidebar({
     restaurantName,
     onNavigate,
     logoUrl,
+    avatarUrl,
 }: DashboardSidebarProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -111,19 +114,11 @@ export default function DashboardSidebar({
         null,
     );
     const [isLoggingOut, setIsLoggingOut] = useState(false);
-
     const isOwner = role === USER_ROLES.OWNER;
     const isAccountMenuOpen = Boolean(accountAnchor);
-
     const displayName = fullName?.trim() || "Admin";
     const displayRestaurantName = restaurantName?.trim() || "Restaurant";
     const initial = displayName.charAt(0).toUpperCase();
-
-    const roleLabels: Partial<Record<UserRole, string>> = {
-        [USER_ROLES.OWNER]: "Owner",
-    };
-
-    const roleLabel = role ? (roleLabels[role] ?? role) : "";
 
     const isActive = (href: string) => {
         if (href === "/dashboard") {
@@ -180,12 +175,22 @@ export default function DashboardSidebar({
         }
     };
 
+    const OWNER_ONLY_ROUTES = ["/dashboard/settings", "/dashboard/users-roles"];
+
     const visibleGroups = navigationGroups
         .map((group) => ({
             ...group,
-            items: group.items.filter(
-                (item) => item.href !== "/dashboard/users-roles" || isOwner,
-            ),
+            items: group.items.filter((item) => {
+                if (OWNER_ONLY_ROUTES.includes(item.href)) {
+                    return isOwner;
+                }
+
+                if (item.href === "/dashboard/feedback") {
+                    return role !== USER_ROLES.MANAGER;
+                }
+
+                return true;
+            }),
         }))
         .filter((group) => group.items.length > 0);
 
@@ -413,6 +418,8 @@ export default function DashboardSidebar({
                     }}
                 >
                     <Avatar
+                        src={avatarUrl ?? undefined}
+                        alt={displayName}
                         sx={{
                             width: 38,
                             height: 38,
@@ -440,25 +447,7 @@ export default function DashboardSidebar({
                             {displayName}
                         </Typography>
 
-                        {roleLabel && (
-                            <Box
-                                sx={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    mt: 0.5,
-                                    px: 1,
-                                    py: 0.25,
-                                    borderRadius: 1,
-                                    bgcolor: "#EEF4F8",
-                                    color: "#193B56",
-                                    fontSize: 11,
-                                    lineHeight: 1.5,
-                                    fontWeight: 600,
-                                }}
-                            >
-                                {roleLabel}
-                            </Box>
-                        )}
+                        {role && <RoleChip role={role} />}
                     </Box>
 
                     <IconButton
@@ -524,6 +513,8 @@ export default function DashboardSidebar({
                             }}
                         >
                             <Avatar
+                                src={avatarUrl ?? undefined}
+                                alt={displayName}
                                 sx={{
                                     width: 44,
                                     height: 44,
@@ -551,25 +542,7 @@ export default function DashboardSidebar({
                                     {displayName}
                                 </Typography>
 
-                                {roleLabel && (
-                                    <Box
-                                        sx={{
-                                            display: "inline-flex",
-                                            alignItems: "center",
-                                            mt: 0.5,
-                                            px: 1,
-                                            py: 0.25,
-                                            borderRadius: 1,
-                                            bgcolor: "#EEF4F8",
-                                            color: "#193B56",
-                                            fontSize: 11,
-                                            lineHeight: 1.5,
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        {roleLabel}
-                                    </Box>
-                                )}
+                                {role && <RoleChip role={role} />}
                             </Box>
                         </Stack>
                     </Box>

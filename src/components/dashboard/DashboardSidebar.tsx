@@ -23,6 +23,7 @@ import {
     QrCode,
     Settings2,
     Table2,
+    UserRound,
     UsersRound,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -96,6 +97,11 @@ const navigationGroups: NavigationGroup[] = [
                 label: "Users & Roles",
                 href: "/dashboard/users-roles",
                 icon: UsersRound,
+            },
+            {
+                label: "Hồ sơ cá nhân",
+                href: "/dashboard/profile",
+                icon: UserRound,
             },
         ],
     },

@@ -36,6 +36,7 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
+import { RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -750,13 +751,7 @@ export default function FeedbackToolbar({
                         <Button
                             size="small"
                             onClick={clearAllFilters}
-                            startIcon={
-                                <FontAwesomeIcon
-                                    icon={faRotateLeft}
-                                    size="sm"
-                                    style={{ fontSize: "12px" }}
-                                />
-                            }
+                            startIcon={<RotateCcw />}
                             sx={{
                                 ml: { xs: 0, sm: "auto" },
                                 minWidth: 0,

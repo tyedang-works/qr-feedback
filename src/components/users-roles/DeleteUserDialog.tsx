@@ -3,7 +3,11 @@
 import { deleteUserAction } from "@/app/dashboard/users-roles/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
-import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
+import {
+    buttonBaseCancelSx,
+    buttonBaseSx,
+    tableDeleteButtonSx,
+} from "@/styles/button.styles";
 import { Button, CircularProgress, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -97,19 +101,7 @@ export default function DeleteUserDialog({
                 type="button"
                 onClick={() => setOpen(true)}
                 disabled={isDeleting}
-                sx={{
-                    color: "#d92d20",
-                    textTransform: "none",
-                    "&:hover": {
-                        backgroundColor: "#fef3f2",
-                    },
-                    minWidth: 0,
-                    px: 1.25,
-                    py: 0.75,
-                    borderRadius: 1.5,
-                    fontSize: 13,
-                    fontWeight: 600,
-                }}
+                sx={tableDeleteButtonSx}
             >
                 Xóa
             </Button>
@@ -167,7 +159,7 @@ export default function DeleteUserDialog({
                     sx={{
                         fontSize: 14,
                         lineHeight: 1.6,
-                        color: "#344054",
+                        color: "var(--color-text-primary)",
                     }}
                 >
                     Bạn có chắc muốn xóa người dùng{" "}
@@ -176,7 +168,7 @@ export default function DeleteUserDialog({
                         sx={{
                             fontSize: "inherit",
                             fontWeight: 600,
-                            color: "#1A202E",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         {fullName || "này"}
@@ -189,7 +181,7 @@ export default function DeleteUserDialog({
                         mt: 1,
                         fontSize: 13,
                         lineHeight: 1.6,
-                        color: "#667085",
+                        color: "var(--color-text-secondary)",
                     }}
                 >
                     Tài khoản và quyền truy cập của người dùng này sẽ bị xóa.

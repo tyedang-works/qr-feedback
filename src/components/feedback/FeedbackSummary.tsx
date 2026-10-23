@@ -12,7 +12,6 @@ type FeedbackSummaryProps = {
 type SummaryItem = {
     key: "total" | "new" | "inProgress" | "resolved";
     label: string;
-    description: string;
     color: string;
 };
 
@@ -26,36 +25,30 @@ const SUMMARY_ITEMS: SummaryItem[] = [
     {
         key: "total",
         label: "Tổng phản hồi",
-        description: "Tất cả phản hồi",
         color: "#193B56",
     },
     {
         key: "new",
         label: "Chưa xử lý",
-        description: "Cần được tiếp nhận",
-        color: "#DC4545",
+        color: "#EF4444",
     },
     {
         key: "inProgress",
         label: "Đang xử lý",
-        description: "Đang được giải quyết",
-        color: "#2563EB",
+        color: "#3B82F6",
     },
     {
         key: "resolved",
         label: "Đã xử lý",
-        description: "Đã hoàn tất",
-        color: "#039855",
+        color: "#10B981",
     },
 ];
 
 const STATUS_COLORS = {
-    new: "#DC4545",
-    inProgress: "#2563EB",
-    resolved: "#039855",
+    new: "#EF4444",
+    inProgress: "#3B82F6",
+    resolved: "#10B981",
 };
-
-const TRACK_COLOR = "#F2F4F7";
 
 function formatNumber(value: number): string {
     return value.toLocaleString("vi-VN");
@@ -104,7 +97,7 @@ function getStatusSegments(
         {
             name: "Còn lại",
             value: Math.max(total - value, 0),
-            color: TRACK_COLOR,
+            color: "var(--color-chart-track, #374151)",
         },
     ];
 }
@@ -125,9 +118,10 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
             <Stack
                 sx={{
                     minWidth: 0,
+                    minHeight: 112,
                     height: "100%",
                     justifyContent: "space-between",
-                    gap: 0.5,
+                    gap: 1,
                 }}
             >
                 <Stack
@@ -135,57 +129,48 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        gap: 1.5,
+                        gap: 1.25,
                         minWidth: 0,
                     }}
                 >
                     <Typography
                         sx={{
                             minWidth: 0,
-                            fontSize: { xs: 14, sm: 17 },
-                            lineHeight: 1.5,
+                            fontSize: { xs: 13, sm: 15 },
+                            lineHeight: 1.45,
                             fontWeight: 600,
-                            color: "var(--color-text-primary, #193B56)",
+                            color: "var(--color-text-primary, #111827)",
                         }}
                     >
                         {item.label}
                     </Typography>
 
                     <MiniDonutChart
-                        size={72}
+                        size={60}
                         centerLabel={`${percentage}%`}
                         data={chartData}
                     />
                 </Stack>
 
-                <Stack
+                <Typography
                     sx={{
-                        flexDirection: "row",
-                        alignItems: "baseline",
-                        flexWrap: "wrap",
                         minWidth: 0,
+                        fontSize: { xs: 26, sm: 29 },
+                        lineHeight: 1.15,
+                        fontWeight: 700,
+                        letterSpacing: "-0.7px",
+                        color: "var(--color-text-primary, #111827)",
+                        fontVariantNumeric: "tabular-nums",
                     }}
                 >
-                    <Typography
-                        sx={{
-                            minWidth: 0,
-                            fontSize: { xs: 27, sm: 30 },
-                            lineHeight: 1.2,
-                            fontWeight: 700,
-                            letterSpacing: "-0.7px",
-                            color: "var(--color-text-primary, #193B56)",
-                            fontVariantNumeric: "tabular-nums",
-                        }}
-                    >
-                        {formatNumber(value)}
-                    </Typography>
-                </Stack>
+                    {formatNumber(value)}
+                </Typography>
 
                 <Typography
                     sx={{
                         fontSize: 12,
                         lineHeight: 1.5,
-                        color: "var(--color-text-secondary, #667085)",
+                        color: "var(--color-text-secondary, #6B7280)",
                     }}
                 >
                     {isTotal
@@ -215,7 +200,7 @@ export default function FeedbackSummary({ data }: FeedbackSummaryProps) {
                     xs: "repeat(2, minmax(0, 1fr))",
                     md: "repeat(4, minmax(0, 1fr))",
                 },
-                gap: { xs: 1.25, sm: 2 },
+                gap: { xs: 1.25, sm: 1.5 },
                 width: "100%",
                 minWidth: 0,
                 alignItems: "stretch",

@@ -9,42 +9,143 @@ body {
     font-family: var(--font-momo-trust-sans), sans-serif;
 }
 
-body {
-    min-height: 100vh;
+html {
+    background: var(--color-background);
 }
 
-:root {
-    color-scheme: light;
+body {
+    min-height: 100vh;
+    background: var(--color-background);
+    color: var(--color-text-primary);
+}
 
-    /* Primary colors */
+:root,
+:root[data-theme="light"] {
+    color-scheme: light;
     --color-primary: #111827;
     --color-background: #ffffff;
-
-    /* Surfaces */
     --color-surface: #ffffff;
     --color-surface-hover: #f9fafb;
     --color-surface-active: #f3f4f6;
-
-    /* Text */
-    --color-text-primary: var(--color-primary);
+    --color-text-primary: #111827;
     --color-text-secondary: #6b7280;
     --color-text-muted: #9ca3af;
-
-    /* Borders and shadows */
     --color-border: #f0f1f3;
     --shadow-card:
         0 0 2px 0 rgba(145, 158, 171, 0.2),
         0 12px 24px -4px rgba(145, 158, 171, 0.12);
-
     --sidebar-width: 230px;
+    --color-chart-track: #e5e7eb;
+
+    /* input */
+    --color-input-background: #ffffff;
+    --color-input-border: #d0d5dd;
+    --color-input-border-hover: #98a2b3;
+    --color-input-focus: #193b56;
+
+    /* button */
+    --color-button-primary-bg: #193b56;
+    --color-button-primary-text: #ffffff;
+    --color-button-primary-hover: #244e6c;
+    --color-button-primary-active: #16344b;
+
+    /* feedback status */
+    --feedback-status-new-text: #9a5b13;
+    --feedback-status-new-bg: #f8f0e4;
+    --feedback-status-new-border: #e9d8be;
+
+    --feedback-status-progress-text: #526b83;
+    --feedback-status-progress-bg: #edf1f5;
+    --feedback-status-progress-border: #d5dde5;
+
+    --feedback-status-resolved-text: #39745c;
+    --feedback-status-resolved-bg: #eaf2ed;
+    --feedback-status-resolved-border: #cfe0d5;
+
+    /* table */
+    --color-status-success: #039855;
+
+    --color-table-edit: #193b56;
+    --bg-table-edit-hover: #f2f4f7;
+
+    --color-table-delete: #d92d20;
+    --bg-table-delete: transparent;
+    --bg-table-delete-hover: #fef3f2;
+
+    --color-table-header-bg: #f9fafb;
+    --color-table-header-text: #1a202e;
+
+    --color-skeleton: #e5e7eb;
+
+    /* donut-skeleton */
+    --color-donut-skeleton: #dde3eb;
+    --color-donut-skeleton-center: #ffffff;
+
+    /* role chip */
+    --color-role-owner-text: #237a62;
+    --color-role-owner-bg: #eaf3f0;
+    --color-role-owner-border: #cde5dc;
+
+    --color-role-manager-text: #315ea8;
+    --color-role-manager-bg: #eef4ff;
+    --color-role-manager-border: #d6e4ff;
+
+    --color-role-staff-text: #475467;
+    --color-role-staff-bg: #f2f4f7;
+    --color-role-staff-border: #e4e7ec;
+
+    /* modal button */
+    --color-button-delete-bg: #d92d20;
+    --color-button-delete-hover: #b42318;
+
+    /* tab indicator */
+    --color-tab-selected: #193b56;
+    --color-tab-indicator: #193b56;
+
+    /* pagination */
+    --color-pagination-text: #52525b;
+    --color-pagination-hover: #f4f4f5;
+    --color-pagination-selected-bg: #18181b;
+    --color-pagination-selected-text: #ffffff;
+    --color-pagination-border: #d4d4d8;
+    --color-pagination-disabled-text: #d4d4d8;
+    --color-pagination-disabled-border: #e4e4e7;
+
+    /* dashboard chart */
+    --color-chart-track: #e5e7eb;
+    --color-chart-new: #e5484d;
+    --color-chart-in-progress: #d97706;
+    --color-chart-resolved: #16a34a;
+    --color-chart-current: #16806a;
+    --color-chart-previous: #b8d8d0;
+
+    --color-chart-legend-current: #55b8a5;
+    --color-chart-legend-previous: #9bbdb4;
+
+    /* feedback status */
+    --color-feedback-status-new-text: #a83232;
+    --color-feedback-status-new-bg: #fdecec;
+    --color-feedback-status-new-border: #f1caca;
+
+    --color-feedback-status-progress-text: #805b20;
+    --color-feedback-status-progress-bg: #f5f0e6;
+    --color-feedback-status-progress-border: #e8dcc3;
+
+    --color-feedback-status-resolved-text: #286747;
+    --color-feedback-status-resolved-bg: #eaf3ed;
+    --color-feedback-status-resolved-border: #cfe2d5;
+
+    --color-feedback-item-hover-bg: #f1f5f9;
+    --color-feedback-item-hover-border: #cbd5e1;
+    --shadow-feedback-item-hover: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
-/* Reserve theme-specific variables for future dark mode */
-[data-theme="dark"] {
+:root[data-theme="dark"] {
     color-scheme: dark;
 
     --color-primary: #f9fafb;
     --color-background: #111827;
+
     --color-surface: #1f2937;
     --color-surface-hover: #374151;
     --color-surface-active: #374151;
@@ -55,6 +156,110 @@ body {
 
     --color-border: #374151;
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --color-chart-track: #374151;
+
+    /* input */
+    --color-input-background: #1f2937;
+    --color-input-border: #374151;
+    --color-input-border-hover: #6b7280;
+    --color-input-focus: #93c5fd;
+
+    /* button */
+    --color-button-primary-bg: #34465d;
+    --color-button-primary-text: #f9fafb;
+    --color-button-primary-hover: #405570;
+    --color-button-primary-active: #29394e;
+
+    /* feedback status */
+    --feedback-status-new-text: #d9b27c;
+    --feedback-status-new-bg: #352d23;
+    --feedback-status-new-border: #594633;
+
+    --feedback-status-progress-text: #a9bbcb;
+    --feedback-status-progress-bg: #2a333d;
+    --feedback-status-progress-border: #414d5a;
+
+    --feedback-status-resolved-text: #9bc5ad;
+    --feedback-status-resolved-bg: #25372f;
+    --feedback-status-resolved-border: #3c5548;
+
+    /* table */
+    --color-status-success: #426b57;
+
+    --color-table-delete: #f87171;
+
+    --bg-table-delete: transparent;
+    --bg-table-delete-hover: rgba(248, 113, 113, 0.1);
+
+    --color-table-edit: #a7b4c7;
+    --bg-table-edit-hover: rgba(147, 197, 253, 0.08);
+
+    --color-table-header-bg: #293548;
+    --color-table-header-text: #d5dde8;
+
+    --color-skeleton: #374151;
+
+    /* donut-skeleton */
+    --color-donut-skeleton: #465368;
+    --color-donut-skeleton-center: var(--color-card, #1f2937);
+
+    /* role chip */
+    --color-role-owner-text: #6ee7b7;
+    --color-role-owner-bg: rgba(16, 185, 129, 0.14);
+    --color-role-owner-border: rgba(110, 231, 183, 0.24);
+
+    --color-role-manager-text: #93c5fd;
+    --color-role-manager-bg: rgba(59, 130, 246, 0.14);
+    --color-role-manager-border: rgba(147, 197, 253, 0.24);
+
+    --color-role-staff-text: #d1d5db;
+    --color-role-staff-bg: rgba(156, 163, 175, 0.14);
+    --color-role-staff-border: rgba(209, 213, 219, 0.2);
+
+    /* modal button */
+    --color-button-delete-bg: #d92d20;
+    --color-button-delete-hover: #b42318;
+
+    /* tab indicator */
+    --color-tab-selected: #f9fafb;
+    --color-tab-indicator: #d1d5db;
+
+    /* pagination */
+    --color-pagination-text: #d1d5db;
+    --color-pagination-hover: #374151;
+    --color-pagination-selected-bg: #e5e7eb;
+    --color-pagination-selected-text: #111827;
+    --color-pagination-border: #4b5563;
+    --color-pagination-disabled-text: #6b7280;
+    --color-pagination-disabled-border: #374151;
+
+    /* dashboard chart */
+    --color-chart-track: #374151;
+    --color-chart-new: #f04438;
+    --color-chart-in-progress: #f79009;
+    --color-chart-resolved: #12b76a;
+    --color-chart-label: #a1a1aa;
+    --color-chart-current: #54b8a0;
+    --color-chart-previous: #536f68;
+    --color-chart-legend-current: #55b8a5;
+    --color-chart-legend-previous: #526f67;
+
+    /* feedback status */
+    --color-feedback-status-new-text: #f0a0a0;
+    --color-feedback-status-new-bg: #352527;
+    --color-feedback-status-new-border: #624044;
+
+    --color-feedback-status-progress-text: #d9bb83;
+    --color-feedback-status-progress-bg: #332e25;
+    --color-feedback-status-progress-border: #594b35;
+
+    --color-feedback-status-resolved-text: #9bc5ad;
+    --color-feedback-status-resolved-bg: #25372f;
+    --color-feedback-status-resolved-border: #3c5548;
+
+    --color-feedback-item-hover-bg: #354256;
+    --color-feedback-item-hover-border: #64748b;
+    --shadow-feedback-item-hover: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 @media print {

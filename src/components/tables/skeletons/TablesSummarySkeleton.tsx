@@ -35,21 +35,7 @@ function DonutSkeleton() {
                 height={60}
                 animation="wave"
                 sx={{
-                    bgcolor: "#EAECF0",
-                }}
-            />
-
-            <Box
-                sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    width: 42,
-                    height: 42,
-                    borderRadius: "50%",
-                    bgcolor: "#FFFFFF",
-                    transform: "translate(-50%, -50%)",
-                    pointerEvents: "none",
+                    bgcolor: "var(--color-donut-skeleton)",
                 }}
             />
         </Box>

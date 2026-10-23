@@ -2,6 +2,16 @@ import { Box, Skeleton, Stack } from "@mui/material";
 
 import PageLoadingSkeleton from "@/components/common/skeleton/PageLoadingSkeleton";
 
+const skeletonSx = {
+    bgcolor: "var(--color-surface-active)",
+};
+
+const skeletonBorderSx = {
+    border: "1px solid var(--color-border)",
+    borderRadius: 2,
+    backgroundColor: "var(--color-surface)",
+};
+
 function QRCodeFilterSkeleton() {
     const fields = [
         { labelWidth: 76 },
@@ -21,16 +31,16 @@ function QRCodeFilterSkeleton() {
                 },
                 gap: 1.5,
                 p: 2,
-                border: "1px solid #eaecf0",
-                borderRadius: 2,
-                backgroundColor: "#ffffff",
+                ...skeletonBorderSx,
             }}
         >
             {fields.map((field, index) => (
                 <Stack key={index} sx={{ gap: 0.5, minWidth: 0 }}>
                     <Skeleton
                         variant="text"
+                        animation="wave"
                         sx={{
+                            ...skeletonSx,
                             width: field.labelWidth,
                             height: 20,
                         }}
@@ -38,7 +48,9 @@ function QRCodeFilterSkeleton() {
 
                     <Skeleton
                         variant="rounded"
+                        animation="wave"
                         sx={{
+                            ...skeletonSx,
                             width: "100%",
                             height: 40,
                             borderRadius: 1,
@@ -60,9 +72,7 @@ function QRCodeDesktopTableSkeleton() {
                 width: "100%",
                 minWidth: 0,
                 overflow: "hidden",
-                border: "1px solid #eaecf0",
-                borderRadius: 2,
-                backgroundColor: "#ffffff",
+                ...skeletonBorderSx,
             }}
         >
             <Box
@@ -70,31 +80,66 @@ function QRCodeDesktopTableSkeleton() {
                     display: "grid",
                     gridTemplateColumns: columns,
                     alignItems: "center",
-                    minHeight: 48,
+                    minHeight: 56,
                     px: 3,
-                    backgroundColor: "#f9fafb",
-                    borderBottom: "1px solid #eaecf0",
+                    backgroundColor: "var(--color-table-header-bg)",
+                    borderBottom: "1px solid var(--color-border)",
                 }}
             >
                 <Skeleton
                     variant="rounded"
+                    animation="wave"
                     sx={{
+                        ...skeletonSx,
                         width: 18,
                         height: 18,
                         borderRadius: "4px",
                     }}
                 />
 
-                <Skeleton variant="text" sx={{ width: 36, height: 22 }} />
+                <Skeleton
+                    variant="text"
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        width: 36,
+                        height: 22,
+                    }}
+                />
 
-                <Skeleton variant="text" sx={{ width: 52, height: 22 }} />
+                <Skeleton
+                    variant="text"
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        width: 52,
+                        height: 22,
+                    }}
+                />
 
-                <Skeleton variant="text" sx={{ width: 100, height: 22 }} />
+                <Skeleton
+                    variant="text"
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        width: 100,
+                        height: 22,
+                    }}
+                />
 
                 <Stack sx={{ alignItems: "flex-end" }}>
-                    <Skeleton variant="text" sx={{ width: 60, height: 22 }} />
+                    <Skeleton
+                        variant="text"
+                        animation="wave"
+                        sx={{
+                            ...skeletonSx,
+                            width: 60,
+                            height: 22,
+                        }}
+                    />
                 </Stack>
             </Box>
+
             {Array.from({ length: 7 }).map((_, index) => (
                 <Box
                     key={index}
@@ -105,12 +150,16 @@ function QRCodeDesktopTableSkeleton() {
                         minHeight: 67,
                         px: 3,
                         borderBottom:
-                            index === 6 ? "none" : "1px solid #eaecf0",
+                            index === 6
+                                ? "none"
+                                : "1px solid var(--color-border)",
                     }}
                 >
                     <Skeleton
                         variant="rounded"
+                        animation="wave"
                         sx={{
+                            ...skeletonSx,
                             width: 18,
                             height: 18,
                             borderRadius: "4px",
@@ -119,7 +168,9 @@ function QRCodeDesktopTableSkeleton() {
 
                     <Skeleton
                         variant="text"
+                        animation="wave"
                         sx={{
+                            ...skeletonSx,
                             width: "45%",
                             maxWidth: 100,
                             height: 22,
@@ -128,7 +179,9 @@ function QRCodeDesktopTableSkeleton() {
 
                     <Skeleton
                         variant="text"
+                        animation="wave"
                         sx={{
+                            ...skeletonSx,
                             width: "75%",
                             maxWidth: 280,
                             height: 22,
@@ -137,7 +190,9 @@ function QRCodeDesktopTableSkeleton() {
 
                     <Skeleton
                         variant="rounded"
+                        animation="wave"
                         sx={{
+                            ...skeletonSx,
                             width: 100,
                             maxWidth: "90%",
                             height: 24,
@@ -148,7 +203,9 @@ function QRCodeDesktopTableSkeleton() {
                     <Stack sx={{ alignItems: "flex-end" }}>
                         <Skeleton
                             variant="text"
+                            animation="wave"
                             sx={{
+                                ...skeletonSx,
                                 width: 52,
                                 height: 22,
                             }}
@@ -174,9 +231,7 @@ function QRCodeMobileListSkeleton() {
                     key={index}
                     sx={{
                         p: 2,
-                        border: "1px solid #eaecf0",
-                        borderRadius: 2,
-                        backgroundColor: "#ffffff",
+                        ...skeletonBorderSx,
                     }}
                 >
                     <Stack sx={{ gap: 1.5 }}>
@@ -199,7 +254,9 @@ function QRCodeMobileListSkeleton() {
                             >
                                 <Skeleton
                                     variant="rounded"
+                                    animation="wave"
                                     sx={{
+                                        ...skeletonSx,
                                         width: 18,
                                         height: 18,
                                         borderRadius: "4px",
@@ -209,7 +266,9 @@ function QRCodeMobileListSkeleton() {
 
                                 <Skeleton
                                     variant="text"
+                                    animation="wave"
                                     sx={{
+                                        ...skeletonSx,
                                         width: 100,
                                         maxWidth: "100%",
                                         height: 22,
@@ -219,7 +278,9 @@ function QRCodeMobileListSkeleton() {
 
                             <Skeleton
                                 variant="rounded"
+                                animation="wave"
                                 sx={{
+                                    ...skeletonSx,
                                     width: 88,
                                     height: 24,
                                     borderRadius: 999,
@@ -231,12 +292,14 @@ function QRCodeMobileListSkeleton() {
                         <Box
                             sx={{
                                 pt: 1,
-                                borderTop: "1px solid #eaecf0",
+                                borderTop: "1px solid var(--color-border)",
                             }}
                         >
                             <Skeleton
                                 variant="text"
+                                animation="wave"
                                 sx={{
+                                    ...skeletonSx,
                                     width: 44,
                                     height: 18,
                                 }}
@@ -244,21 +307,26 @@ function QRCodeMobileListSkeleton() {
 
                             <Skeleton
                                 variant="text"
+                                animation="wave"
                                 sx={{
-                                    width: "85%",
+                                    ...skeletonSx,
+                                    width: "100%",
                                     height: 22,
                                 }}
                             />
                         </Box>
-
-                        <Skeleton
-                            variant="rounded"
-                            sx={{
-                                width: "100%",
-                                height: 36,
-                                borderRadius: 1,
-                            }}
-                        />
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                            <Skeleton
+                                variant="rounded"
+                                animation="wave"
+                                sx={{
+                                    ...skeletonSx,
+                                    width: "100px",
+                                    height: 36,
+                                    borderRadius: 1,
+                                }}
+                            />
+                        </Box>
                     </Stack>
                 </Box>
             ))}
@@ -271,15 +339,17 @@ function QRCodePaginationSkeleton() {
         <Stack
             sx={{
                 flexDirection: { xs: "column", sm: "row" },
-                alignItems: { xs: "flex-start", sm: "center" },
+                alignItems: "center",
                 justifyContent: "space-between",
                 gap: 1.5,
-                py: 1,
+                py: { xs: 1, md: 0 },
             }}
         >
             <Skeleton
                 variant="text"
+                animation="wave"
                 sx={{
+                    ...skeletonSx,
                     width: 150,
                     height: 22,
                 }}
@@ -292,41 +362,19 @@ function QRCodePaginationSkeleton() {
                     gap: 1,
                 }}
             >
-                <Skeleton
-                    variant="rounded"
-                    sx={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: 1,
-                    }}
-                />
-
-                <Skeleton
-                    variant="rounded"
-                    sx={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: 1,
-                    }}
-                />
-
-                <Skeleton
-                    variant="rounded"
-                    sx={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: 1,
-                    }}
-                />
-
-                <Skeleton
-                    variant="rounded"
-                    sx={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: 1,
-                    }}
-                />
+                {Array.from({ length: 4 }).map((_, index) => (
+                    <Skeleton
+                        key={index}
+                        variant="rounded"
+                        animation="wave"
+                        sx={{
+                            ...skeletonSx,
+                            width: 34,
+                            height: 34,
+                            borderRadius: 1,
+                        }}
+                    />
+                ))}
             </Stack>
         </Stack>
     );

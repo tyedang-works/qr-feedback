@@ -1,10 +1,54 @@
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Skeleton, Stack } from "@mui/material";
 
+const skeletonSx = {
+    bgcolor: "var(--color-skeleton, rgba(145, 158, 171, 0.16))",
+    "&::after": {
+        background:
+            "linear-gradient(90deg, transparent, var(--color-skeleton-highlight, rgba(255, 255, 255, 0.12)), transparent)",
+    },
+};
+
+const dividerSx = {
+    borderColor: "var(--color-border, #E5E7EB)",
+};
+
+function Placeholder({
+    width,
+    height,
+    variant = "text",
+}: {
+    width?: number | string;
+    height: number;
+    variant?: "text" | "rounded" | "circular";
+}) {
+    return (
+        <Skeleton
+            variant={variant}
+            width={width}
+            height={height}
+            animation="wave"
+            sx={{
+                ...skeletonSx,
+                ...(variant === "text" && { transform: "none" }),
+                ...(variant === "rounded" && { borderRadius: 1.5 }),
+            }}
+        />
+    );
+}
+
 export default function FeedbackDetailSkeleton() {
     return (
-        <Card sx={{ ...cardSx, overflow: "hidden" }}>
-            <Box sx={{ p: 2, borderBottom: "1px solid #EAECF0" }}>
+        <Card
+            elevation={0}
+            sx={{
+                ...cardSx,
+                p: 0,
+                overflow: "hidden",
+                boxShadow: "none",
+            }}
+        >
+            <Stack sx={{ px: { xs: 2, md: 2.5 }, pt: 2.5, pb: 2, gap: 1.5 }}>
                 <Stack
                     sx={{
                         flexDirection: "row",
@@ -14,173 +58,149 @@ export default function FeedbackDetailSkeleton() {
                     }}
                 >
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Skeleton
-                            variant="text"
-                            width={145}
-                            height={23}
-                            sx={{ transform: "none" }}
-                        />
-                        <Skeleton
-                            variant="text"
-                            width={165}
-                            height={19}
-                            sx={{ mt: 0.25, transform: "none" }}
-                        />
+                        <Placeholder width={145} height={23} />
+                        <Box sx={{ mt: 0.25 }}>
+                            <Placeholder width={165} height={19} />
+                        </Box>
                     </Box>
 
-                    <Skeleton
-                        variant="rounded"
-                        width={86}
-                        height={26}
-                        sx={{
-                            flexShrink: 0,
-                            borderRadius: 1,
-                        }}
-                    />
+                    <Placeholder width={86} height={26} variant="rounded" />
                 </Stack>
 
-                <Box
-                    sx={{
-                        mt: 1.5,
-                        pt: 1.5,
-                        borderTop: "1px solid #EAECF0",
-                    }}
-                >
+                <Box sx={{ pt: 1.5, borderTop: "1px solid", ...dividerSx }}>
                     <Stack
                         sx={{
                             flexDirection: "row",
-                            gap: 3,
+                            columnGap: 5,
+                            rowGap: 2,
                             flexWrap: "wrap",
                         }}
                     >
                         <Box>
-                            <Skeleton
-                                variant="text"
-                                width={30}
-                                height={18}
-                                sx={{ transform: "none" }}
-                            />
-                            <Skeleton
-                                variant="text"
-                                width={65}
-                                height={22}
-                                sx={{ transform: "none" }}
-                            />
+                            <Placeholder width={30} height={18} />
+                            <Box sx={{ mt: 0.5 }}>
+                                <Placeholder width={65} height={22} />
+                            </Box>
                         </Box>
 
                         <Box>
-                            <Skeleton
-                                variant="text"
-                                width={85}
-                                height={18}
-                                sx={{ transform: "none" }}
-                            />
-                            <Skeleton
-                                variant="text"
-                                width={125}
-                                height={22}
-                                sx={{ transform: "none" }}
-                            />
+                            <Placeholder width={85} height={18} />
+                            <Box sx={{ mt: 0.5 }}>
+                                <Placeholder width={125} height={22} />
+                            </Box>
                         </Box>
                     </Stack>
                 </Box>
-            </Box>
-            <Box sx={{ p: 2, borderBottom: "1px solid #EAECF0" }}>
-                <Skeleton
-                    variant="text"
-                    width={195}
-                    height={22}
-                    sx={{ transform: "none" }}
-                />
+            </Stack>
 
-                <Stack
-                    sx={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        gap: 0.75,
-                        mt: 1,
-                    }}
-                >
-                    {[135, 108].map((width, index) => (
-                        <Skeleton
-                            key={index}
-                            variant="rounded"
-                            width={width}
-                            height={27}
-                            sx={{ borderRadius: 1 }}
-                        />
-                    ))}
-                </Stack>
+            <Box sx={{ borderTop: "1px solid", ...dividerSx }} />
 
-                <Skeleton
-                    variant="text"
-                    width={125}
-                    height={22}
-                    sx={{ mt: 2, transform: "none" }}
-                />
+            <Stack
+                sx={{
+                    px: { xs: 2, md: 2.5 },
+                    py: 2,
+                    gap: 2,
+                }}
+            >
+                <Box>
+                    <Placeholder width={195} height={22} />
 
-                <Skeleton
-                    variant="rounded"
-                    height={54}
-                    sx={{ mt: 0.75, borderRadius: 1.5 }}
-                />
-            </Box>
+                    <Stack
+                        sx={{
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            gap: 0.75,
+                            mt: 1,
+                        }}
+                    >
+                        {[135, 108].map((width) => (
+                            <Placeholder
+                                key={width}
+                                width={width}
+                                height={27}
+                                variant="rounded"
+                            />
+                        ))}
+                    </Stack>
+                </Box>
 
-            <Box sx={{ p: 2 }}>
-                <Skeleton
-                    variant="text"
-                    width={145}
-                    height={22}
-                    sx={{ transform: "none" }}
-                />
-
-                <Stack sx={{ gap: 1.5, mt: 1.5 }}>
-                    <Box>
-                        <Skeleton
-                            variant="text"
-                            width={105}
-                            height={18}
-                            sx={{ transform: "none" }}
-                        />
-                        <Skeleton
-                            variant="rounded"
+                <Box>
+                    <Placeholder width={125} height={22} />
+                    <Box sx={{ mt: 0.75 }}>
+                        <Placeholder
                             width="100%"
-                            height={40}
-                            sx={{ mt: 0.5, borderRadius: 1.5 }}
+                            height={54}
+                            variant="rounded"
                         />
+                    </Box>
+                </Box>
+
+                <Box>
+                    <Placeholder width={175} height={22} />
+
+                    <Box sx={{ mt: 0.5 }}>
+                        <Placeholder width={115} height={20} />
+                    </Box>
+                </Box>
+            </Stack>
+
+            <Box sx={{ borderTop: "1px solid", ...dividerSx }} />
+
+            <Stack
+                sx={{
+                    px: { xs: 2, md: 2.5 },
+                    pt: 2,
+                    pb: 2.5,
+                    gap: 1.5,
+                }}
+            >
+                <Box>
+                    <Placeholder width={145} height={22} />
+
+                    <Box sx={{ mt: 0.25 }}>
+                        <Placeholder width={245} height={19} />
+                    </Box>
+                </Box>
+
+                <Stack sx={{ gap: 2 }}>
+                    <Box>
+                        <Placeholder width={105} height={18} />
+
+                        <Box sx={{ mt: 0.5 }}>
+                            <Placeholder
+                                width="100%"
+                                height={42}
+                                variant="rounded"
+                            />
+                        </Box>
                     </Box>
 
                     <Box>
-                        <Skeleton
-                            variant="text"
-                            width={115}
-                            height={18}
-                            sx={{ transform: "none" }}
-                        />
-                        <Skeleton
-                            variant="rounded"
-                            width="100%"
-                            height={72}
-                            sx={{ mt: 0.5, borderRadius: 1.5 }}
-                        />
+                        <Placeholder width={115} height={18} />
+
+                        <Box sx={{ mt: 0.5 }}>
+                            <Placeholder
+                                width="100%"
+                                height={100}
+                                variant="rounded"
+                            />
+                        </Box>
                     </Box>
 
                     <Stack
                         sx={{
                             flexDirection: "row",
                             justifyContent: "flex-end",
-                            gap: 1,
                         }}
                     >
-                        <Skeleton
+                        <Placeholder
+                            width={130}
+                            height={40}
                             variant="rounded"
-                            width={125}
-                            height={36}
-                            sx={{ borderRadius: 1.5 }}
                         />
                     </Stack>
                 </Stack>
-            </Box>
+            </Stack>
         </Card>
     );
 }

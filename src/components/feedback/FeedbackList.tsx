@@ -1,40 +1,16 @@
 "use client";
 
-import {
-    FEEDBACK_ISSUE_LABEL_MAP,
-    FEEDBACK_STATUS,
-    type FeedbackStatus,
-} from "@/lib/feedback/constants";
+import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
 import type { FeedbackListItem } from "@/lib/feedback/types";
 import { Box, Card, Chip, Divider, Stack, Typography } from "@mui/material";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
+import FeedbackStatusChip from "../common/feedback/FeedbackStatusChip";
 import FeedbackDetailPanel from "./FeedbackDetailPanel";
 
 type FeedbackListProps = {
     data: FeedbackListItem[];
-};
-
-const STATUS_CONFIG: Record<
-    FeedbackStatus,
-    { label: string; color: string; backgroundColor: string }
-> = {
-    [FEEDBACK_STATUS.NEW]: {
-        label: "Mới",
-        color: "#B54708",
-        backgroundColor: "#FFFAEB",
-    },
-    [FEEDBACK_STATUS.IN_PROGRESS]: {
-        label: "Đang xử lý",
-        color: "#175CD3",
-        backgroundColor: "#EFF8FF",
-    },
-    [FEEDBACK_STATUS.RESOLVED]: {
-        label: "Đã xử lý",
-        color: "#027A48",
-        backgroundColor: "#ECFDF3",
-    },
 };
 
 function formatDateTime(dateString: string) {
@@ -62,7 +38,6 @@ function FeedbackRowContent({
     item: FeedbackListItem;
     isSelected: boolean;
 }) {
-    const status = STATUS_CONFIG[item.status];
     const visibleIssues = item.selectedOptions.slice(0, 2);
     const remainingIssues = item.selectedOptions.length - visibleIssues.length;
 
@@ -72,13 +47,26 @@ function FeedbackRowContent({
                 p: 2,
                 gap: 1.25,
                 textAlign: "left",
-                backgroundColor: isSelected ? "#F0F6FA" : "#FFFFFF",
+                bgcolor: isSelected
+                    ? "var(--color-surface-active, #F3F4F6)"
+                    : "transparent",
                 borderLeft: isSelected
-                    ? "3px solid #193B56"
-                    : "3px solid transparent",
-                transition: "background-color 0.2s ease",
+                    ? "2px solid var(--color-text-secondary, #667085)"
+                    : "2px solid transparent",
+                transition:
+                    "background-color 150ms ease, border-color 150ms ease",
+
                 "&:hover": {
-                    backgroundColor: "#F8FAFC",
+                    bgcolor: "var(--color-surface-hover, #F8F9FA)",
+                },
+
+                '[data-theme="dark"] &': {
+                    bgcolor: isSelected ? "#292F38" : "transparent",
+                    borderLeftColor: isSelected ? "#8B949E" : "transparent",
+                },
+
+                '[data-theme="dark"] &:hover': {
+                    bgcolor: isSelected ? "#303741" : "#252C35",
                 },
             }}
         >
@@ -95,7 +83,7 @@ function FeedbackRowContent({
                         minWidth: 0,
                         fontSize: 14,
                         fontWeight: 700,
-                        color: "#193B56",
+                        color: "var(--color-text-primary, #193B56)",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -108,7 +96,7 @@ function FeedbackRowContent({
                     sx={{
                         flexShrink: 0,
                         fontSize: 11,
-                        color: "#667085",
+                        color: "var(--color-text-secondary, #667085)",
                     }}
                 >
                     {formatDateTime(item.createdAt)}
@@ -123,21 +111,7 @@ function FeedbackRowContent({
                     gap: 0.75,
                 }}
             >
-                <Chip
-                    label={status.label}
-                    size="small"
-                    sx={{
-                        height: 23,
-                        borderRadius: 1,
-                        color: status.color,
-                        backgroundColor: status.backgroundColor,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        "& .MuiChip-label": {
-                            px: 1,
-                        },
-                    }}
-                />
+                <FeedbackStatusChip status={item.status} />
 
                 {visibleIssues.map((option) => (
                     <Chip
@@ -145,16 +119,27 @@ function FeedbackRowContent({
                         label={FEEDBACK_ISSUE_LABEL_MAP[option] ?? option}
                         size="small"
                         variant="outlined"
+
                         sx={{
                             maxWidth: "100%",
                             height: 23,
-                            borderColor: "#EAECF0",
+                            borderColor: "var(--color-border, #D9DEE5)",
                             borderRadius: 1,
-                            color: "#475467",
+                            color: "var(--color-text-secondary, #667085)",
                             fontSize: 11,
+                            fontWeight: 400,
+                            bgcolor: "transparent",
+
                             "& .MuiChip-label": {
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
+                                px: 1,
+                            },
+
+                            '[data-theme="dark"] &': {
+                                borderColor: "#414955",
+                                color: "#B8C0CA",
+                                bgcolor: "transparent",
                             },
                         }}
                     />
@@ -164,7 +149,7 @@ function FeedbackRowContent({
                     <Typography
                         sx={{
                             fontSize: 11,
-                            color: "#667085",
+                            color: "var(--color-text-secondary, #667085)",
                         }}
                     >
                         +{remainingIssues}
@@ -176,7 +161,9 @@ function FeedbackRowContent({
                 sx={{
                     fontSize: 13,
                     lineHeight: 1.6,
-                    color: item.feedback ? "#475467" : "#98A2B3",
+                    color: item.feedback
+                        ? "var(--color-text-primary, #344054)"
+                        : "var(--color-text-muted, #98A2B3)",
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
                     WebkitLineClamp: 2,
@@ -190,7 +177,7 @@ function FeedbackRowContent({
             <Typography
                 sx={{
                     fontSize: 12,
-                    color: "#667085",
+                    color: "var(--color-text-secondary, #667085)",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
@@ -209,9 +196,10 @@ function EmptyFeedbackState() {
             sx={{
                 py: 7,
                 px: 3,
-                border: "1px solid #EAECF0",
+                border: "1px solid var(--color-border, #EAECF0)",
                 borderRadius: 2,
-                backgroundColor: "#FFFFFF",
+                bgcolor: "var(--color-surface, #FFFFFF)",
+                color: "var(--color-text-primary, #344054)",
                 textAlign: "center",
             }}
         >
@@ -225,8 +213,12 @@ function EmptyFeedbackState() {
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: "50%",
-                    backgroundColor: "#F2F4F7",
-                    color: "#667085",
+                    backgroundColor: "var(--color-surface-active, #F2F4F7)",
+                    color: "var(--color-text-secondary, #667085)",
+                    '[data-theme="dark"] &': {
+                        bgcolor: "#374151",
+                        color: "#D1D5DB",
+                    },
                     fontSize: 23,
                 }}
             >
@@ -237,7 +229,7 @@ function EmptyFeedbackState() {
                 sx={{
                     fontSize: 15,
                     fontWeight: 600,
-                    color: "#344054",
+                    color: "var(--color-text-primary, #344054)",
                 }}
             >
                 Chưa có phản hồi nào
@@ -247,7 +239,7 @@ function EmptyFeedbackState() {
                 sx={{
                     mt: 0.75,
                     fontSize: 13,
-                    color: "#667085",
+                    color: "var(--color-text-secondary, #667085)",
                 }}
             >
                 Phản hồi từ khách hàng sẽ xuất hiện tại đây.
@@ -260,6 +252,25 @@ export default function FeedbackList({ data }: FeedbackListProps) {
     const [selectedId, setSelectedId] = useState<string | null>(
         data[0]?.id ?? null,
     );
+
+    const detailPanelRef = useRef<HTMLDivElement | null>(null);
+
+    const handleFeedbackSelect = (id: string) => {
+        setSelectedId(id);
+
+        if (!window.matchMedia("(min-width: 900px)").matches) {
+            return;
+        }
+
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+        detailPanelRef.current?.scrollIntoView({
+            behavior: prefersReducedMotion ? "auto" : "smooth",
+            block: "start",
+        });
+    };
 
     const selectedFeedback =
         data.find((item) => item.id === selectedId) ?? data[0] ?? null;
@@ -285,7 +296,7 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                 elevation={0}
                 sx={{
                     minWidth: 0,
-                    backgroundColor: "#FFFFFF",
+                    backgroundColor: "var(--color-surface, #FFFFFF)",
                     overflow: "hidden",
 
                     boxSizing: "border-box",
@@ -299,14 +310,14 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                 <Box
                     sx={{
                         py: 1.75,
-                        borderBottom: "1px solid #EAECF0",
+                        borderBottom: "1px solid var(--color-border, #EAECF0)",
                     }}
                 >
                     <Typography
                         sx={{
                             fontSize: 14,
                             fontWeight: 700,
-                            color: "#193B56",
+                            color: "var(--color-text-primary, #193B56)",
                         }}
                     >
                         Danh sách phản hồi
@@ -316,7 +327,7 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                         sx={{
                             mt: 0.5,
                             fontSize: 12,
-                            color: "#667085",
+                            color: "var(--color-text-secondary, #667085)",
                         }}
                     >
                         Chọn một phản hồi để xem chi tiết.
@@ -328,11 +339,18 @@ export default function FeedbackList({ data }: FeedbackListProps) {
 
                     return (
                         <Box key={item.id}>
-                            {index > 0 && <Divider />}
+                            {index > 0 && (
+                                <Divider
+                                    sx={{
+                                        borderColor:
+                                            "var(--color-border, #EAECF0)",
+                                    }}
+                                />
+                            )}
                             <Box
                                 component="button"
                                 type="button"
-                                onClick={() => setSelectedId(item.id)}
+                                onClick={() => handleFeedbackSelect(item.id)}
                                 aria-pressed={isSelected}
                                 sx={{
                                     display: {
@@ -383,7 +401,9 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                         md: "block",
                     },
                     minWidth: 0,
+                    scrollMarginTop: "24px",
                 }}
+                ref={detailPanelRef}
             >
                 {selectedFeedback ? (
                     <FeedbackDetailPanel data={selectedFeedback} />
@@ -392,8 +412,9 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                         elevation={0}
                         sx={{
                             p: 4,
-                            border: "1px solid #EAECF0",
+                            border: "1px solid var(--color-border, #EAECF0)",
                             borderRadius: 2,
+                            bgcolor: "var(--color-surface, #FFFFFF)",
                             textAlign: "center",
                         }}
                     >

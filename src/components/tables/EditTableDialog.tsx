@@ -7,7 +7,11 @@ import { updateTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
-import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
+import {
+    buttonBaseCancelSx,
+    buttonBaseSx,
+    tableEditButtonSx,
+} from "@/styles/button.styles";
 import { Form, Formik, type FormikHelpers } from "formik";
 import * as yup from "yup";
 
@@ -149,19 +153,7 @@ export default function EditTableDialog({
             <Button
                 type="button"
                 onClick={() => setOpen(true)}
-                sx={{
-                    minWidth: 64,
-                    height: 36,
-                    px: 1.5,
-                    borderRadius: 1.5,
-                    color: "#193B56",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    textTransform: "none",
-                    "&:hover": {
-                        backgroundColor: "#f2f4f7",
-                    },
-                }}
+                sx={tableEditButtonSx}
             >
                 Chỉnh sửa
             </Button>

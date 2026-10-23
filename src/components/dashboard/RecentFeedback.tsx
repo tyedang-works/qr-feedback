@@ -10,18 +10,18 @@ type RecentFeedbackProps = {
 const STATUS_CONFIG = {
     new: {
         label: "Chưa xử lý",
-        color: "#B42318",
-        backgroundColor: "#FEF3F2",
+        color: "var(--color-feedback-status-new-text, #9A5B13)",
+        backgroundColor: "var(--color-feedback-status-new-bg, #F8F0E4)",
     },
     in_progress: {
         label: "Đang xử lý",
-        color: "#B54708",
-        backgroundColor: "#FFFAEB",
+        color: "var(--color-feedback-status-progress-text, #526B83)",
+        backgroundColor: "var(--color-feedback-status-progress-bg, #EDF1F5)",
     },
     resolved: {
         label: "Đã giải quyết",
-        color: "#027A48",
-        backgroundColor: "#ECFDF3",
+        color: "var(--color-feedback-status-resolved-text, #39745C)",
+        backgroundColor: "var(--color-feedback-status-resolved-bg, #EAF2ED)",
     },
 } as const;
 
@@ -40,46 +40,41 @@ function getIssueLabel(option: string) {
     return FEEDBACK_ISSUE_LABEL_MAP[option] ?? option;
 }
 
-const ISSUE_CHIP_COLORS: Record<
-    string,
-    { backgroundColor: string; color: string; borderColor: string }
-> = {
-    food_quality: {
-        backgroundColor: "#FEF3F2",
-        color: "#B42318",
-        borderColor: "#FECDCA",
-    },
-    food_presentation: {
-        backgroundColor: "#F4F3FF",
-        color: "#5925DC",
-        borderColor: "#D9D6FE",
-    },
-    service: {
-        backgroundColor: "#EFF8FF",
-        color: "#175CD3",
-        borderColor: "#B2DDFF",
-    },
-    space_cleanliness: {
-        backgroundColor: "#FFF6ED",
-        color: "#C4320A",
-        borderColor: "#FEDF89",
-    },
-    service_time: {
-        backgroundColor: "#FFFAEB",
-        color: "#B54708",
-        borderColor: "#FEDF89",
-    },
-};
+const ISSUE_CHIP_SX = {
+    maxWidth: "100%",
+    height: 25,
+    borderRadius: "6px",
+    border: "1px solid var(--color-border)",
+    bgcolor: "var(--color-surface-hover)",
+    color: "var(--color-text-secondary)",
+    fontSize: 10.5,
+    fontWeight: 500,
+    transition:
+        "background-color 150ms ease, color 150ms ease, border-color 150ms ease",
 
-const DEFAULT_ISSUE_CHIP_COLOR = {
-    backgroundColor: "#F2F4F7",
-    color: "#344054",
-    borderColor: "#EAECF0",
-};
+    "& .MuiChip-label": {
+        px: 1,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+    },
 
-function getIssueChipColor(option: string) {
-    return ISSUE_CHIP_COLORS[option] ?? DEFAULT_ISSUE_CHIP_COLOR;
-}
+    "&:hover": {
+        bgcolor: "var(--color-surface-active)",
+    },
+
+    '[data-theme="light"] .feedback-item:hover &': {
+        bgcolor: "#FFFFFF",
+        color: "#344054",
+        borderColor: "#CBD5E1",
+    },
+
+    '[data-theme="dark"] .feedback-item:hover &': {
+        bgcolor: "#293548",
+        color: "#E5E7EB",
+        borderColor: "#64748B",
+    },
+} as const;
 
 export default function RecentFeedback({ data }: RecentFeedbackProps) {
     return (
@@ -88,9 +83,9 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
             sx={{
                 minWidth: 0,
                 overflow: "hidden",
-                border: "1px solid #EAECF0",
+                border: "1px solid var(--color-border)",
                 borderRadius: "16px",
-                bgcolor: "#FFFFFF",
+                bgcolor: "var(--color-surface)",
                 boxShadow: "var(--shadow-card)",
             }}
         >
@@ -110,7 +105,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                             fontSize: 16,
                             lineHeight: 1.5,
                             fontWeight: 700,
-                            color: "#193B56",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         Phản hồi gần đây
@@ -120,7 +115,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                         sx={{
                             mt: 0.25,
                             fontSize: 12,
-                            color: "#667085",
+                            color: "var(--color-text-secondary)",
                         }}
                     >
                         {data.length} phản hồi mới nhất
@@ -134,7 +129,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                         alignItems: "center",
                         gap: 6,
                         flexShrink: 0,
-                        color: "#193B56",
+                        color: "var(--color-text-primary)",
                         fontSize: 12,
                         fontWeight: 600,
                         textDecoration: "none",
@@ -151,14 +146,14 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                     sx={{
                         px: 2.5,
                         py: 5,
-                        borderTop: "1px solid #F0F2F5",
+                        borderTop: "1px solid var(--color-border)",
                         textAlign: "center",
                     }}
                 >
                     <Typography
                         sx={{
                             fontSize: 13,
-                            color: "#667085",
+                            color: "var(--color-text-secondary)",
                         }}
                     >
                         Chưa có phản hồi nào.
@@ -177,13 +172,21 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                         return (
                             <Box
                                 key={item.id}
+                                className="feedback-item"
                                 sx={{
                                     px: { xs: 2, sm: 2.5 },
                                     py: 1.5,
-                                    borderTop: "1px solid #F0F2F5",
-                                    transition: "background-color 0.15s",
+                                    borderTop: "1px solid var(--color-border)",
+                                    transition:
+                                        "background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease",
+
                                     "&:hover": {
-                                        bgcolor: "#FCFCFD",
+                                        bgcolor:
+                                            "var(--color-feedback-item-hover-bg)",
+                                        borderTopColor:
+                                            "var(--color-feedback-item-hover-border)",
+                                        boxShadow:
+                                            "var(--shadow-feedback-item-hover)",
                                     },
                                 }}
                             >
@@ -205,6 +208,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                             }}
                                         >
                                             <Box
+                                                aria-hidden="true"
                                                 sx={{
                                                     width: 34,
                                                     height: 34,
@@ -213,11 +217,11 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                                     alignItems: "center",
                                                     justifyContent: "center",
                                                     borderRadius: "9px",
-                                                    bgcolor: "#F2F4F7",
-                                                    color: "#344054",
+                                                    bgcolor:
+                                                        "var(--color-surface-hover)",
+                                                    color: "var(--color-text-secondary)",
                                                     fontSize: 17,
                                                 }}
-                                                aria-hidden="true"
                                             >
                                                 ▦
                                             </Box>
@@ -228,7 +232,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                                         fontSize: 13,
                                                         lineHeight: 1.5,
                                                         fontWeight: 600,
-                                                        color: "#193B56",
+                                                        color: "var(--color-text-primary)",
                                                         overflow: "hidden",
                                                         textOverflow:
                                                             "ellipsis",
@@ -243,7 +247,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                                         mt: 0.125,
                                                         fontSize: 11,
                                                         lineHeight: 1.5,
-                                                        color: "#667085",
+                                                        color: "var(--color-text-secondary)",
                                                     }}
                                                 >
                                                     {formatDateTime(
@@ -262,6 +266,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                                 borderRadius: "6px",
                                                 color: status.color,
                                                 bgcolor: status.backgroundColor,
+                                                border: "1px solid transparent",
                                                 fontSize: 10,
                                                 fontWeight: 600,
                                                 "& .MuiChip-label": {
@@ -288,31 +293,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                                         option,
                                                     )}
                                                     size="small"
-
-                                                    sx={{
-                                                        maxWidth: "100%",
-                                                        height: 25,
-                                                        borderRadius: "6px",
-                                                        border: "1px solid",
-                                                        ...getIssueChipColor(
-                                                            option,
-                                                        ),
-                                                        fontSize: 10.5,
-                                                        fontWeight: 500,
-                                                        transition:
-                                                            "all 0.15s ease",
-                                                        "& .MuiChip-label": {
-                                                            px: 1,
-                                                            overflow: "hidden",
-                                                            textOverflow:
-                                                                "ellipsis",
-                                                            whiteSpace:
-                                                                "nowrap",
-                                                        },
-                                                        "&:hover": {
-                                                            filter: "brightness(0.97)",
-                                                        },
-                                                    }}
+                                                    sx={ISSUE_CHIP_SX}
                                                 />
                                             ))}
 
@@ -320,13 +301,13 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                                 <Chip
                                                     label={`+${remainingCount}`}
                                                     size="small"
-
                                                     sx={{
                                                         height: 25,
                                                         borderRadius: "6px",
-                                                        bgcolor: "#EAECF0",
-                                                        color: "#475467",
-                                                        border: "1px solid #D0D5DD",
+                                                        bgcolor:
+                                                            "var(--color-surface-active)",
+                                                        color: "var(--color-text-secondary)",
+                                                        border: "1px solid var(--color-border)",
                                                         fontSize: 10.5,
                                                         fontWeight: 700,
                                                         "& .MuiChip-label": {
@@ -345,8 +326,8 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                             fontSize: 12,
                                             lineHeight: 1.6,
                                             color: item.feedback
-                                                ? "#475467"
-                                                : "#98A2B3",
+                                                ? "var(--color-text-secondary)"
+                                                : "var(--color-text-muted)",
                                             display: "-webkit-box",
                                             WebkitBoxOrient: "vertical",
                                             WebkitLineClamp: 2,

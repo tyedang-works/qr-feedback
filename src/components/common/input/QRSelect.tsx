@@ -14,6 +14,7 @@ export default function QRSelect<Value = string>({
     errorMessage,
     required = false,
     sx,
+    MenuProps,
     ...props
 }: QRSelectProps<Value>) {
     const hasError = Boolean(errorMessage);
@@ -47,26 +48,31 @@ export default function QRSelect<Value = string>({
                         minHeight: 42,
                         boxSizing: "border-box",
                         borderRadius: 1,
-                        backgroundColor: "#ffffff",
-
+                        backgroundColor:
+                            "var(--color-input-background, var(--color-surface, #FFFFFF))",
+                        color: "var(--color-text-primary, #111827)",
                         display: "flex",
                         alignItems: "center",
+                        transition:
+                            "background-color 150ms ease, border-color 150ms ease",
 
                         "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#d0d5dd",
+                            borderColor:
+                                "var(--color-input-border, var(--color-border, #D0D5DD))",
                         },
 
                         "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#98a2b3",
+                            borderColor:
+                                "var(--color-input-border-hover, #98A2B3)",
                         },
 
                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#193B56",
+                            borderColor: "var(--color-input-focus, #193B56)",
                             borderWidth: 1,
                         },
 
                         "&.Mui-error .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#d92d20",
+                            borderColor: "#D92D20",
                         },
 
                         "& .MuiSelect-select": {
@@ -82,19 +88,53 @@ export default function QRSelect<Value = string>({
 
                         "& .MuiSelect-icon": {
                             top: "50%",
+                            right: 10,
                             transform: "translateY(-50%)",
+                            color: "var(--color-text-secondary, #667085)",
+                        },
+
+                        "&.Mui-disabled": {
+                            backgroundColor:
+                                "var(--color-surface-hover, #F9FAFB)",
+                            color: "var(--color-text-muted, #98A2B3)",
                         },
                     },
                     ...(Array.isArray(sx) ? sx : [sx]),
                 ]}
+
                 MenuProps={{
+                    ...MenuProps,
+
+                    anchorOrigin: {
+                        vertical: "bottom",
+                        horizontal: "left",
+                        ...MenuProps?.anchorOrigin,
+                    },
+
+                    transformOrigin: {
+                        vertical: "top",
+                        horizontal: "left",
+                        ...MenuProps?.transformOrigin,
+                    },
+
+                    marginThreshold: 8,
+
                     slotProps: {
+                        ...MenuProps?.slotProps,
+
                         paper: {
                             sx: {
                                 mt: 0.5,
-                                borderRadius: 1,
-                                border: "1px solid #eaecf0",
-                                boxShadow: "0 4px 12px rgba(16, 24, 40, 0.08)",
+                                maxHeight: "min(280px, calc(100dvh - 32px))",
+                                overflowY: "auto",
+                                overscrollBehavior: "contain",
+
+                                border: "1px solid var(--color-border, #EAECF0)",
+                                borderRadius: 1.5,
+                                bgcolor: "var(--color-surface, #FFFFFF)",
+                                color: "var(--color-text-primary, #111827)",
+                                boxShadow: "var(--shadow-card)",
+                                backgroundImage: "none",
 
                                 "& .MuiMenuItem-root": {
                                     minHeight: 40,
@@ -102,19 +142,22 @@ export default function QRSelect<Value = string>({
                                     py: 1,
                                     fontSize: 14,
                                     lineHeight: 1.5,
-                                    color: "#1A202E",
+                                    color: "var(--color-text-primary, #111827)",
                                 },
 
                                 "& .MuiMenuItem-root:hover": {
-                                    backgroundColor: "#f9fafb",
+                                    backgroundColor:
+                                        "var(--color-surface-hover, #F9FAFB)",
                                 },
 
                                 "& .MuiMenuItem-root.Mui-selected": {
-                                    backgroundColor: "#f2f4f7",
+                                    backgroundColor:
+                                        "var(--color-surface-active, #F2F4F7)",
                                 },
 
                                 "& .MuiMenuItem-root.Mui-selected:hover": {
-                                    backgroundColor: "#eaecf0",
+                                    backgroundColor:
+                                        "var(--color-surface-active, #EAECF0)",
                                 },
                             },
                         },

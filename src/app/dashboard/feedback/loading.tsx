@@ -30,13 +30,19 @@ export default function FeedbackLoading() {
                         xs: "minmax(0, 1fr)",
                         lg: "minmax(0, 1fr) minmax(0, 1.25fr)",
                     },
-                    gap: 2,
+                    gap: { xs: 2, lg: 2.5 },
                     alignItems: "start",
                     minWidth: 0,
                 }}
             >
                 <FeedbackListSkeleton />
-                <Box sx={{ display: { xs: "none", lg: "block" }, minWidth: 0 }}>
+
+                <Box
+                    sx={{
+                        display: { xs: "none", lg: "block" },
+                        minWidth: 0,
+                    }}
+                >
                     <FeedbackDetailSkeleton />
                 </Box>
             </Box>

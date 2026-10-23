@@ -25,6 +25,10 @@ const STATUS_FILTER_OPTIONS = [
     { value: "inactive", label: "Đã tắt" },
 ] as const;
 
+const dividerSx = {
+    borderColor: "var(--color-border, #E5E7EB)",
+};
+
 export default function TablesList({ data, canManageTables }: TablesListProps) {
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<TableStatusFilter>("all");
@@ -80,7 +84,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                             sx={{
                                                 display: "inline-flex",
                                                 alignItems: "center",
-                                                color: "#98a2b3",
+                                                color: "var(--color-text-muted, #98A2B3)",
                                             }}
                                         >
                                             <Search size={16} />
@@ -138,7 +142,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                         <Typography
                             sx={{
                                 fontSize: 13,
-                                color: "#667085",
+                                color: "var(--color-text-secondary, #667085)",
                             }}
                         >
                             Hiển thị{" "}
@@ -146,7 +150,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 component="span"
                                 sx={{
                                     fontWeight: 600,
-                                    color: "#193B56",
+                                    color: "var(--color-text-primary, #193B56)",
                                 }}
                             >
                                 {filteredTables.length}
@@ -163,7 +167,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                     p: 0,
                                     border: 0,
                                     background: "transparent",
-                                    color: "#193B56",
+                                    color: "var(--color-text-primary, #193B56)",
                                     fontSize: 13,
                                     fontWeight: 600,
                                     cursor: "pointer",
@@ -179,7 +183,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                 </Box>
             )}
 
-            <Box sx={{ ...cardSx, overflow: "hidden" }}>
+            <Box sx={{ ...cardSx, p: 0, overflow: "clip" }}>
                 {data.length === 0 ? (
                     <Box
                         sx={{
@@ -192,7 +196,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                             sx={{
                                 fontSize: 14,
                                 fontWeight: 600,
-                                color: "#344054",
+                                color: "var(--color-text-primary, #344054)",
                             }}
                         >
                             Chưa có bàn nào
@@ -202,7 +206,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                             sx={{
                                 mt: 0.5,
                                 fontSize: 13,
-                                color: "#98a2b3",
+                                color: "var(--color-text-muted, #98A2B3)",
                             }}
                         >
                             Hãy thêm bàn đầu tiên cho nhà hàng của bạn.
@@ -220,7 +224,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                             sx={{
                                 fontSize: 14,
                                 fontWeight: 600,
-                                color: "#344054",
+                                color: "var(--color-text-primary, #344054)",
                             }}
                         >
                             Không tìm thấy bàn phù hợp
@@ -230,7 +234,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                             sx={{
                                 mt: 0.5,
                                 fontSize: 13,
-                                color: "#98a2b3",
+                                color: "var(--color-text-muted, #98A2B3)",
                             }}
                         >
                             Thử thay đổi từ khóa hoặc bộ lọc trạng thái.
@@ -246,7 +250,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                     p: 0,
                                     border: 0,
                                     background: "transparent",
-                                    color: "#193B56",
+                                    color: "var(--color-text-primary, #193B56)",
                                     fontSize: 13,
                                     fontWeight: 600,
                                     cursor: "pointer",
@@ -258,12 +262,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                     </Box>
                 ) : (
                     <>
-                        <Box
-                            sx={{
-                                display: { xs: "none", sm: "block" },
-                                overflowX: "auto",
-                            }}
-                        >
+                        <Box sx={{ display: { xs: "none", sm: "block" } }}>
                             <Box
                                 sx={{
                                     display: "grid",
@@ -274,7 +273,14 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                     gap: 2,
                                     px: 2.5,
                                     py: 1.5,
-                                    backgroundColor: "#f8fafc",
+                                    minHeight: 56,
+                                    boxSizing: "border-box",
+                                    backgroundColor:
+                                        "var(--color-table-header-bg)",
+                                    position: "sticky",
+                                    top: 0,
+                                    zIndex: 10,
+                                    boxShadow: "0 1px 0 var(--color-border)",
                                 }}
                             >
                                 <Typography sx={tableColumnHeaderSx}>
@@ -294,7 +300,6 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                         sx={{
                                             ...tableColumnHeaderSx,
                                             textAlign: "left",
-                                            color: "#667085",
                                         }}
                                     >
                                         Thao tác
@@ -302,11 +307,9 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 )}
                             </Box>
 
-                            <Divider />
-
                             {filteredTables.map((table, index) => (
                                 <Box key={table.id}>
-                                    {index > 0 && <Divider />}
+                                    {index > 0 && <Divider sx={dividerSx} />}
 
                                     <Box
                                         sx={{
@@ -321,7 +324,8 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                             transition:
                                                 "background-color 150ms ease",
                                             "&:hover": {
-                                                backgroundColor: "#f8fafc",
+                                                backgroundColor:
+                                                    "var(--color-surface-hover, #F9FAFB)",
                                             },
                                         }}
                                     >
@@ -330,7 +334,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                 minWidth: 0,
                                                 fontSize: 14,
                                                 fontWeight: 600,
-                                                color: "#193B56",
+                                                color: "var(--color-text-primary, #193B56)",
                                                 overflowWrap: "anywhere",
                                             }}
                                         >
@@ -342,7 +346,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                             sx={{
                                                 minWidth: 0,
                                                 fontSize: 12,
-                                                color: "#475467",
+                                                color: "var(--color-text-secondary, #475467)",
                                                 overflowWrap: "anywhere",
                                                 wordBreak: "break-word",
                                                 lineHeight: 1.6,
@@ -388,7 +392,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                         <Stack sx={{ display: { xs: "flex", sm: "none" } }}>
                             {filteredTables.map((table, index) => (
                                 <Box key={table.id}>
-                                    {index > 0 && <Divider />}
+                                    {index > 0 && <Divider sx={dividerSx} />}
 
                                     <Box sx={{ px: 2, py: 2 }}>
                                         <Stack
@@ -409,7 +413,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                     sx={{
                                                         fontSize: 15,
                                                         fontWeight: 600,
-                                                        color: "#193B56",
+                                                        color: "var(--color-text-primary, #193B56)",
                                                         overflowWrap:
                                                             "anywhere",
                                                     }}
@@ -422,7 +426,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                     sx={{
                                                         mt: 0.5,
                                                         fontSize: 12,
-                                                        color: "#667085",
+                                                        color: "var(--color-text-secondary, #667085)",
                                                         overflow: "hidden",
                                                         textOverflow:
                                                             "ellipsis",

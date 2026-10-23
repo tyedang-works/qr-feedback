@@ -1,16 +1,16 @@
-import { Skeleton } from "@mui/material";
 import PageLoadingSkeleton from "@/components/common/skeleton/PageLoadingSkeleton";
 import TablesDesktopSkeleton from "@/components/tables/skeletons/TablesDesktopSkeleton";
 import TablesFilterSkeleton from "@/components/tables/skeletons/TablesFilterSkeleton";
 import TablesMobileSkeleton from "@/components/tables/skeletons/TablesMobileSkeleton";
 import TablesSummarySkeleton from "@/components/tables/skeletons/TablesSummarySkeleton";
+import { Skeleton } from "@mui/material";
 
 export default function TablesLoading() {
     return (
         <PageLoadingSkeleton
             titleWidth={150}
             subtitleWidth={280}
-            gap={2}
+            gap={1}
             action={
                 <Skeleton
                     variant="rounded"

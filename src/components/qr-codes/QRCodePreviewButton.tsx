@@ -20,11 +20,12 @@ export default function QRCodePreviewButton({
                 borderRadius: 1.5,
                 fontSize: 13,
                 fontWeight: 600,
-                color: "#193B56",
+                color: "var(--color-table-edit)",
                 textTransform: "none",
+                backgroundColor: "transparent",
 
                 "&:hover": {
-                    backgroundColor: "#f2f4f7",
+                    backgroundColor: "var(--bg-table-edit-hover)",
                 },
             }}
         >

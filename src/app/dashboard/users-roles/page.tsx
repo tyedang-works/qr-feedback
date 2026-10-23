@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
 import UsersRolesClient from "@/components/users-roles/UsersRolesClient";
 import { canManageUsers } from "@/lib/auth/permissions";
 import { getRestaurantMembers, getUserContext } from "@/lib/auth/queries";
+import { redirect } from "next/navigation";
 
 export default async function UsersRolesPage() {
     const userContext = await getUserContext();

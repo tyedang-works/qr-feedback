@@ -10,7 +10,7 @@ import DeleteUserDialog from "@/components/users-roles/DeleteUserDialog";
 import EditUserDialog from "@/components/users-roles/EditUserDialog";
 import { USER_ROLES } from "@/lib/auth/constants";
 import type { UserRoleMember } from "@/lib/auth/user-roles.types";
-import { buttonBaseSx } from "@/styles/button.styles";
+import { buttonBaseSx, tableEditButtonSx } from "@/styles/button.styles";
 import { tableColumnHeaderSx } from "@/styles/table.styles";
 import RoleChip from "../common/RoleChip";
 
@@ -23,7 +23,7 @@ type UserRoleItemProps = {
     onEdit: (member: UserRoleMember) => void;
 };
 
-const GRID_COLUMNS = "1.5fr 1.5fr 1fr 180px";
+const GRID_COLUMNS = "1.5fr 1.5fr 1fr 160px";
 
 function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
     const isOwner = member.role === USER_ROLES.OWNER;
@@ -32,10 +32,10 @@ function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
         <Box
             sx={{
                 p: 2,
-                border: "1px solid #EAECF0",
+                border: "1px solid var(--color-border)",
                 borderRadius: 2,
-                bgcolor: "#FFFFFF",
-                boxShadow: "0 1px 2px rgba(16, 24, 40, 0.03)",
+                bgcolor: "var(--color-surface)",
+                boxShadow: "var(--shadow-card)",
             }}
         >
             <Stack sx={{ gap: 1.5 }}>
@@ -53,7 +53,7 @@ function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
                                 fontSize: 14,
                                 fontWeight: 600,
                                 lineHeight: 1.5,
-                                color: "#193B56",
+                                color: "var(--color-text-primary)",
                                 overflowWrap: "anywhere",
                             }}
                         >
@@ -65,7 +65,7 @@ function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
                                 mt: 0.5,
                                 fontSize: 13,
                                 lineHeight: 1.5,
-                                color: "#667085",
+                                color: "var(--color-text-secondary)",
                                 overflowWrap: "anywhere",
                             }}
                         >
@@ -84,24 +84,12 @@ function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
                             justifyContent: "flex-end",
                             gap: 1,
                             pt: 1.5,
-                            borderTop: "1px solid #EAECF0",
+                            borderTop: "1px solid var(--color-border)",
                         }}
                     >
                         <Button
-                            size="small"
-                            variant="text"
                             onClick={() => onEdit(member)}
-                            sx={{
-                                minWidth: 0,
-                                minHeight: 32,
-                                px: 0.5,
-                                color: "#344054",
-                                textTransform: "none",
-                                fontWeight: 600,
-                                "&:hover": {
-                                    bgcolor: "rgba(52, 64, 84, 0.06)",
-                                },
-                            }}
+                            sx={tableEditButtonSx}
                         >
                             Chỉnh sửa
                         </Button>
@@ -127,9 +115,9 @@ function UsersTable({
         <Box
             sx={{
                 display: { xs: "none", md: "block" },
-                border: "1px solid #EAECF0",
+                border: "1px solid var(--color-border)",
                 borderRadius: 2,
-                bgcolor: "#FFFFFF",
+                bgcolor: "var(--color-surface)",
                 overflow: "hidden",
             }}
         >
@@ -138,23 +126,16 @@ function UsersTable({
                     display: "grid",
                     gridTemplateColumns: GRID_COLUMNS,
                     alignItems: "center",
-                    minHeight: 52,
+                    minHeight: 56,
                     px: 3,
-                    bgcolor: "#F9FAFB",
-                    borderBottom: "1px solid #EAECF0",
+                    bgcolor: "var(--color-table-header-bg)",
+                    borderBottom: "1px solid var(--color-border)",
                 }}
             >
                 <Typography sx={tableColumnHeaderSx}>Người dùng</Typography>
                 <Typography sx={tableColumnHeaderSx}>Email</Typography>
                 <Typography sx={tableColumnHeaderSx}>Role</Typography>
-                <Typography
-                    sx={{
-                        ...tableColumnHeaderSx,
-                        color: "#667085",
-                    }}
-                >
-                    Thao tác
-                </Typography>
+                <Typography sx={tableColumnHeaderSx}>Thao tác</Typography>
             </Box>
 
             {members.length === 0 ? (
@@ -172,7 +153,7 @@ function UsersTable({
                                 alignItems: "center",
                                 minHeight: 64,
                                 px: 3,
-                                borderBottom: "1px solid #EAECF0",
+                                borderBottom: "1px solid var(--color-border)",
                                 "&:last-child": {
                                     borderBottom: 0,
                                 },
@@ -196,8 +177,8 @@ function UsersTable({
                                         flexShrink: 0,
                                         fontSize: 14,
                                         fontWeight: 600,
-                                        bgcolor: "#EAF0F6",
-                                        color: "#193B56",
+                                        bgcolor: "var(--color-surface-active)",
+                                        color: "var(--color-text-primary)",
                                     }}
                                 >
                                     {(member.fullName || member.email || "?")
@@ -211,7 +192,7 @@ function UsersTable({
                                         minWidth: 0,
                                         fontSize: 14,
                                         fontWeight: 600,
-                                        color: "#1A202E",
+                                        color: "var(--color-text-primary)",
                                         overflow: "hidden",
                                         textOverflow: "ellipsis",
                                         whiteSpace: "nowrap",
@@ -227,7 +208,7 @@ function UsersTable({
                                     minWidth: 0,
                                     pr: 2,
                                     fontSize: 14,
-                                    color: "#667085",
+                                    color: "var(--color-text-secondary)",
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                     whiteSpace: "nowrap",
@@ -253,18 +234,7 @@ function UsersTable({
                                             size="small"
                                             variant="text"
                                             onClick={() => onEdit(member)}
-                                            sx={{
-                                                minWidth: 0,
-                                                minHeight: 32,
-                                                px: 0.5,
-                                                color: "#344054",
-                                                textTransform: "none",
-                                                fontWeight: 600,
-                                                "&:hover": {
-                                                    bgcolor:
-                                                        "rgba(52, 64, 84, 0.06)",
-                                                },
-                                            }}
+                                            sx={tableEditButtonSx}
                                         >
                                             Chỉnh sửa
                                         </Button>
@@ -291,7 +261,7 @@ function EmptyUsersState() {
                 sx={{
                     textAlign: "center",
                     fontSize: 14,
-                    color: "#98A2B3",
+                    color: "var(--color-text-muted)",
                 }}
             >
                 Chưa có người dùng.
@@ -312,7 +282,7 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
         setIsEditDialogOpen(true);
     };
 
-    const handleCloseEditDialog = () => {
+    const handleCloseEditUser = () => {
         setIsEditDialogOpen(false);
     };
 
@@ -381,16 +351,16 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                             sx={{
                                 py: 5,
                                 px: 2,
-                                border: "1px solid #EAECF0",
+                                border: "1px solid var(--color-border)",
                                 borderRadius: 2,
-                                bgcolor: "#FFFFFF",
+                                bgcolor: "var(--color-surface)",
                             }}
                         >
                             <Typography
                                 sx={{
                                     textAlign: "center",
                                     fontSize: 14,
-                                    color: "#98A2B3",
+                                    color: "var(--color-text-muted)",
                                 }}
                             >
                                 Chưa có người dùng.
@@ -423,7 +393,7 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                         role: currentSelectedUser.role,
                         avatar_url: currentSelectedUser.avatarUrl,
                     }}
-                    onClose={handleCloseEditDialog}
+                    onClose={handleCloseEditUser}
                     onUserUpdated={handleUserUpdated}
                 />
             )}

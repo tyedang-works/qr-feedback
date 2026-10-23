@@ -1,11 +1,12 @@
 "use client";
 
+import ThemeToggle from "@/components/common/theme/ThemeToggle";
 import type { UserContext } from "@/lib/auth/queries";
 import { Box, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import { Menu as MenuIcon } from "lucide-react";
 import { useState } from "react";
-import DashboardSidebar from "./DashboardSidebar";
 import DashboardFooter from "./DashboardFooter";
+import DashboardSidebar from "./DashboardSidebar";
 
 type DashboardLayoutProps = {
     children: React.ReactNode;
@@ -135,6 +136,7 @@ export default function DashboardLayout({
                                 {restaurantName || "Restaurant"}
                             </Typography>
                         </Box>
+                        <ThemeToggle />
                     </Stack>
                 </Box>
 

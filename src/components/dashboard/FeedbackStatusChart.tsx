@@ -7,13 +7,6 @@ type FeedbackStatusChartProps = {
     data: FeedbackStatusDistributionItem[];
 };
 
-const STATUS_COLORS: Record<FeedbackStatusDistributionItem["status"], string> =
-    {
-        new: "#F04438",
-        in_progress: "#F79009",
-        resolved: "#12B76A",
-    };
-
 const numberFormatter = new Intl.NumberFormat("vi-VN");
 
 const RING_ITEMS: {
@@ -24,17 +17,17 @@ const RING_ITEMS: {
     {
         status: "new",
         label: "Chưa xử lý",
-        color: STATUS_COLORS.new,
+        color: "var(--color-chart-new)",
     },
     {
         status: "in_progress",
         label: "Đang xử lý",
-        color: STATUS_COLORS.in_progress,
+        color: "var(--color-chart-in-progress)",
     },
     {
         status: "resolved",
         label: "Đã giải quyết",
-        color: STATUS_COLORS.resolved,
+        color: "var(--color-chart-resolved)",
     },
 ];
 
@@ -89,7 +82,7 @@ function StatusRings({
                                 cy={CENTER}
                                 r={radius}
                                 fill="none"
-                                stroke="#F3F4F6"
+                                stroke="var(--color-chart-track)"
                                 strokeWidth={RING_WIDTH}
                             />
 
@@ -125,7 +118,7 @@ function StatusRings({
                     sx={{
                         fontSize: 11,
                         lineHeight: 1.5,
-                        color: "var(--color-text-secondary, #6B7280)",
+                        color: "var(--color-text-secondary)",
                     }}
                 >
                     Tổng phản hồi
@@ -137,7 +130,7 @@ function StatusRings({
                         lineHeight: 1.3,
                         fontWeight: 700,
                         letterSpacing: "-0.7px",
-                        color: "var(--color-text-primary, #111827)",
+                        color: "var(--color-text-primary)",
                         fontVariantNumeric: "tabular-nums",
                     }}
                 >
@@ -170,7 +163,7 @@ function StatusLegend({
                 rowGap: 1,
                 pt: 2,
                 mt: 1,
-                borderTop: "1px dashed var(--color-border, #E5E7EB)",
+                borderTop: "1px dashed var(--color-border)",
             }}
         >
             {RING_ITEMS.map((item) => {
@@ -201,7 +194,7 @@ function StatusLegend({
                             sx={{
                                 fontSize: 12,
                                 lineHeight: 1.5,
-                                color: "var(--color-text-secondary, #4B5563)",
+                                color: "var(--color-text-secondary)",
                             }}
                         >
                             {item.label}
@@ -212,7 +205,7 @@ function StatusLegend({
                                 fontSize: 12,
                                 lineHeight: 1.5,
                                 fontWeight: 600,
-                                color: "var(--color-text-primary, #111827)",
+                                color: "var(--color-text-primary)",
                                 fontVariantNumeric: "tabular-nums",
                             }}
                         >
@@ -222,7 +215,7 @@ function StatusLegend({
                         <Typography
                             sx={{
                                 fontSize: 11,
-                                color: "var(--color-text-secondary, #6B7280)",
+                                color: "var(--color-text-secondary)",
                                 fontVariantNumeric: "tabular-nums",
                             }}
                         >
@@ -251,9 +244,9 @@ export default function FeedbackStatusChart({
                 minWidth: 0,
                 boxSizing: "border-box",
                 p: { xs: 2, sm: 2.5 },
-                border: "1px solid var(--color-border, #F0F2F5)",
+                border: "1px solid var(--color-border)",
                 borderRadius: "16px",
-                bgcolor: "var(--color-surface, #FFFFFF)",
+                bgcolor: "var(--color-surface)",
                 boxShadow: "var(--shadow-card)",
             }}
         >
@@ -269,7 +262,7 @@ export default function FeedbackStatusChart({
                         fontSize: 16,
                         lineHeight: 1.5,
                         fontWeight: 700,
-                        color: "var(--color-text-primary, #111827)",
+                        color: "var(--color-text-primary)",
                     }}
                 >
                     Trạng thái phản hồi
@@ -279,7 +272,7 @@ export default function FeedbackStatusChart({
                     sx={{
                         fontSize: 13,
                         lineHeight: 1.5,
-                        color: "var(--color-text-secondary, #6B7280)",
+                        color: "var(--color-text-secondary)",
                     }}
                 >
                     Phân bố theo tình trạng xử lý
@@ -298,7 +291,7 @@ export default function FeedbackStatusChart({
                         <Typography
                             sx={{
                                 fontSize: 14,
-                                color: "var(--color-text-secondary, #6B7280)",
+                                color: "var(--color-text-secondary)",
                                 textAlign: "center",
                             }}
                         >

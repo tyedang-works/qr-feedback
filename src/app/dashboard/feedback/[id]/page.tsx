@@ -13,6 +13,7 @@ type FeedbackDetailPageProps = {
 export default async function FeedbackDetailPage({
     params,
 }: FeedbackDetailPageProps) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     const { id: feedbackPublicId } = await params;
 
     const userContext = await getUserContext();

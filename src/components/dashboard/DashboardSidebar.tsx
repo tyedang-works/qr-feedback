@@ -33,6 +33,7 @@ import Logo from "../common/Logo";
 import RoleChip from "../common/RoleChip";
 import { LockKeyhole } from "lucide-react";
 import ChangePasswordDialog from "@/components/account/ChangePasswordDialog";
+import ThemeToggle from "../common/theme/ThemeToggle";
 
 type DashboardSidebarProps = {
     role: UserRole | null;
@@ -219,6 +220,8 @@ export default function DashboardSidebar({
                     flexDirection: "column",
                     px: 1.75,
                     py: 2.5,
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "var(--color-border, #374151) transparent",
                     color: "var(--color-text-primary, #111827)",
                     bgcolor: "var(--color-surface, #FFFFFF)",
                     borderRight: "1px solid var(--color-border, #F0F1F3)",
@@ -293,6 +296,9 @@ export default function DashboardSidebar({
                             {displayRestaurantName}
                         </Typography>
                     </Box>
+
+                    {/* theme */}
+                    <ThemeToggle />
                 </Stack>
                 <Divider
                     sx={{
@@ -491,7 +497,7 @@ export default function DashboardSidebar({
                     onClose={handleCloseAccountMenu}
                     anchorOrigin={{
                         vertical: "top",
-                        horizontal: "left",
+                        horizontal: "right",
                     }}
                     transformOrigin={{
                         vertical: "bottom",
@@ -500,124 +506,91 @@ export default function DashboardSidebar({
                     slotProps={{
                         paper: {
                             sx: {
-                                width: 236,
+                                width: 208,
                                 maxWidth: "calc(100vw - 24px)",
+                                mt: -1,
                                 overflow: "hidden",
-                                border: "1px solid #E5E7EB",
-                                borderRadius: 3,
-                                bgcolor: "#FFFFFF",
-                                boxShadow:
-                                    "0 12px 32px rgba(17, 24, 39, 0.10), 0 2px 6px rgba(17, 24, 39, 0.04)",
+                                border: "1px solid var(--color-border, #E5E7EB)",
+                                borderRadius: 2.5,
+                                bgcolor: "var(--color-surface, #FFFFFF)",
+                                color: "var(--color-text-primary, #111827)",
+                                boxShadow: "var(--shadow-card)",
                                 backgroundImage: "none",
+                                "& .MuiMenu-list": {
+                                    p: 0.75,
+                                },
                             },
                         },
                     }}
                 >
-                    <Box sx={{ px: 2, pt: 2, pb: 1.75 }}>
-                        <Stack
+                    <MenuItem
+                        onClick={() => {
+                            handleCloseAccountMenu();
+                            setIsChangePasswordOpen(true);
+                        }}
+                        sx={{
+                            minHeight: 42,
+                            px: 1.25,
+                            py: 1,
+                            gap: 1.25,
+                            borderRadius: 1.5,
+                            color: "var(--color-text-primary, #344054)",
+                            fontSize: 13.5,
+                            fontWeight: 550,
+                            "&:hover": {
+                                bgcolor: "var(--color-surface-hover, #F9FAFB)",
+                            },
+                            "&:focus-visible": {
+                                outline:
+                                    "2px solid var(--color-text-muted, #9CA3AF)",
+                                outlineOffset: -2,
+                            },
+                        }}
+                    >
+                        <LockKeyhole size={17} strokeWidth={1.8} />
+                        Đổi mật khẩu
+                    </MenuItem>
+
+                    <Divider
+                        sx={{
+                            my: 0.5,
+                            borderColor: "var(--color-border, #E5E7EB)",
+                        }}
+                    />
+
+                    <MenuItem
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        sx={{
+                            minHeight: 42,
+                            px: 1.25,
+                            py: 1,
+                            gap: 1.25,
+                            borderRadius: 1.5,
+                            color: "#F04438",
+                            fontSize: 13.5,
+                            fontWeight: 550,
+                            "&:hover": {
+                                bgcolor: "rgba(240, 68, 56, 0.10)",
+                            },
+                            "&:focus-visible": {
+                                outline: "2px solid rgba(240, 68, 56, 0.35)",
+                                outlineOffset: -2,
+                            },
+                        }}
+                    >
+                        <LogOut size={17} strokeWidth={1.8} />
+                        <Typography
+                            component="span"
                             sx={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                gap: 1.5,
+                                fontSize: "inherit",
+                                fontWeight: "inherit",
+                                color: "inherit",
                             }}
                         >
-                            <Avatar
-                                src={avatarUrl ?? undefined}
-                                alt={displayName}
-                                sx={{
-                                    width: 44,
-                                    height: 44,
-                                    flexShrink: 0,
-                                    bgcolor: "#111827",
-                                    color: "#FFFFFF",
-                                    fontSize: 16,
-                                    fontWeight: 700,
-                                }}
-                            >
-                                {initial}
-                            </Avatar>
-
-                            <Box sx={{ minWidth: 0, flex: 1 }}>
-                                <Typography
-                                    noWrap
-                                    title={displayName}
-                                    sx={{
-                                        fontSize: 14,
-                                        lineHeight: 1.5,
-                                        fontWeight: 650,
-                                        color: "#111827",
-                                    }}
-                                >
-                                    {displayName}
-                                </Typography>
-
-                                {role && <RoleChip role={role} />}
-                            </Box>
-                        </Stack>
-                    </Box>
-
-                    <Divider sx={{ borderColor: "#E5E7EB" }} />
-
-                    <Box sx={{ p: 1 }}>
-                        <MenuItem
-                            onClick={() => {
-                                handleCloseAccountMenu();
-                                setIsChangePasswordOpen(true);
-                            }}
-                            sx={{
-                                minHeight: 42,
-                                px: 1.25,
-                                py: 1,
-                                gap: 1.25,
-                                borderRadius: 1.5,
-                                color: "#344054",
-                                fontSize: 13.5,
-                                fontWeight: 550,
-                                "&:hover": {
-                                    bgcolor: "#F9FAFB",
-                                },
-                            }}
-                        >
-                            <LockKeyhole size={17} strokeWidth={1.8} />
-                            Đổi mật khẩu
-                        </MenuItem>
-                        <MenuItem
-                            onClick={handleLogout}
-                            disabled={isLoggingOut}
-                            sx={{
-                                minHeight: 42,
-                                px: 1.25,
-                                py: 1,
-                                gap: 1.25,
-                                borderRadius: 1.5,
-                                color: "#B42318",
-                                fontSize: 13.5,
-                                fontWeight: 550,
-                                "&:hover": {
-                                    bgcolor: "#FEF2F2",
-                                },
-                                "&:focus-visible": {
-                                    outline: "2px solid #FECACA",
-                                    outlineOffset: -2,
-                                },
-                            }}
-                        >
-                            <LogOut size={17} strokeWidth={1.8} />
-
-                            <Typography
-                                component="span"
-                                sx={{
-                                    fontSize: "inherit",
-                                    fontWeight: "inherit",
-                                    color: "inherit",
-                                }}
-                            >
-                                {isLoggingOut
-                                    ? "Đang đăng xuất..."
-                                    : "Đăng xuất"}
-                            </Typography>
-                        </MenuItem>
-                    </Box>
+                            {isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
+                        </Typography>
+                    </MenuItem>
                 </Menu>
             </Box>
             <ChangePasswordDialog

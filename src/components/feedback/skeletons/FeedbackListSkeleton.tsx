@@ -1,27 +1,53 @@
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Skeleton, Stack } from "@mui/material";
 
+const skeletonSx = {
+    bgcolor: "var(--color-skeleton, rgba(145, 158, 171, 0.16))",
+    "&::after": {
+        background:
+            "linear-gradient(90deg, transparent, var(--color-skeleton-highlight, rgba(255, 255, 255, 0.12)), transparent)",
+    },
+};
+
+const dividerColor = "var(--color-border, #E5E7EB)";
+
 export default function FeedbackListSkeleton() {
     return (
-        <Card sx={{ ...cardSx, overflow: "hidden" }}>
+        <Card
+            sx={{
+                ...cardSx,
+                overflow: "hidden",
+                boxShadow: "none",
+            }}
+        >
             <Box
                 sx={{
                     px: 2,
                     py: 1.75,
-                    borderBottom: "1px solid #EAECF0",
+                    borderBottom: `1px solid ${dividerColor}`,
                 }}
             >
                 <Skeleton
                     variant="text"
                     width={150}
                     height={22}
-                    sx={{ transform: "none" }}
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        transform: "none",
+                    }}
                 />
+
                 <Skeleton
                     variant="text"
                     width={200}
                     height={19}
-                    sx={{ mt: 0.25, transform: "none" }}
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        mt: 0.25,
+                        transform: "none",
+                    }}
                 />
             </Box>
 
@@ -31,12 +57,21 @@ export default function FeedbackListSkeleton() {
                     sx={{
                         px: 2,
                         py: 1.75,
-                        borderBottom: item < 4 ? "1px solid #EAECF0" : "none",
-                        backgroundColor: item === 1 ? "#F0F6FA" : "#FFFFFF",
+                        borderBottom:
+                            item < 4 ? `1px solid ${dividerColor}` : "none",
+                        bgcolor:
+                            item === 1
+                                ? "var(--color-surface-active, #F3F4F6)"
+                                : "transparent",
                         borderLeft:
                             item === 1
-                                ? "3px solid #193B56"
-                                : "3px solid transparent",
+                                ? "2px solid var(--color-text-secondary, #667085)"
+                                : "2px solid transparent",
+                        '[data-theme="dark"] &': {
+                            bgcolor: item === 1 ? "#292F38" : "transparent",
+                            borderLeftColor:
+                                item === 1 ? "#8B949E" : "transparent",
+                        },
                     }}
                 >
                     <Stack sx={{ gap: 1 }}>
@@ -53,7 +88,11 @@ export default function FeedbackListSkeleton() {
                                     variant="text"
                                     width={70}
                                     height={21}
-                                    sx={{ transform: "none" }}
+                                    animation="wave"
+                                    sx={{
+                                        ...skeletonSx,
+                                        transform: "none",
+                                    }}
                                 />
                             </Box>
 
@@ -61,7 +100,11 @@ export default function FeedbackListSkeleton() {
                                 variant="text"
                                 width={90}
                                 height={18}
-                                sx={{ transform: "none" }}
+                                animation="wave"
+                                sx={{
+                                    ...skeletonSx,
+                                    transform: "none",
+                                }}
                             />
                         </Stack>
 
@@ -76,19 +119,33 @@ export default function FeedbackListSkeleton() {
                                 variant="rounded"
                                 width={item === 2 ? 88 : 42}
                                 height={22}
-                                sx={{ borderRadius: 1 }}
+                                animation="wave"
+                                sx={{
+                                    ...skeletonSx,
+                                    borderRadius: 1,
+                                }}
                             />
+
                             <Skeleton
                                 variant="rounded"
                                 width={125}
                                 height={22}
-                                sx={{ borderRadius: 1 }}
+                                animation="wave"
+                                sx={{
+                                    ...skeletonSx,
+                                    borderRadius: 1,
+                                }}
                             />
+
                             <Skeleton
                                 variant="rounded"
                                 width={100}
                                 height={22}
-                                sx={{ borderRadius: 1 }}
+                                animation="wave"
+                                sx={{
+                                    ...skeletonSx,
+                                    borderRadius: 1,
+                                }}
                             />
                         </Stack>
 
@@ -96,14 +153,22 @@ export default function FeedbackListSkeleton() {
                             variant="text"
                             width={item === 2 ? "75%" : "45%"}
                             height={20}
-                            sx={{ transform: "none" }}
+                            animation="wave"
+                            sx={{
+                                ...skeletonSx,
+                                transform: "none",
+                            }}
                         />
 
                         <Skeleton
                             variant="text"
                             width={135}
                             height={19}
-                            sx={{ transform: "none" }}
+                            animation="wave"
+                            sx={{
+                                ...skeletonSx,
+                                transform: "none",
+                            }}
                         />
                     </Stack>
                 </Box>

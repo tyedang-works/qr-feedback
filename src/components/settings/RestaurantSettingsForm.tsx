@@ -423,6 +423,7 @@ export default function RestaurantSettingsForm({
                                                 display: "flex",
                                                 justifyContent: "flex-end",
                                                 pt: 1,
+                                                pb: 2,
                                             }}
                                         >
                                             <Button

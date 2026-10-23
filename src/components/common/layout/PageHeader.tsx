@@ -34,9 +34,10 @@ export default function PageHeader({
                     borderRadius: "16px",
                     bgcolor: "var(--color-surface, #FFFFFF)",
                     boxShadow: "var(--shadow-card)",
+                    color: "var(--color-text-secondary, #667085)",
                 }}
             >
-                <Icon size={21} strokeWidth={2} aria-hidden="true" />
+                <Icon size={21} strokeWidth={1.8} aria-hidden="true" />
             </Box>
 
             <Box sx={{ minWidth: 0 }}>
@@ -45,8 +46,9 @@ export default function PageHeader({
                     sx={{
                         fontSize: { xs: 18, sm: 20 },
                         lineHeight: 1.4,
-                        fontWeight: 700,
-                        color: "#193B56",
+                        fontWeight: 650,
+                        letterSpacing: "-0.35px",
+                        color: "var(--color-text-primary, #111827)",
                     }}
                 >
                     {title}
@@ -54,9 +56,11 @@ export default function PageHeader({
 
                 <Typography
                     sx={{
-                        fontSize: 14,
+                        mt: 0.25,
+                        fontSize: 13,
                         lineHeight: 1.6,
-                        color: "#667085",
+                        fontWeight: 400,
+                        color: "var(--color-text-secondary, #6B7280)",
                     }}
                 >
                     {subtitle}

@@ -2,7 +2,7 @@
 
 import { buttonBaseSx } from "@/styles/button.styles";
 import { Box, Button, Typography } from "@mui/material";
-import { Printer, X } from "lucide-react";
+import { CircleCheck, Printer, X } from "lucide-react";
 
 type QRCodeSelectionToolbarProps = {
     selectedCount: number;
@@ -35,9 +35,9 @@ export default function QRCodeSelectionToolbar({
                 minHeight: 52,
                 px: 2,
                 py: 1,
-                border: "1px solid #d0d5dd",
+                border: "1px solid var(--color-border)",
                 borderRadius: 2,
-                backgroundColor: "#f9fafb",
+                backgroundColor: "var(--color-surface)",
                 flexDirection: "row",
                 "@media (max-width: 767px)": {
                     alignItems: "stretch",
@@ -65,13 +65,26 @@ export default function QRCodeSelectionToolbar({
             >
                 <Typography
                     sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
                         flexShrink: 0,
                         fontSize: 14,
                         fontWeight: 500,
-                        color: "#344054",
+                        lineHeight: 1.5,
+                        color: "var(--color-text-primary)",
                     }}
                 >
-                    ✓ {selectedCount} bàn đã chọn
+                    <Box
+                        component="span"
+                        sx={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            mr: 0.75,
+                        }}
+                    >
+                        <CircleCheck size={16} strokeWidth={2} />
+                    </Box>
+                    {selectedCount} bàn đã chọn
                 </Typography>
 
                 {showSelectAll && selectableTotal > selectedCount && (
@@ -89,11 +102,16 @@ export default function QRCodeSelectionToolbar({
                             justifyContent: "flex-start",
                             textAlign: "left",
                             whiteSpace: "normal",
-                            color: "#1976d2",
+
+                            color: "var(--color-table-edit)",
+                            textDecoration: "none",
+                            textUnderlineOffset: "3px",
+                            textDecorationThickness: "1px",
 
                             "&:hover": {
                                 backgroundColor: "transparent",
                                 textDecoration: "underline",
+                                opacity: 0.8,
                             },
 
                             "@media (max-width: 767px)": {
@@ -147,11 +165,11 @@ export default function QRCodeSelectionToolbar({
                         border: 0,
                         borderRadius: 1,
                         backgroundColor: "transparent",
-                        color: "#667085",
+                        color: "var(--color-text-secondary)",
                         cursor: "pointer",
 
                         "&:hover": {
-                            backgroundColor: "#eaecf0",
+                            backgroundColor: "var(--bg-table-edit-hover)",
                         },
                     }}
                 >

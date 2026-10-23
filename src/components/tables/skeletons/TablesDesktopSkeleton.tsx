@@ -24,7 +24,9 @@ export default function TablesDesktopSkeleton() {
                         gap: 2,
                         px: 2.5,
                         py: 1.5,
-                        backgroundColor: "#f8fafc",
+                        height: 56,
+                        backgroundColor: "var(--color-table-header-bg)",
+                        borderRadius: "8px",
                     }}
                 >
                     {headers.map((width, index) => (
@@ -40,14 +42,14 @@ export default function TablesDesktopSkeleton() {
                                 sx={{
                                     width,
                                     maxWidth: "100%",
-                                    height: 22,
+                                    height: 32,
+                                    bgcolor:
+                                        "var(--color-table-header-skeleton)",
                                 }}
                             />
                         </Stack>
                     ))}
                 </Box>
-
-                <Box sx={{ borderTop: "1px solid #eaecf0" }} />
 
                 {Array.from({ length: 6 }).map((_, index) => (
                     <Box key={index}>
@@ -127,7 +129,12 @@ export default function TablesDesktopSkeleton() {
                         </Box>
 
                         {index < 5 && (
-                            <Box sx={{ borderTop: "1px solid #eaecf0" }} />
+                            <Box
+                                sx={{
+                                    borderTop:
+                                        "1px solid var(--color-donut-skeleton, #eaecf0)",
+                                }}
+                            />
                         )}
                     </Box>
                 ))}

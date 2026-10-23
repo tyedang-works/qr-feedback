@@ -88,7 +88,7 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                           {
                               name: "Còn lại",
                               value: Math.max(total - value, 0),
-                              color: "#F2F4F7",
+                              color: "var(--color-surface-active, #F3F4F6)",
                           },
                       ];
 
@@ -117,7 +117,7 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                                         fontSize: { xs: 13, sm: 15 },
                                         lineHeight: 1.5,
                                         fontWeight: 600,
-                                        color: "#193B56",
+                                        color: "var(--color-text-secondary, #193B56)",
                                     }}
                                 >
                                     {item.label}
@@ -125,7 +125,7 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
 
                                 <MiniDonutChart
                                     data={chartData}
-                                    size={60}
+                                    size={68}
                                     centerLabel={
                                         isTotal
                                             ? formatNumber(total)
@@ -150,7 +150,7 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                                         lineHeight: 1.2,
                                         fontWeight: 700,
                                         letterSpacing: "-0.7px",
-                                        color: "#193B56",
+                                        color: "var(--color-text-primary, #193B56)",
                                         fontVariantNumeric: "tabular-nums",
                                     }}
                                 >
@@ -162,7 +162,7 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                                 sx={{
                                     fontSize: 12,
                                     lineHeight: 1.5,
-                                    color: "#667085",
+                                    color: "var(--color-text-secondary, #667085)",
                                 }}
                             >
                                 {isTotal

@@ -31,7 +31,7 @@ export default function QRCodeBulkPrintView({
                 width: "100%",
                 minHeight: "100vh",
                 boxSizing: "border-box",
-                backgroundColor: "#f2f4f7",
+                backgroundColor: "var(--color-background)",
                 py: { xs: 2, md: 4 },
                 px: { xs: 1.5, md: 2 },
                 "@media print": {
@@ -67,7 +67,7 @@ export default function QRCodeBulkPrintView({
                         sx={{
                             fontSize: 20,
                             fontWeight: 700,
-                            color: "#193B56",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         In mã QR
@@ -114,7 +114,8 @@ export default function QRCodeBulkPrintView({
                         alignItems: "stretch",
                         "@media print": {
                             gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                            gap: 1,
+                            gap: "6px",
+                            alignItems: "start",
                         },
                     }}
                 >
@@ -133,17 +134,20 @@ export default function QRCodeBulkPrintView({
                                     minWidth: 0,
                                     minHeight: 320,
                                     p: { xs: 2, md: 3 },
-                                    border: "1px solid #eaecf0",
+                                    border: "1px solid var(--color-border)",
                                     borderRadius: 2,
-                                    backgroundColor: "#ffffff",
+                                    backgroundColor: "var(--color-surface)",
                                     boxSizing: "border-box",
                                     breakInside: "avoid",
                                     pageBreakInside: "avoid",
+
                                     "@media print": {
                                         minHeight: 0,
-                                        p: 1.5,
+                                        p: "8px 6px",
                                         border: "1px solid #eaecf0",
-                                        borderRadius: 1,
+                                        borderRadius: "4px",
+                                        backgroundColor: "#ffffff",
+                                        justifyContent: "flex-start",
                                     },
                                 }}
                             >
@@ -152,8 +156,11 @@ export default function QRCodeBulkPrintView({
                                         fontSize: { xs: 16, md: 18 },
                                         lineHeight: 1.4,
                                         fontWeight: 700,
-                                        color: "#193B56",
+                                        color: "var(--color-text-primary)",
                                         textAlign: "center",
+                                        "@media print": {
+                                            color: "#193b56",
+                                        },
                                     }}
                                 >
                                     QR Feedback
@@ -165,9 +172,12 @@ export default function QRCodeBulkPrintView({
                                         fontSize: { xs: 18, md: 20 },
                                         lineHeight: 1.4,
                                         fontWeight: 700,
-                                        color: "#1A202E",
+                                        color: "var(--color-text-primary)",
                                         textAlign: "center",
                                         overflowWrap: "anywhere",
+                                        "@media print": {
+                                            color: "#1a202e",
+                                        },
                                     }}
                                 >
                                     {table.name}
@@ -208,8 +218,11 @@ export default function QRCodeBulkPrintView({
                                         fontSize: 14,
                                         lineHeight: 1.5,
                                         fontWeight: 500,
-                                        color: "#344054",
+                                        color: "var(--color-text-secondary)",
                                         textAlign: "center",
+                                        "@media print": {
+                                            color: "#344054",
+                                        },
                                     }}
                                 >
                                     Quét mã để gửi phản hồi
@@ -221,9 +234,12 @@ export default function QRCodeBulkPrintView({
                                         mt: 0.75,
                                         fontSize: 10,
                                         lineHeight: 1.4,
-                                        color: "#98a2b3",
+                                        color: "var(--color-text-muted)",
                                         textAlign: "center",
                                         overflowWrap: "anywhere",
+                                        "@media print": {
+                                            color: "#98a2b3",
+                                        },
                                     }}
                                 >
                                     {qrUrl}

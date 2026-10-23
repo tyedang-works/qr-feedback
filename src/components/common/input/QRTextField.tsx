@@ -50,31 +50,48 @@ export default function QRTextField({
                     {
                         "& .MuiOutlinedInput-root": {
                             borderRadius: multiline ? 2 : 1,
-                            backgroundColor: "#ffffff",
+                            backgroundColor:
+                                "var(--color-input-background, var(--color-surface, #FFFFFF))",
+                            color: "var(--color-text-primary, #111827)",
+                            transition:
+                                "background-color 150ms ease, border-color 150ms ease",
 
                             ...(multiline && {
                                 padding: 0,
                             }),
 
                             "& fieldset": {
-                                borderColor: "#d0d5dd",
+                                borderColor:
+                                    "var(--color-input-border, var(--color-border, #D0D5DD))",
                             },
 
                             "&:hover fieldset": {
-                                borderColor: "#98a2b3",
+                                borderColor:
+                                    "var(--color-input-border-hover, #98A2B3)",
                             },
 
                             "&.Mui-focused fieldset": {
-                                borderColor: "#193B56",
+                                borderColor:
+                                    "var(--color-input-focus, #193B56)",
                                 borderWidth: 1,
                             },
 
                             "&.Mui-error fieldset": {
-                                borderColor: "#d92d20",
+                                borderColor: "#D92D20",
                             },
 
                             "&.Mui-error.Mui-focused fieldset": {
-                                borderColor: "#d92d20",
+                                borderColor: "#D92D20",
+                            },
+
+                            "&.Mui-disabled": {
+                                backgroundColor:
+                                    "var(--color-surface-hover, #F9FAFB)",
+                            },
+                            "& textarea::placeholder": {
+                                fontSize: "13px",
+                                opacity: 0.8,
+                                fontFamily: "var(--font-momo-trust-sans)",
                             },
                         },
 
@@ -83,8 +100,10 @@ export default function QRTextField({
                             height: "42px",
                             padding: "10px 12px",
                             fontSize: 14,
-                            lineHeight: 1,
-                            color: "#344054",
+                            lineHeight: 1.4,
+                            color: "var(--color-text-primary, #111827)",
+                            WebkitTextFillColor:
+                                "var(--color-text-primary, #111827)",
                         },
 
                         "& .MuiOutlinedInput-inputMultiline": {
@@ -93,24 +112,41 @@ export default function QRTextField({
                             minHeight: "unset",
                             padding: "8px 10px",
                             fontSize: 13,
-                            lineHeight: 1.5,
-                            color: "#344054",
+                            lineHeight: 1.6,
+                            color: "var(--color-text-primary, #111827)",
                             resize: "vertical",
                         },
 
                         "& .MuiInputBase-input::placeholder": {
-                            color: "#98a2b3",
+                            color: "var(--color-text-muted, #98A2B3)",
                             opacity: 1,
+                        },
+
+                        "& .MuiInputBase-input.Mui-disabled": {
+                            WebkitTextFillColor:
+                                "var(--color-text-muted, #98A2B3)",
                         },
 
                         "& input::-ms-reveal, & input::-ms-clear": {
                             display: "none",
                         },
+
                         "& input::-webkit-credentials-auto-fill-button": {
                             visibility: "hidden",
                             display: "none !important",
                             pointerEvents: "none",
                         },
+                        "& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus":
+                            {
+                                WebkitBoxShadow:
+                                    "0 0 0 1000px var(--color-surface, #FFFFFF) inset",
+                                WebkitTextFillColor:
+                                    "var(--color-text-primary, #111827)",
+                                caretColor:
+                                    "var(--color-text-primary, #111827)",
+                                transition:
+                                    "background-color 9999s ease-out 0s",
+                            },
                     },
                     ...(Array.isArray(sx) ? sx : [sx]),
                 ]}

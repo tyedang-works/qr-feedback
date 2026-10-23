@@ -6,23 +6,35 @@ import type { LucideIcon } from "lucide-react";
 
 const tabSx = {
     minHeight: 56,
-    borderBottom: "1px solid #EAECF0",
+    borderBottom: "1px solid var(--color-border)",
+
     "& .MuiTab-root": {
         minHeight: 56,
         textTransform: "none",
         fontSize: 13,
         fontWeight: 500,
-        color: "#667085",
+        color: "var(--color-text-secondary)",
         gap: 1,
+
+        "&:hover": {
+            color: "var(--color-text-primary)",
+            backgroundColor: "var(--color-surface-hover)",
+        },
+
+        "&.Mui-selected": {
+            color: "var(--color-tab-selected)",
+            fontWeight: 700,
+        },
+
+        "&.Mui-disabled": {
+            color: "var(--color-text-muted)",
+        },
     },
-    "& .Mui-selected": {
-        color: "#193B56 !important",
-        fontWeight: 600,
-    },
+
     "& .MuiTabs-indicator": {
-        height: 2,
-        borderRadius: "2px 2px 0 0",
-        bgcolor: "#237A62",
+        height: 3,
+        borderRadius: 0,
+        bgcolor: "var(--color-tab-indicator)",
     },
 };
 

@@ -5,8 +5,8 @@ export const formLabelSx: SxProps<Theme> = {
     mb: 0.75,
     fontSize: 13,
     lineHeight: 1.5,
-    fontWeight: 600,
-    color: "#1A202E",
+    fontWeight: 500,
+    color: "var(--color-text-secondary, #667085)",
 };
 
 export const formErrorSx: SxProps<Theme> = {
@@ -34,18 +34,24 @@ export const checkboxStyleSx: SxProps<Theme> = {
     m: 0,
     flexShrink: 0,
     borderRadius: 1,
-    color: "#98A2B3",
+
+    color: "var(--color-text-muted)",
 
     "& .MuiSvgIcon-root": {
         fontSize: 20,
     },
 
     "&:hover": {
-        backgroundColor: "rgba(25, 59, 86, 0.06)",
+        backgroundColor: "var(--bg-table-edit-hover)",
     },
 
     "&.Mui-checked, &.MuiCheckbox-indeterminate": {
-        color: "#1976D2",
+        color: "var(--color-table-edit)",
+    },
+
+    "&.Mui-disabled": {
+        color: "var(--color-text-muted)",
+        opacity: 0.5,
     },
 
     "& .MuiTouchRipple-root": {

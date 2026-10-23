@@ -32,11 +32,46 @@ type IssueDistributionProps = {
     data: IssueWeeklyComparisonItem[];
 };
 
-const CURRENT_COLOR = "#008F78";
-const PREVIOUS_COLOR = "#B8DDD7";
+const CURRENT_COLOR = "var(--color-chart-current)";
+const PREVIOUS_COLOR = "var(--color-chart-previous)";
 
 const numberFormatter = new Intl.NumberFormat("vi-VN");
 const currentDate = new Date();
+
+const chartTickStyle = {
+    fontSize: 11,
+    fill: "var(--color-text-secondary)",
+    fontFamily: "var(--font-momo-trust-sans), sans-serif",
+};
+
+const periodButtonSx = (selected: boolean) => ({
+    px: 1.5,
+    py: 0.75,
+    border: "1px solid",
+    borderColor: selected ? "var(--color-text-primary)" : "var(--color-border)",
+    borderRadius: 1.5,
+    bgcolor: selected ? "var(--color-text-primary)" : "transparent",
+    color: selected ? "var(--color-background)" : "var(--color-text-secondary)",
+    fontSize: 12,
+    lineHeight: 1.4,
+    fontWeight: 600,
+    textTransform: "none",
+    whiteSpace: "nowrap",
+    boxShadow: "none",
+    "&:hover": {
+        bgcolor: selected
+            ? "var(--color-text-primary)"
+            : "var(--color-surface-hover)",
+        borderColor: selected
+            ? "var(--color-text-primary)"
+            : "var(--color-input-border-hover)",
+        boxShadow: "none",
+    },
+    "&.Mui-focusVisible": {
+        outline: "2px solid var(--color-input-focus)",
+        outlineOffset: 2,
+    },
+});
 
 const MONTH_OPTIONS = Array.from({ length: 12 }, (_, index) => ({
     value: index + 1,
@@ -96,6 +131,8 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
     };
 
     const handleSelectWeek = () => {
+        setIsLoading(false);
+        setErrorMessage("");
         setPeriod("week");
         setPeriodAnchor(null);
     };
@@ -223,37 +260,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                         size="small"
                         aria-pressed={period === "week"}
                         onClick={handleSelectWeek}
-                        sx={{
-                            px: 1.5,
-                            py: 0.75,
-                            border: "1px solid",
-                            borderColor:
-                                period === "week"
-                                    ? "var(--color-primary, #111827)"
-                                    : "var(--color-border, #E5E7EB)",
-                            borderRadius: 1.5,
-                            bgcolor:
-                                period === "week"
-                                    ? "var(--color-primary, #111827)"
-                                    : "transparent",
-                            color:
-                                period === "week"
-                                    ? "#FFFFFF"
-                                    : "var(--color-text-secondary, #667085)",
-                            fontSize: 12,
-                            lineHeight: 1.4,
-                            fontWeight: 600,
-                            textTransform: "none",
-                            whiteSpace: "nowrap",
-                            boxShadow: "none",
-                            "&:hover": {
-                                bgcolor:
-                                    period === "week"
-                                        ? "var(--color-primary, #111827)"
-                                        : "var(--color-surface-hover, #F9FAFB)",
-                                boxShadow: "none",
-                            },
-                        }}
+                        sx={periodButtonSx(period === "week")}
                     >
                         7 ngày
                     </Button>
@@ -264,37 +271,9 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                         aria-haspopup="dialog"
                         aria-expanded={isPeriodPopoverOpen}
                         onClick={handleOpenPeriodPopover}
-                        sx={{
-                            px: 1.5,
-                            py: 0.75,
-                            border: "1px solid",
-                            borderColor:
-                                period === "month" || isPeriodPopoverOpen
-                                    ? "var(--color-primary, #111827)"
-                                    : "var(--color-border, #E5E7EB)",
-                            borderRadius: 1.5,
-                            bgcolor:
-                                period === "month" || isPeriodPopoverOpen
-                                    ? "var(--color-primary, #111827)"
-                                    : "transparent",
-                            color:
-                                period === "month" || isPeriodPopoverOpen
-                                    ? "#FFFFFF"
-                                    : "var(--color-text-secondary, #667085)",
-                            fontSize: 12,
-                            lineHeight: 1.4,
-                            fontWeight: 600,
-                            textTransform: "none",
-                            whiteSpace: "nowrap",
-                            boxShadow: "none",
-                            "&:hover": {
-                                bgcolor:
-                                    period === "month" || isPeriodPopoverOpen
-                                        ? "var(--color-primary, #111827)"
-                                        : "var(--color-surface-hover, #F9FAFB)",
-                                boxShadow: "none",
-                            },
-                        }}
+                        sx={periodButtonSx(
+                            period === "month" || isPeriodPopoverOpen,
+                        )}
                     >
                         Theo tháng
                     </Button>
@@ -321,10 +300,11 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                     },
                                     maxWidth: 350,
                                     p: 2.5,
-                                    border: "1px solid #EAECF0",
+                                    border: "1px solid var(--color-border)",
                                     borderRadius: 2,
-                                    boxShadow:
-                                        "0 12px 28px rgba(16, 24, 40, 0.14)",
+                                    bgcolor: "var(--color-surface)",
+                                    color: "var(--color-text-primary)",
+                                    boxShadow: "var(--shadow-card)",
                                 },
                             },
                         }}
@@ -335,7 +315,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                     sx={{
                                         fontSize: 15,
                                         fontWeight: 700,
-                                        color: "#193B56",
+                                        color: "var(--color-text-primary)",
                                     }}
                                 >
                                     Chọn thời gian
@@ -346,7 +326,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                         mt: 0.5,
                                         fontSize: 12,
                                         lineHeight: 1.6,
-                                        color: "#667085",
+                                        color: "var(--color-text-secondary)",
                                     }}
                                 >
                                     So sánh số lượt phản hồi của tháng đã chọn
@@ -380,7 +360,12 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                             <MenuItem
                                                 key={option.value}
                                                 value={option.value}
-                                                sx={{ fontSize: 13 }}
+                                                sx={{
+                                                    fontSize: 13,
+                                                    bgcolor:
+                                                        "var(--color-surface)",
+                                                    color: "var(--color-text-primary)",
+                                                }}
                                             >
                                                 {option.label}
                                             </MenuItem>
@@ -407,7 +392,12 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                             <MenuItem
                                                 key={year}
                                                 value={year}
-                                                sx={{ fontSize: 13 }}
+                                                sx={{
+                                                    fontSize: 13,
+                                                    bgcolor:
+                                                        "var(--color-surface)",
+                                                    color: "var(--color-text-primary)",
+                                                }}
                                             >
                                                 {year}
                                             </MenuItem>
@@ -470,10 +460,16 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             height: 9,
                             borderRadius: "50%",
                             bgcolor: CURRENT_COLOR,
+                            flexShrink: 0,
                         }}
                     />
 
-                    <Typography sx={{ fontSize: 12, color: "#475467" }}>
+                    <Typography
+                        sx={{
+                            fontSize: 12,
+                            color: "var(--color-text-secondary)",
+                        }}
+                    >
                         {displayedResult.currentLabel}
                     </Typography>
                 </Stack>
@@ -491,10 +487,16 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             height: 9,
                             borderRadius: "50%",
                             bgcolor: PREVIOUS_COLOR,
+                            flexShrink: 0,
                         }}
                     />
 
-                    <Typography sx={{ fontSize: 12, color: "#475467" }}>
+                    <Typography
+                        sx={{
+                            fontSize: 12,
+                            color: "var(--color-text-secondary)",
+                        }}
+                    >
                         {displayedResult.previousLabel}
                     </Typography>
                 </Stack>
@@ -522,7 +524,12 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                         justifyContent: "center",
                     }}
                 >
-                    <Typography sx={{ fontSize: 13, color: "#B42318" }}>
+                    <Typography
+                        sx={{
+                            fontSize: 13,
+                            color: "var(--color-feedback-status-new-text, #B42318)",
+                        }}
+                    >
                         {errorMessage}
                     </Typography>
                 </Box>
@@ -574,7 +581,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             }}
                         >
                             <CartesianGrid
-                                stroke="#EAECF0"
+                                stroke="var(--color-chart-track)"
                                 strokeDasharray="3 3"
                                 horizontal={false}
                             />
@@ -583,12 +590,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                 type="number"
                                 allowDecimals={false}
                                 domain={[0, "auto"]}
-                                tick={{
-                                    fontSize: 11,
-                                    fill: "#667085",
-                                    fontFamily:
-                                        "var(--font-momo-trust-sans), sans-serif",
-                                }}
+                                tick={chartTickStyle}
                                 tickLine={false}
                                 axisLine={false}
                                 tickMargin={8}
@@ -599,12 +601,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                 dataKey="label"
                                 width={155}
                                 interval={0}
-                                tick={{
-                                    fontSize: 11,
-                                    fill: "#344054",
-                                    fontFamily:
-                                        "var(--font-momo-trust-sans), sans-serif",
-                                }}
+                                tick={chartTickStyle}
                                 tickLine={false}
                                 axisLine={false}
                                 tickMargin={8}
@@ -612,7 +609,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
 
                             <Tooltip
                                 cursor={{
-                                    fill: "rgba(0, 143, 120, 0.05)",
+                                    fill: "var(--color-surface-hover)",
                                 }}
                                 isAnimationActive={false}
                                 formatter={(value, name) => [
@@ -624,17 +621,17 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                         : displayedResult.previousLabel,
                                 ]}
                                 contentStyle={{
-                                    border: "1px solid #E5E7EB",
+                                    border: "1px solid var(--color-border)",
                                     borderRadius: 10,
                                     fontSize: 12,
                                     fontFamily:
                                         "var(--font-momo-trust-sans), sans-serif",
-                                    backgroundColor: "#FFFFFF",
-                                    boxShadow:
-                                        "0 4px 12px rgba(17, 24, 39, 0.08)",
+                                    backgroundColor: "var(--color-surface)",
+                                    color: "var(--color-text-primary)",
+                                    boxShadow: "var(--shadow-card)",
                                 }}
                                 labelStyle={{
-                                    color: "#344054",
+                                    color: "var(--color-text-primary)",
                                     fontWeight: 600,
                                     marginBottom: 6,
                                 }}

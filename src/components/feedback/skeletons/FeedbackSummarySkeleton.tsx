@@ -1,6 +1,14 @@
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Skeleton, Stack } from "@mui/material";
 
+const skeletonSx = {
+    bgcolor: "var(--color-skeleton, rgba(145, 158, 171, 0.16))",
+    "&::after": {
+        background:
+            "linear-gradient(90deg, transparent, var(--color-skeleton-highlight, rgba(255, 255, 255, 0.12)), transparent)",
+    },
+};
+
 function DonutSkeleton() {
     return (
         <Box
@@ -18,9 +26,7 @@ function DonutSkeleton() {
                 width={60}
                 height={60}
                 animation="wave"
-                sx={{
-                    bgcolor: "#EAECF0",
-                }}
+                sx={skeletonSx}
             />
 
             <Box
@@ -29,7 +35,7 @@ function DonutSkeleton() {
                     width: 42,
                     height: 42,
                     borderRadius: "50%",
-                    bgcolor: "#FFFFFF",
+                    bgcolor: "var(--color-surface, #FFFFFF)",
                     pointerEvents: "none",
                 }}
             />
@@ -38,8 +44,17 @@ function DonutSkeleton() {
 }
 
 function FeedbackSummaryCardSkeleton({ index }: { index: number }) {
+    const titleWidths = [100, 88, 100, 80];
+    const descriptionWidths = [145, 155, 155, 145];
+
     return (
-        <Card elevation={0} sx={cardSx}>
+        <Card
+            elevation={0}
+            sx={{
+                ...cardSx,
+                boxShadow: "none",
+            }}
+        >
             <Stack
                 sx={{
                     height: "100%",
@@ -59,10 +74,11 @@ function FeedbackSummaryCardSkeleton({ index }: { index: number }) {
                 >
                     <Skeleton
                         variant="text"
-                        width={[100, 88, 100, 80][index]}
+                        width={titleWidths[index]}
                         height={24}
                         animation="wave"
                         sx={{
+                            ...skeletonSx,
                             transform: "none",
                             flex: "0 1 auto",
                             maxWidth: "100%",
@@ -85,16 +101,20 @@ function FeedbackSummaryCardSkeleton({ index }: { index: number }) {
                         width={index === 0 ? 54 : 42}
                         height={38}
                         animation="wave"
-                        sx={{ transform: "none" }}
+                        sx={{
+                            ...skeletonSx,
+                            transform: "none",
+                        }}
                     />
                 </Stack>
 
                 <Skeleton
                     variant="text"
-                    width={index === 0 ? 145 : 155}
+                    width={descriptionWidths[index]}
                     height={18}
                     animation="wave"
                     sx={{
+                        ...skeletonSx,
                         transform: "none",
                         maxWidth: "100%",
                     }}

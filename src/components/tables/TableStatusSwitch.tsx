@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
 import { Box, CircularProgress, Switch, Typography } from "@mui/material";
-
 import { updateTableStatusAction } from "@/app/dashboard/tables/actions";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import {
@@ -29,7 +27,6 @@ export default function TableStatusSwitch({
     canManageTables,
 }: TableStatusSwitchProps) {
     const [checked, setChecked] = useState(isActive);
-
     const [loading, setLoading] = useState(false);
 
     const [snackbar, setSnackbar] = useState<SnackbarState>({
@@ -68,11 +65,8 @@ export default function TableStatusSwitch({
                     : "Đã tắt bàn thành công.",
                 severity: "success",
             });
-        } catch (error) {
-            console.error("Failed to update table status:", error);
-
+        } catch {
             setChecked(previousValue);
-
             setSnackbar({
                 open: true,
                 message: "Đã xảy ra lỗi. Vui lòng thử lại.",
@@ -127,7 +121,7 @@ export default function TableStatusSwitch({
                                 size={12}
                                 thickness={5}
                                 sx={{
-                                    color: "#ffffff",
+                                    color: "var(--color-text-primary, #FFFFFF)",
                                 }}
                             />
                         </Box>

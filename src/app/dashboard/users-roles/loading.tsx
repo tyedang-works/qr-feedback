@@ -7,6 +7,10 @@ const SKELETON_ROW_COUNT = 5;
 
 const TABLE_HEADER_WIDTHS = [150, 100, 50, 65];
 
+const skeletonSx = {
+    bgcolor: "var(--color-skeleton)",
+};
+
 function UserRowSkeleton() {
     return (
         <Box
@@ -22,14 +26,14 @@ function UserRowSkeleton() {
                 p: { xs: 2, md: 0 },
                 px: { md: 3 },
                 border: {
-                    xs: "1px solid #EAECF0",
+                    xs: "1px solid var(--color-border)",
                     md: "none",
                 },
-                borderBottom: "1px solid #EAECF0",
+                borderBottom: "1px solid var(--color-border)",
                 borderRadius: { xs: 2, md: 0 },
-                bgcolor: "#FFFFFF",
+                bgcolor: "var(--color-surface)",
                 boxShadow: {
-                    xs: "0 1px 2px rgba(16, 24, 40, 0.03)",
+                    xs: "var(--shadow-card)",
                     md: "none",
                 },
             }}
@@ -37,7 +41,7 @@ function UserRowSkeleton() {
             <Stack
                 sx={{
                     flexDirection: "row",
-                    alignItems: "center",
+                    alignItems: { xs: "flex-start", md: "center" },
                     gap: 1.5,
                     minWidth: 0,
                 }}
@@ -46,29 +50,52 @@ function UserRowSkeleton() {
                     variant="circular"
                     width={40}
                     height={40}
-                    sx={{ flexShrink: 0 }}
+                    sx={{
+                        ...skeletonSx,
+                        flexShrink: 0,
+                        display: { xs: "none", md: "block" },
+                    }}
                 />
 
                 <Stack sx={{ flex: 1, minWidth: 0, gap: 0.5 }}>
                     <Skeleton
                         variant="text"
-                        sx={{ width: 120, maxWidth: "85%", height: 22 }}
+                        sx={{
+                            ...skeletonSx,
+                            width: 120,
+                            maxWidth: "85%",
+                            height: 22,
+                        }}
                     />
 
                     <Skeleton
                         variant="text"
                         sx={{
+                            ...skeletonSx,
                             display: { xs: "block", md: "none" },
                             width: "75%",
                             height: 20,
                         }}
                     />
                 </Stack>
+
+                <Skeleton
+                    variant="rounded"
+                    sx={{
+                        ...skeletonSx,
+                        display: { xs: "block", md: "none" },
+                        width: 48,
+                        height: 26,
+                        borderRadius: 1.5,
+                        flexShrink: 0,
+                    }}
+                />
             </Stack>
 
             <Skeleton
                 variant="text"
                 sx={{
+                    ...skeletonSx,
                     display: { xs: "none", md: "block" },
                     width: "75%",
                     height: 22,
@@ -76,11 +103,13 @@ function UserRowSkeleton() {
             />
 
             <Skeleton
-                variant="text"
+                variant="rounded"
                 sx={{
+                    ...skeletonSx,
                     display: { xs: "none", md: "block" },
                     width: 55,
                     height: 26,
+                    borderRadius: 1.5,
                 }}
             />
 
@@ -96,6 +125,7 @@ function UserRowSkeleton() {
                     variant="text"
                     animation="wave"
                     sx={{
+                        ...skeletonSx,
                         width: 55,
                         height: 22,
                         transform: "none",
@@ -106,6 +136,7 @@ function UserRowSkeleton() {
                     variant="text"
                     animation="wave"
                     sx={{
+                        ...skeletonSx,
                         width: 48,
                         height: 22,
                         transform: "none",
@@ -118,48 +149,33 @@ function UserRowSkeleton() {
                     display: { xs: "flex", md: "none" },
                     flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 2,
+                    justifyContent: "flex-end",
+                    gap: 1.5,
                     pt: 1.5,
-                    borderTop: "1px solid #EAECF0",
+                    borderTop: "1px solid var(--color-border)",
                 }}
             >
                 <Skeleton
-                    variant="rounded"
+                    variant="text"
+                    animation="wave"
                     sx={{
+                        ...skeletonSx,
                         width: 55,
-                        height: 24,
-                        borderRadius: 1,
+                        height: 22,
+                        transform: "none",
                     }}
                 />
 
-                <Stack
+                <Skeleton
+                    variant="text"
+                    animation="wave"
                     sx={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 1.5,
+                        ...skeletonSx,
+                        width: 30,
+                        height: 22,
+                        transform: "none",
                     }}
-                >
-                    <Skeleton
-                        variant="text"
-                        animation="wave"
-                        sx={{
-                            width: 55,
-                            height: 22,
-                            transform: "none",
-                        }}
-                    />
-
-                    <Skeleton
-                        variant="text"
-                        animation="wave"
-                        sx={{
-                            width: 30,
-                            height: 22,
-                            transform: "none",
-                        }}
-                    />
-                </Stack>
+                />
             </Stack>
         </Box>
     );
@@ -172,9 +188,9 @@ function DesktopTableSkeleton() {
                 display: { xs: "none", md: "block" },
                 width: "100%",
                 minWidth: 0,
-                border: "1px solid #EAECF0",
+                border: "1px solid var(--color-border)",
                 borderRadius: 2,
-                bgcolor: "#FFFFFF",
+                bgcolor: "var(--color-surface)",
                 overflow: "hidden",
             }}
         >
@@ -185,15 +201,19 @@ function DesktopTableSkeleton() {
                     alignItems: "center",
                     minHeight: 52,
                     px: 3,
-                    bgcolor: "#F9FAFB",
-                    borderBottom: "1px solid #EAECF0",
+                    bgcolor: "var(--color-table-header-bg)",
+                    borderBottom: "1px solid var(--color-border)",
                 }}
             >
                 {TABLE_HEADER_WIDTHS.map((width, index) => (
                     <Skeleton
                         key={index}
                         variant="text"
-                        sx={{ width, height: 22 }}
+                        sx={{
+                            ...skeletonSx,
+                            width,
+                            height: 22,
+                        }}
                     />
                 ))}
             </Box>
@@ -230,7 +250,9 @@ export default function UsersRolesLoading() {
             action={
                 <Skeleton
                     variant="rounded"
+                    animation="wave"
                     sx={{
+                        ...skeletonSx,
                         width: { xs: "100%", sm: 169 },
                         height: 40,
                         borderRadius: 1.5,

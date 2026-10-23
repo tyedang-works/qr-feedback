@@ -4,15 +4,28 @@ const BAR_WIDTHS = ["76%", "52%", "26%", "26%", "26%"];
 
 const LABEL_WIDTHS = [92, 88, 92, 100, 90];
 
+const ISSUE_COLORS = [
+    "var(--color-chart-legend-current)",
+    "var(--color-chart-legend-previous)",
+];
+
+const skeletonSx = {
+    bgcolor: "var(--color-donut-skeleton)",
+    "&::after": {
+        background:
+            "linear-gradient(90deg, transparent, var(--color-surface-hover), transparent)",
+    },
+};
+
 export default function IssueDistributionSkeleton() {
     return (
         <Card
             elevation={0}
             sx={{
                 p: { xs: 2, sm: 2.5 },
-                border: "1px solid var(--color-border, #F0F2F5)",
+                border: "1px solid var(--color-border)",
                 borderRadius: "16px",
-                bgcolor: "var(--color-surface, #FFFFFF)",
+                bgcolor: "var(--color-surface)",
                 boxShadow: "var(--shadow-card)",
                 minWidth: 0,
                 height: "fit-content",
@@ -37,7 +50,7 @@ export default function IssueDistributionSkeleton() {
                         variant="text"
                         width={125}
                         height={24}
-                        sx={{ transform: "none" }}
+                        sx={{ ...skeletonSx, transform: "none" }}
                     />
 
                     <Skeleton
@@ -45,6 +58,7 @@ export default function IssueDistributionSkeleton() {
                         width={245}
                         height={21}
                         sx={{
+                            ...skeletonSx,
                             mt: 0.5,
                             transform: "none",
                         }}
@@ -62,14 +76,20 @@ export default function IssueDistributionSkeleton() {
                         variant="rounded"
                         width={65}
                         height={32}
-                        sx={{ borderRadius: "7px" }}
+                        sx={{
+                            ...skeletonSx,
+                            borderRadius: "7px",
+                        }}
                     />
 
                     <Skeleton
                         variant="rounded"
                         width={91}
                         height={32}
-                        sx={{ borderRadius: "7px" }}
+                        sx={{
+                            ...skeletonSx,
+                            borderRadius: "7px",
+                        }}
                     />
                 </Stack>
             </Stack>
@@ -93,13 +113,22 @@ export default function IssueDistributionSkeleton() {
                             gap: 0.75,
                         }}
                     >
-                        <Skeleton variant="circular" width={9} height={9} />
+                        <Box
+                            sx={{
+                                width: 9,
+                                height: 9,
+                                flexShrink: 0,
+                                borderRadius: "50%",
+                                bgcolor: ISSUE_COLORS[item - 1],
+                                opacity: 0.8,
+                            }}
+                        />
 
                         <Skeleton
                             variant="text"
                             width={item === 1 ? 105 : 100}
                             height={20}
-                            sx={{ transform: "none" }}
+                            sx={{ ...skeletonSx, transform: "none" }}
                         />
                     </Stack>
                 ))}
@@ -148,20 +177,23 @@ export default function IssueDistributionSkeleton() {
                                     variant="text"
                                     width={width}
                                     height={14}
-                                    sx={{ transform: "none" }}
+                                    sx={{
+                                        ...skeletonSx,
+                                        transform: "none",
+                                    }}
                                 />
 
-                                {index === 1 ||
-                                index === 2 ||
-                                index === 3 ||
-                                index === 4 ? (
+                                {index > 0 && (
                                     <Skeleton
                                         variant="text"
                                         width={index === 1 ? 54 : 48}
                                         height={14}
-                                        sx={{ transform: "none" }}
+                                        sx={{
+                                            ...skeletonSx,
+                                            transform: "none",
+                                        }}
                                     />
-                                ) : null}
+                                )}
                             </Stack>
                         ))}
                     </Stack>
@@ -176,7 +208,7 @@ export default function IssueDistributionSkeleton() {
                             justifyContent: "space-around",
                             py: 0.5,
                             backgroundImage:
-                                "repeating-linear-gradient(to right, transparent 0, transparent calc(25% - 1px), #EAECF0 calc(25% - 1px), #EAECF0 25%)",
+                                "repeating-linear-gradient(to right, transparent 0, transparent calc(25% - 1px), var(--color-border) calc(25% - 1px), var(--color-border) 25%)",
                             backgroundSize: "100% 100%",
                         }}
                     >
@@ -193,6 +225,7 @@ export default function IssueDistributionSkeleton() {
                                     width={width}
                                     height={12}
                                     sx={{
+                                        ...skeletonSx,
                                         borderRadius: "0 4px 4px 0",
                                     }}
                                 />
@@ -203,6 +236,7 @@ export default function IssueDistributionSkeleton() {
                                         width="25%"
                                         height={12}
                                         sx={{
+                                            ...skeletonSx,
                                             borderRadius: "0 4px 4px 0",
                                         }}
                                     />
@@ -228,7 +262,10 @@ export default function IssueDistributionSkeleton() {
                             variant="text"
                             width={8}
                             height={18}
-                            sx={{ transform: "none" }}
+                            sx={{
+                                ...skeletonSx,
+                                transform: "none",
+                            }}
                         />
                     ))}
                 </Stack>

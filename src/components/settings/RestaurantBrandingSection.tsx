@@ -688,6 +688,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                         justifyContent: "flex-end",
                         gap: 1,
                         pt: 2,
+                        pb: 2,
                         borderTop: "1px solid var(--color-border)",
                     }}
                 >
@@ -695,7 +696,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                         variant="outlined"
                         disabled={!hasChanges || loading}
                         onClick={handleCancelChanges}
-                        startIcon={<RotateCcw size={15} />}
+                        startIcon={<RotateCcw size={14} />}
                         sx={buttonBaseCancelSx}
                     >
                         Hủy thay đổi
@@ -709,7 +710,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                             loading ? (
                                 <CircularProgress size={15} color="inherit" />
                             ) : (
-                                <Save size={15} />
+                                <Save size={14} />
                             )
                         }
                         sx={{ ...buttonBaseSx, minWidth: 150 }}

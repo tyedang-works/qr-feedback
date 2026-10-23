@@ -5,28 +5,11 @@ import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
 import type { FeedbackListItem } from "@/lib/feedback/types";
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Chip, Divider, Stack, Typography } from "@mui/material";
+import FeedbackStatusChip from "../common/feedback/FeedbackStatusChip";
 
 type FeedbackDetailPanelProps = {
     data: FeedbackListItem;
 };
-
-const STATUS_CONFIG = {
-    new: {
-        label: "Chưa xử lý",
-        color: "#B54708",
-        backgroundColor: "#FFFAEB",
-    },
-    in_progress: {
-        label: "Đang xử lý",
-        color: "#175CD3",
-        backgroundColor: "#EFF8FF",
-    },
-    resolved: {
-        label: "Đã xử lý",
-        color: "#027A48",
-        backgroundColor: "#ECFDF3",
-    },
-} as const;
 
 function formatDateTime(value: string) {
     return new Intl.DateTimeFormat("vi-VN", {
@@ -40,34 +23,34 @@ function formatDateTime(value: string) {
     }).format(new Date(value));
 }
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
-    return (
-        <Typography
-            component="h3"
-            sx={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: "#193B56",
-                lineHeight: 1.5,
-            }}
-        >
-            {children}
-        </Typography>
-    );
-}
+const sectionTitleSx = {
+    fontSize: 14,
+    fontWeight: 600,
+    lineHeight: 1.5,
+    color: "var(--color-text-primary, #111827)",
+};
+
+const metadataLabelSx = {
+    fontSize: 12,
+    lineHeight: 1.5,
+    color: "var(--color-text-secondary, #667085)",
+};
+
+const dividerSx = {
+    borderColor: "var(--color-border, #E5E7EB)",
+};
 
 export default function FeedbackDetailPanel({
     data,
 }: FeedbackDetailPanelProps) {
-    const status = STATUS_CONFIG[data.status];
-
     return (
-        <Card elevation={0} sx={cardSx}>
+        <Card elevation={0} sx={{ ...cardSx, p: 0, overflow: "hidden" }}>
             <Stack sx={{ gap: 0 }}>
                 <Stack
                     sx={{
                         px: { xs: 2, md: 2.5 },
-                        py: 2,
+                        pt: 2.5,
+                        pb: 2,
                         gap: 1.5,
                     }}
                 >
@@ -83,10 +66,10 @@ export default function FeedbackDetailPanel({
                             <Typography
                                 component="h2"
                                 sx={{
-                                    fontSize: 17,
-                                    fontWeight: 700,
-                                    color: "#193B56",
-                                    lineHeight: 1.4,
+                                    fontSize: 16,
+                                    lineHeight: 1.5,
+                                    fontWeight: 650,
+                                    color: "var(--color-text-primary, #111827)",
                                 }}
                             >
                                 Chi tiết phản hồi
@@ -96,7 +79,8 @@ export default function FeedbackDetailPanel({
                                 sx={{
                                     mt: 0.5,
                                     fontSize: 12,
-                                    color: "#667085",
+                                    lineHeight: 1.5,
+                                    color: "var(--color-text-secondary, #667085)",
                                     overflowWrap: "anywhere",
                                 }}
                             >
@@ -104,50 +88,27 @@ export default function FeedbackDetailPanel({
                             </Typography>
                         </Box>
 
-                        <Chip
-                            label={status.label}
-                            size="small"
-                            sx={{
-                                flexShrink: 0,
-                                height: 26,
-                                color: status.color,
-                                backgroundColor: status.backgroundColor,
-                                fontSize: 12,
-                                fontWeight: 600,
-                                borderRadius: 1.5,
-                                "& .MuiChip-label": {
-                                    px: 1,
-                                },
-                            }}
-                        />
+                        <FeedbackStatusChip status={data.status} />
                     </Stack>
 
-                    <Divider sx={{ borderColor: "#EAECF0" }} />
+                    <Divider sx={dividerSx} />
 
                     <Stack
                         sx={{
                             flexDirection: "row",
                             flexWrap: "wrap",
-                            columnGap: 3,
+                            columnGap: 5,
                             rowGap: 1.5,
                         }}
                     >
-                        <Box>
-                            <Typography
-                                sx={{
-                                    fontSize: 12,
-                                    color: "#667085",
-                                }}
-                            >
-                                Bàn
-                            </Typography>
-
+                        <Box sx={{ minWidth: 80 }}>
+                            <Typography sx={metadataLabelSx}>Bàn</Typography>
                             <Typography
                                 sx={{
                                     mt: 0.5,
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    color: "#344054",
+                                    fontSize: 13,
+                                    fontWeight: 500,
+                                    color: "var(--color-text-primary, #111827)",
                                 }}
                             >
                                 {data.tableName}
@@ -155,21 +116,15 @@ export default function FeedbackDetailPanel({
                         </Box>
 
                         <Box>
-                            <Typography
-                                sx={{
-                                    fontSize: 12,
-                                    color: "#667085",
-                                }}
-                            >
+                            <Typography sx={metadataLabelSx}>
                                 Thời gian gửi
                             </Typography>
-
                             <Typography
                                 sx={{
                                     mt: 0.5,
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    color: "#344054",
+                                    fontSize: 13,
+                                    fontWeight: 500,
+                                    color: "var(--color-text-primary, #111827)",
                                 }}
                             >
                                 {formatDateTime(data.createdAt)}
@@ -178,27 +133,27 @@ export default function FeedbackDetailPanel({
                     </Stack>
                 </Stack>
 
-                <Divider sx={{ borderColor: "#EAECF0" }} />
+                <Divider sx={dividerSx} />
 
                 <Stack
                     sx={{
                         px: { xs: 2, md: 2.5 },
-                        py: 2.5,
-                        gap: 2.5,
+                        py: 2,
+                        gap: 2,
                     }}
                 >
                     <Box>
-                        <SectionHeading>
+                        <Typography component="h3" sx={sectionTitleSx}>
                             Vấn đề khách hàng ghi nhận
-                        </SectionHeading>
+                        </Typography>
 
                         {data.selectedOptions.length > 0 ? (
                             <Stack
                                 sx={{
-                                    mt: 1.25,
+                                    mt: 1,
                                     flexDirection: "row",
                                     flexWrap: "wrap",
-                                    gap: 1,
+                                    gap: 0.75,
                                 }}
                             >
                                 {data.selectedOptions.map((option) => (
@@ -212,16 +167,23 @@ export default function FeedbackDetailPanel({
                                         variant="outlined"
                                         sx={{
                                             height: "auto",
-                                            minHeight: 28,
+                                            minHeight: 27,
                                             maxWidth: "100%",
-                                            borderColor: "#D0D5DD",
-                                            borderRadius: 1.5,
-                                            color: "#475467",
+                                            borderColor:
+                                                "var(--color-border, #D9DEE5)",
+                                            borderRadius: 1,
+                                            bgcolor: "transparent",
+                                            color: "var(--color-text-secondary, #667085)",
                                             fontSize: 12,
+                                            fontWeight: 400,
                                             "& .MuiChip-label": {
                                                 display: "block",
                                                 whiteSpace: "normal",
                                                 py: 0.5,
+                                            },
+                                            '[data-theme="dark"] &': {
+                                                borderColor: "#414955",
+                                                color: "#B8C0CA",
                                             },
                                         }}
                                     />
@@ -230,35 +192,40 @@ export default function FeedbackDetailPanel({
                         ) : (
                             <Typography
                                 sx={{
-                                    mt: 1,
+                                    mt: 0.75,
                                     fontSize: 13,
-                                    color: "#98A2B3",
+                                    color: "var(--color-text-muted, #98A2B3)",
                                 }}
                             >
-                                Khách hàng không chọn vấn đề cụ thể.
+                                Không có vấn đề được chọn.
                             </Typography>
                         )}
                     </Box>
 
                     <Box>
-                        <SectionHeading>Nội dung phản hồi</SectionHeading>
+                        <Typography component="h3" sx={sectionTitleSx}>
+                            Nội dung phản hồi
+                        </Typography>
 
                         <Box
                             sx={{
-                                mt: 1.25,
-                                p: 1.75,
-                                backgroundColor: "#F9FAFB",
-                                border: "1px solid #EAECF0",
-                                borderRadius: 2,
+                                mt: 1,
+                                px: 1.5,
+                                py: 1.25,
+                                minHeight: 52,
+                                border: "1px solid var(--color-border, #E5E7EB)",
+                                borderRadius: 1.5,
+                                bgcolor: "var(--color-surface-hover, #F9FAFB)",
+                                '[data-theme="dark"] &': {
+                                    bgcolor: "#19212C",
+                                },
                             }}
                         >
                             <Typography
                                 sx={{
-                                    fontSize: 14,
-                                    lineHeight: 1.8,
-                                    color: data.feedback
-                                        ? "#344054"
-                                        : "#98A2B3",
+                                    fontSize: 13,
+                                    lineHeight: 1.7,
+                                    color: "var(--color-text-primary, #111827)",
                                     whiteSpace: "pre-wrap",
                                     overflowWrap: "anywhere",
                                 }}
@@ -270,23 +237,24 @@ export default function FeedbackDetailPanel({
                     </Box>
 
                     <Box>
-                        <SectionHeading>
+                        <Typography component="h3" sx={sectionTitleSx}>
                             Số điện thoại khách hàng
-                        </SectionHeading>
+                        </Typography>
 
                         <Typography
                             component="a"
                             href={`tel:${data.phone}`}
                             sx={{
                                 display: "inline-block",
-                                mt: 1,
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "#175CD3",
+                                mt: 0.5,
+                                fontSize: 13,
+                                fontWeight: 500,
+                                color: "var(--color-text-primary, #111827)",
                                 textDecoration: "none",
                                 overflowWrap: "anywhere",
                                 "&:hover": {
                                     textDecoration: "underline",
+                                    textUnderlineOffset: 3,
                                 },
                             }}
                         >
@@ -295,36 +263,30 @@ export default function FeedbackDetailPanel({
                     </Box>
                 </Stack>
 
-                <Divider sx={{ borderColor: "#EAECF0" }} />
+                <Divider sx={dividerSx} />
 
                 <Stack
                     sx={{
                         px: { xs: 2, md: 2.5 },
-                        py: 2.5,
-                        gap: 2,
+                        pt: 2,
+                        pb: 2.5,
+                        gap: 1.5,
                     }}
                 >
                     <Box>
-                        <Typography
-                            component="h3"
-                            sx={{
-                                fontSize: 16,
-                                fontWeight: 700,
-                                color: "#193B56",
-                            }}
-                        >
+                        <Typography component="h3" sx={sectionTitleSx}>
                             Xử lý phản hồi
                         </Typography>
 
                         <Typography
                             sx={{
                                 mt: 0.5,
-                                fontSize: 13,
+                                fontSize: 12,
                                 lineHeight: 1.6,
-                                color: "#667085",
+                                color: "var(--color-text-secondary, #667085)",
                             }}
                         >
-                            Cập nhật trạng thái và ghi chú nội bộ cho nhân viên.
+                            Cập nhật trạng thái và ghi chú nội bộ.
                         </Typography>
                     </Box>
 

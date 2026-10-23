@@ -3,7 +3,11 @@
 import { deleteTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
-import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
+import {
+    buttonBaseCancelSx,
+    buttonBaseSx,
+    tableDeleteButtonSx,
+} from "@/styles/button.styles";
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { Form, Formik, type FormikHelpers } from "formik";
 import { useState } from "react";
@@ -133,20 +137,7 @@ export default function DeleteTableDialog({
                         type="button"
                         disabled={disabled}
                         onClick={() => setOpen(true)}
-                        sx={{
-                            minWidth: 50,
-                            height: 36,
-                            px: 1,
-                            borderRadius: 1.5,
-                            color: "#d92d20",
-                            fontSize: 13,
-                            fontWeight: 600,
-                            textTransform: "none",
-
-                            "&:hover": {
-                                backgroundColor: "#fef3f2",
-                            },
-                        }}
+                        sx={tableDeleteButtonSx}
                     >
                         Xóa
                     </Button>
@@ -211,7 +202,7 @@ export default function DeleteTableDialog({
                                     sx={{
                                         fontSize: 14,
                                         lineHeight: 1.6,
-                                        color: "#344054",
+                                        color: "var(--color-text-primary)",
                                     }}
                                 >
                                     Bạn có chắc muốn xóa bàn{" "}
@@ -219,7 +210,7 @@ export default function DeleteTableDialog({
                                         component="span"
                                         sx={{
                                             fontWeight: 700,
-                                            color: "#193B56",
+                                            color: "var(--color-text-primary)",
                                         }}
                                     >
                                         {tableName}
@@ -232,7 +223,7 @@ export default function DeleteTableDialog({
                                         mt: 1,
                                         fontSize: 13,
                                         lineHeight: 1.5,
-                                        color: "#667085",
+                                        color: "var(--color-text-secondary)",
                                         fontStyle: "italic",
                                     }}
                                 >

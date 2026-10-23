@@ -15,30 +15,27 @@ import type {
     QRCodeTable,
 } from "@/lib/qr-codes/types";
 
+import { cardSx } from "@/styles/card.styles";
 import { checkboxStyleSx } from "@/styles/form.styles";
+import { tableColumnHeaderSx } from "@/styles/table.styles";
 import QRCodeBulkPrintView from "./QRCodeBulkPrintView";
 import QRCodePagination from "./QRCodePagination";
 import QRCodePreviewButton from "./QRCodePreviewButton";
 import QRCodePreviewDialog from "./QRCodePreviewDialog";
 import QRCodePrintView from "./QRCodePrintView";
 import QRCodeSelectionToolbar from "./QRCodeSelectionToolbar";
-import { cardSx } from "@/styles/card.styles";
 
 function getStatusStyles(isActive: boolean) {
     if (isActive) {
         return {
             label: "Đang hoạt động",
-            color: "#027a48",
-            backgroundColor: "#ecfdf3",
-            borderColor: "#abefc6",
+            color: "var(--color-status-success)",
         };
     }
 
     return {
         label: "Đang tắt",
-        color: "#667085",
-        backgroundColor: "#f2f4f7",
-        borderColor: "#d0d5dd",
+        color: "var(--color-text-muted)",
     };
 }
 
@@ -337,7 +334,7 @@ export default function QRCodeList({
                         sx={{
                             fontSize: 16,
                             fontWeight: 600,
-                            color: "#344054",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         Không tìm thấy bàn
@@ -346,7 +343,7 @@ export default function QRCodeList({
                     <Typography
                         sx={{
                             fontSize: 14,
-                            color: "#667085",
+                            color: "var(--color-text-secondary)",
                             textAlign: "center",
                         }}
                     >
@@ -378,10 +375,9 @@ export default function QRCodeList({
                             xs: "none",
                             md: "block",
                         },
-                        border: "1px solid #eaecf0",
+                        border: "1px solid var(--color-border)",
                         borderRadius: 2,
-                        overflow: "hidden",
-                        backgroundColor: "#ffffff",
+                        backgroundColor: "var(--color-surface)",
                     }}
                 >
                     <Box
@@ -389,10 +385,14 @@ export default function QRCodeList({
                             display: "grid",
                             gridTemplateColumns: "48px 1.5fr 1.5fr 1fr 120px",
                             alignItems: "center",
-                            minHeight: 48,
+                            minHeight: 56,
                             px: 3,
-                            backgroundColor: "#f9fafb",
-                            borderBottom: "1px solid #eaecf0",
+                            backgroundColor: "var(--color-table-header-bg)",
+                            borderBottom: "1px solid var(--color-border)",
+
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 2,
                         }}
                     >
                         <Checkbox
@@ -404,41 +404,17 @@ export default function QRCodeList({
                             sx={checkboxStyleSx}
                         />
 
-                        <Typography
-                            sx={{
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "#344054",
-                            }}
-                        >
-                            Bàn
-                        </Typography>
+                        <Typography sx={tableColumnHeaderSx}>Bàn</Typography>
 
-                        <Typography
-                            sx={{
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "#344054",
-                            }}
-                        >
-                            Mã QR
-                        </Typography>
+                        <Typography sx={tableColumnHeaderSx}>Mã QR</Typography>
 
-                        <Typography
-                            sx={{
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "#344054",
-                            }}
-                        >
+                        <Typography sx={tableColumnHeaderSx}>
                             Trạng thái hoạt động
                         </Typography>
 
                         <Typography
                             sx={{
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "#1a202e",
+                                ...tableColumnHeaderSx,
                                 textAlign: "right",
                             }}
                         >
@@ -462,7 +438,7 @@ export default function QRCodeList({
                                     borderBottom:
                                         index === data.length - 1
                                             ? "none"
-                                            : "1px solid #eaecf0",
+                                            : "1px solid var(--color-border)",
                                 }}
                             >
                                 <Checkbox
@@ -481,7 +457,7 @@ export default function QRCodeList({
                                     sx={{
                                         fontSize: 14,
                                         fontWeight: 500,
-                                        color: "#344054",
+                                        color: "var(--color-text-primary)",
                                     }}
                                 >
                                     {table.name}
@@ -490,7 +466,7 @@ export default function QRCodeList({
                                 <Typography
                                     sx={{
                                         fontSize: 13,
-                                        color: "#667085",
+                                        color: "var(--color-text-secondary)",
                                     }}
                                 >
                                     {table.token}
@@ -555,9 +531,9 @@ export default function QRCodeList({
                             <Box
                                 key={table.id}
                                 sx={{
-                                    border: "1px solid #eaecf0",
+                                    border: "1px solid var(--color-border)",
                                     borderRadius: 2,
-                                    backgroundColor: "#ffffff",
+                                    backgroundColor: "var(--color-surface)",
                                     px: 2,
                                     py: 1.75,
                                 }}
@@ -602,7 +578,7 @@ export default function QRCodeList({
                                                 sx={{
                                                     fontSize: 14,
                                                     fontWeight: 600,
-                                                    color: "#344054",
+                                                    color: "var(--color-text-primary)",
                                                     overflow: "hidden",
                                                     textOverflow: "ellipsis",
                                                     whiteSpace: "nowrap",
@@ -642,7 +618,11 @@ export default function QRCodeList({
                                         </Box>
                                     </Stack>
 
-                                    <Divider />
+                                    <Divider
+                                        sx={{
+                                            borderColor: "var(--color-border)",
+                                        }}
+                                    />
 
                                     <Stack
                                         sx={{
@@ -652,7 +632,7 @@ export default function QRCodeList({
                                         <Typography
                                             sx={{
                                                 fontSize: 12,
-                                                color: "#98a2b3",
+                                                color: "var(--color-text-muted)",
                                             }}
                                         >
                                             Mã QR
@@ -661,7 +641,7 @@ export default function QRCodeList({
                                         <Typography
                                             sx={{
                                                 fontSize: 13,
-                                                color: "#667085",
+                                                color: "var(--color-text-secondary)",
                                                 wordBreak: "break-all",
                                             }}
                                         >

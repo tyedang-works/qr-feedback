@@ -27,7 +27,13 @@ export default function MiniDonutChart({
     const chartData =
         total > 0
             ? data
-            : [{ name: "Chưa có dữ liệu", value: 1, color: "#EAECF0" }];
+            : [
+                  {
+                      name: "Chưa có dữ liệu",
+                      value: 1,
+                      color: "var(--color-chart-track, #374151)",
+                  },
+              ];
 
     return (
         <Box
@@ -38,7 +44,13 @@ export default function MiniDonutChart({
                 position: "relative",
             }}
         >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer
+                width="100%"
+                height="100%"
+                style={{
+                    pointerEvents: "none",
+                }}
+            >
                 <PieChart>
                     <Pie
                         data={chartData}
@@ -66,6 +78,17 @@ export default function MiniDonutChart({
                                 Number(value).toLocaleString("vi-VN"),
                                 String(name),
                             ]}
+                            contentStyle={{
+                                backgroundColor:
+                                    "var(--color-surface, #FFFFFF)",
+                                border: "1px solid var(--color-border, #E5E7EB)",
+                                borderRadius: 8,
+                                color: "var(--color-text-primary, #111827)",
+                                boxShadow: "var(--shadow-card)",
+                            }}
+                            labelStyle={{
+                                color: "var(--color-text-primary, #111827)",
+                            }}
                         />
                     )}
                 </PieChart>
@@ -73,6 +96,7 @@ export default function MiniDonutChart({
 
             {centerLabel && (
                 <Box
+                    component="span"
                     sx={{
                         position: "absolute",
                         inset: 0,
@@ -80,9 +104,10 @@ export default function MiniDonutChart({
                         alignItems: "center",
                         justifyContent: "center",
                         pointerEvents: "none",
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: "#193B56",
+                        fontSize: 11,
+                        lineHeight: 1,
+                        fontWeight: 650,
+                        color: "var(--color-text-primary, #111827)",
                         fontVariantNumeric: "tabular-nums",
                     }}
                 >

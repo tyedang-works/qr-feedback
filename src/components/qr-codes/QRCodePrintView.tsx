@@ -31,7 +31,7 @@ export default function QRCodePrintView({
                 height: "100%",
                 minHeight: 0,
                 boxSizing: "border-box",
-                backgroundColor: "#f2f4f7",
+                backgroundColor: "var(--color-background)",
                 py: 4,
                 px: 2,
                 overflow: "hidden",
@@ -52,10 +52,10 @@ export default function QRCodePrintView({
                         maxWidth: 420,
                         px: 4,
                         py: 5,
-                        border: "1px solid #eaecf0",
+                        border: "1px solid var(--color-border)",
                         borderRadius: 2,
-                        backgroundColor: "#ffffff",
-                        boxShadow: "0 1px 3px rgba(16, 24, 40, 0.08)",
+                        backgroundColor: "var(--color-surface)",
+                        boxShadow: "var(--shadow-card)",
                         textAlign: "center",
                     }}
                 >
@@ -64,7 +64,7 @@ export default function QRCodePrintView({
                             fontSize: 18,
                             lineHeight: 1.5,
                             fontWeight: 700,
-                            color: "#193B56",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         QR Feedback
@@ -76,7 +76,7 @@ export default function QRCodePrintView({
                             fontSize: 20,
                             lineHeight: 1.5,
                             fontWeight: 700,
-                            color: "#1A202E",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         {tableName}
@@ -95,6 +95,8 @@ export default function QRCodePrintView({
                             size={260}
                             level="M"
                             marginSize={4}
+                            bgColor="#FFFFFF"
+                            fgColor="#000000"
                         />
                     </Box>
 
@@ -105,7 +107,7 @@ export default function QRCodePrintView({
                             fontSize: 14,
                             lineHeight: 1.5,
                             fontWeight: 500,
-                            color: "#344054",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         Quét mã để gửi phản hồi
@@ -117,7 +119,7 @@ export default function QRCodePrintView({
                             mt: 1,
                             fontSize: 11,
                             lineHeight: 1.5,
-                            color: "#98A2B3",
+                            color: "var(--color-text-muted)",
                             wordBreak: "break-all",
                         }}
                     >

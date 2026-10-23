@@ -2,7 +2,27 @@ import { Box, Card, Skeleton, Stack } from "@mui/material";
 
 const RING_RADII = [104, 78, 52];
 
-const STATUS_COLORS = ["#10B981", "#F59E0B", "#FF8066"];
+const STATUS_COLORS = [
+    "var(--color-feedback-status-new-text)",
+    "var(--color-feedback-status-progress-text)",
+    "var(--color-feedback-status-resolved-text)",
+];
+
+const RING_PROGRESS = [0.7, 0.35, 0.22];
+
+const LEGEND_ITEMS = [
+    { labelWidth: 54, countWidth: 14, percentWidth: 22 },
+    { labelWidth: 50, countWidth: 10, percentWidth: 18 },
+    { labelWidth: 62, countWidth: 12, percentWidth: 22 },
+];
+
+const skeletonSx = {
+    bgcolor: "var(--color-donut-skeleton)",
+    "&::after": {
+        background:
+            "linear-gradient(90deg, transparent, var(--color-surface-hover), transparent)",
+    },
+};
 
 export default function FeedbackStatusChartSkeleton() {
     return (
@@ -13,9 +33,9 @@ export default function FeedbackStatusChartSkeleton() {
                 minWidth: 0,
                 boxSizing: "border-box",
                 p: { xs: 2, sm: 2.5 },
-                border: "1px solid var(--color-border, #F0F2F5)",
+                border: "1px solid var(--color-border)",
                 borderRadius: "16px",
-                bgcolor: "var(--color-surface, #FFFFFF)",
+                bgcolor: "var(--color-surface)",
                 boxShadow: "var(--shadow-card)",
             }}
         >
@@ -30,14 +50,14 @@ export default function FeedbackStatusChartSkeleton() {
                     variant="text"
                     width={155}
                     height={24}
-                    sx={{ transform: "none" }}
+                    sx={{ ...skeletonSx, transform: "none" }}
                 />
 
                 <Skeleton
                     variant="text"
                     width={175}
                     height={20}
-                    sx={{ transform: "none" }}
+                    sx={{ ...skeletonSx, transform: "none" }}
                 />
 
                 <Box
@@ -60,36 +80,38 @@ export default function FeedbackStatusChartSkeleton() {
                             height="100%"
                             aria-hidden="true"
                         >
-                            {RING_RADII.map((radius, index) => (
-                                <g key={radius}>
-                                    <circle
-                                        cx={160}
-                                        cy={160}
-                                        r={radius}
-                                        fill="none"
-                                        stroke="#F3F4F6"
-                                        strokeWidth={18}
-                                    />
+                            {RING_RADII.map((radius, index) => {
+                                const circumference = 2 * Math.PI * radius;
 
-                                    <circle
-                                        cx={160}
-                                        cy={160}
-                                        r={radius}
-                                        fill="none"
-                                        stroke={STATUS_COLORS[index]}
-                                        strokeWidth={18}
-                                        strokeLinecap="round"
-                                        strokeDasharray={`${
-                                            2 *
-                                            Math.PI *
-                                            radius *
-                                            [0.7, 0.35, 0.22][index]
-                                        } ${2 * Math.PI * radius}`}
-                                        transform="rotate(-90 160 160)"
-                                        opacity={0.45}
-                                    />
-                                </g>
-                            ))}
+                                return (
+                                    <g key={radius}>
+                                        <circle
+                                            cx={160}
+                                            cy={160}
+                                            r={radius}
+                                            fill="none"
+                                            stroke="var(--color-donut-skeleton)"
+                                            strokeWidth={18}
+                                        />
+
+                                        <circle
+                                            cx={160}
+                                            cy={160}
+                                            r={radius}
+                                            fill="none"
+                                            stroke={STATUS_COLORS[index]}
+                                            strokeWidth={18}
+                                            strokeLinecap="round"
+                                            strokeDasharray={`${
+                                                circumference *
+                                                RING_PROGRESS[index]
+                                            } ${circumference}`}
+                                            transform="rotate(-90 160 160)"
+                                            opacity={0.45}
+                                        />
+                                    </g>
+                                );
+                            })}
                         </svg>
 
                         <Stack
@@ -105,14 +127,20 @@ export default function FeedbackStatusChartSkeleton() {
                                 variant="text"
                                 width={78}
                                 height={17}
-                                sx={{ transform: "none" }}
+                                sx={{
+                                    ...skeletonSx,
+                                    transform: "none",
+                                }}
                             />
 
                             <Skeleton
                                 variant="text"
                                 width={54}
                                 height={40}
-                                sx={{ transform: "none" }}
+                                sx={{
+                                    ...skeletonSx,
+                                    transform: "none",
+                                }}
                             />
                         </Stack>
                     </Box>
@@ -128,14 +156,10 @@ export default function FeedbackStatusChartSkeleton() {
                         rowGap: 1,
                         pt: 2,
                         mt: 1,
-                        borderTop: "1px dashed var(--color-border, #E5E7EB)",
+                        borderTop: "1px dashed var(--color-border)",
                     }}
                 >
-                    {[
-                        { labelWidth: 54, countWidth: 14, percentWidth: 22 },
-                        { labelWidth: 50, countWidth: 10, percentWidth: 18 },
-                        { labelWidth: 62, countWidth: 12, percentWidth: 22 },
-                    ].map((item, index) => (
+                    {LEGEND_ITEMS.map((item, index) => (
                         <Stack
                             key={index}
                             sx={{
@@ -145,14 +169,14 @@ export default function FeedbackStatusChartSkeleton() {
                                 minWidth: 0,
                             }}
                         >
-                            <Skeleton
-                                variant="circular"
-                                width={10}
-                                height={10}
+                            <Box
                                 sx={{
+                                    width: 10,
+                                    height: 10,
                                     flexShrink: 0,
+                                    borderRadius: "50%",
                                     bgcolor: STATUS_COLORS[index],
-                                    opacity: 0.65,
+                                    opacity: 0.8,
                                 }}
                             />
 
@@ -160,21 +184,30 @@ export default function FeedbackStatusChartSkeleton() {
                                 variant="text"
                                 width={item.labelWidth}
                                 height={19}
-                                sx={{ transform: "none" }}
+                                sx={{
+                                    ...skeletonSx,
+                                    transform: "none",
+                                }}
                             />
 
                             <Skeleton
                                 variant="text"
                                 width={item.countWidth}
                                 height={19}
-                                sx={{ transform: "none" }}
+                                sx={{
+                                    ...skeletonSx,
+                                    transform: "none",
+                                }}
                             />
 
                             <Skeleton
                                 variant="text"
                                 width={item.percentWidth}
                                 height={18}
-                                sx={{ transform: "none" }}
+                                sx={{
+                                    ...skeletonSx,
+                                    transform: "none",
+                                }}
                             />
                         </Stack>
                     ))}

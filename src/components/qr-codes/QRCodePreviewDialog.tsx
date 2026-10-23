@@ -42,7 +42,6 @@ async function downloadQRCode(tableName: string) {
     const svgClone = svgElement.cloneNode(true) as SVGSVGElement;
 
     svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-
     svgClone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
 
     const svgData = new XMLSerializer().serializeToString(svgClone);
@@ -64,7 +63,6 @@ async function downloadQRCode(tableName: string) {
         });
 
         const canvas = document.createElement("canvas");
-
         const size = 1024;
 
         canvas.width = size;
@@ -82,7 +80,6 @@ async function downloadQRCode(tableName: string) {
         context.drawImage(image, 0, 0, size, size);
 
         const pngUrl = canvas.toDataURL("image/png");
-
         const link = document.createElement("a");
 
         link.href = pngUrl;
@@ -139,7 +136,7 @@ export default function QRCodePreviewDialog({
                         width: 220,
                         height: 220,
                         p: 2,
-                        border: "1px solid #eaecf0",
+                        border: "1px solid var(--color-border)",
                         borderRadius: 2,
                         backgroundColor: "#ffffff",
                     }}
@@ -164,7 +161,7 @@ export default function QRCodePreviewDialog({
                             fontSize: 18,
                             lineHeight: 1.5,
                             fontWeight: 700,
-                            color: "#193B56",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         {tableName}
@@ -175,7 +172,7 @@ export default function QRCodePreviewDialog({
                             mt: 0.75,
                             fontSize: 12,
                             lineHeight: 1.5,
-                            color: "#667085",
+                            color: "var(--color-text-secondary)",
                             wordBreak: "break-all",
                         }}
                     >

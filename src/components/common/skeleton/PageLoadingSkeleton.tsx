@@ -16,13 +16,13 @@ export default function PageLoadingSkeleton({
     action,
     titleWidth,
     subtitleWidth,
-    gap = 3,
+    gap = 2,
 }: PageLoadingSkeletonProps) {
     return (
         <Stack
             aria-label="Đang tải trang"
             sx={{
-                gap: { xs: gap, md: gap + 1 },
+                gap: gap,
                 width: "100%",
                 minWidth: 0,
             }}

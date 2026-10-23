@@ -95,6 +95,7 @@ export default function FeedbackPagination({
                     boundaryCount={1}
                     size="small"
                     shape="rounded"
+
                     sx={{
                         "& .MuiPagination-ul": {
                             justifyContent: {
@@ -110,29 +111,40 @@ export default function FeedbackPagination({
                             margin: "0 2px",
                             borderRadius: 1.5,
                             fontSize: 13,
-                            color: "#344054",
-                        },
+                            color: "var(--color-pagination-text)",
+                            transition:
+                                "background-color 150ms ease, color 150ms ease",
 
-                        "& .MuiPaginationItem-root:hover": {
-                            backgroundColor: "#F2F4F7",
+                            "&:hover": {
+                                backgroundColor:
+                                    "var(--color-pagination-hover)",
+                            },
                         },
 
                         "& .MuiPaginationItem-root.Mui-selected": {
-                            backgroundColor: "#193B56",
-                            color: "#FFFFFF",
-                        },
+                            backgroundColor:
+                                "var(--color-pagination-selected-bg)",
+                            color: "var(--color-pagination-selected-text)",
+                            fontWeight: 600,
 
-                        "& .MuiPaginationItem-root.Mui-selected:hover": {
-                            backgroundColor: "#193B56",
+                            "&:hover": {
+                                backgroundColor:
+                                    "var(--color-pagination-selected-bg)",
+                            },
                         },
 
                         "& .MuiPaginationItem-previousNext": {
-                            border: "1px solid #D0D5DD",
+                            border: "1px solid var(--color-pagination-border)",
+                        },
+
+                        "& .MuiPaginationItem-root.Mui-disabled": {
+                            color: "var(--color-pagination-disabled-text)",
+                            cursor: "default",
                         },
 
                         "& .MuiPaginationItem-previousNext.Mui-disabled": {
-                            borderColor: "#EAECF0",
-                            color: "#D0D5DD",
+                            borderColor:
+                                "var(--color-pagination-disabled-border)",
                         },
                     }}
                 />

@@ -34,6 +34,57 @@ const PERIODS: FeedbackTrendPeriod[] = [7, 30];
 const TREND_CHART_COLOR = "#F79009";
 const numberFormatter = new Intl.NumberFormat("vi-VN");
 
+const chartTickStyle = {
+    fontSize: 11,
+    fill: "var(--color-text-secondary)",
+    fontFamily: "var(--font-momo-trust-sans), sans-serif",
+};
+
+const periodButtonSx = (selected: boolean) => ({
+    minWidth: 76,
+    px: 1.5,
+    py: 0.625,
+    border: "1px solid",
+    borderColor: selected ? "var(--color-text-primary)" : "var(--color-border)",
+    borderRadius: 1.5,
+    bgcolor: selected ? "var(--color-text-primary)" : "transparent",
+    color: selected ? "var(--color-background)" : "var(--color-text-secondary)",
+    fontSize: 12,
+    lineHeight: 1.4,
+    fontWeight: selected ? 600 : 500,
+    textTransform: "none",
+    whiteSpace: "nowrap",
+    boxShadow: "none",
+    transition:
+        "background-color 150ms ease, color 150ms ease, border-color 150ms ease",
+
+    "&:hover": {
+        bgcolor: selected
+            ? "var(--color-text-primary)"
+            : "var(--color-surface-hover)",
+        borderColor: selected
+            ? "var(--color-text-primary)"
+            : "var(--color-input-border-hover)",
+        boxShadow: "none",
+    },
+
+    "&.Mui-disabled": {
+        opacity: 1,
+        color: selected
+            ? "var(--color-background)"
+            : "var(--color-text-secondary)",
+        bgcolor: selected ? "var(--color-text-primary)" : "transparent",
+        borderColor: selected
+            ? "var(--color-text-primary)"
+            : "var(--color-border)",
+    },
+
+    "&.Mui-focusVisible": {
+        outline: "2px solid var(--color-input-focus)",
+        outlineOffset: 2,
+    },
+});
+
 export default function FeedbackTrend({ data }: FeedbackTrendProps) {
     const [period, setPeriod] = useState<FeedbackTrendPeriod>(7);
     const [chartData, setChartData] = useState<FeedbackTrendItem[]>(data);
@@ -41,6 +92,15 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
     const [errorMessage, setErrorMessage] = useState("");
 
     const displayedData = period === 7 ? data : chartData;
+
+    const handlePeriodChange = (nextPeriod: FeedbackTrendPeriod) => {
+        if (nextPeriod === 7) {
+            setIsLoading(false);
+            setErrorMessage("");
+        }
+
+        setPeriod(nextPeriod);
+    };
 
     useEffect(() => {
         if (period === 7) {
@@ -104,9 +164,9 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                 minWidth: 0,
                 height: "100%",
                 boxSizing: "border-box",
-                border: "1px solid var(--color-border, #F0F2F5)",
+                border: "1px solid var(--color-border)",
                 borderRadius: "16px",
-                bgcolor: "var(--color-surface, #FFFFFF)",
+                bgcolor: "var(--color-surface)",
                 boxShadow: "var(--shadow-card)",
             }}
         >
@@ -137,7 +197,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 fontSize: 16,
                                 lineHeight: 1.5,
                                 fontWeight: 700,
-                                color: "var(--color-text-primary, #111827)",
+                                color: "var(--color-text-primary)",
                             }}
                         >
                             Xu hướng phản hồi
@@ -148,7 +208,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 mt: 0.5,
                                 fontSize: 13,
                                 lineHeight: 1.6,
-                                color: "var(--color-text-secondary, #6B7280)",
+                                color: "var(--color-text-secondary)",
                             }}
                         >
                             Số lượng phản hồi trong {period} ngày gần nhất
@@ -166,60 +226,18 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                         }}
                     >
                         {PERIODS.map((value) => {
-                            const isSelected = period === value;
+                            const selected = period === value;
 
                             return (
                                 <Button
                                     key={value}
+                                    type="button"
                                     size="small"
                                     variant="text"
-                                    aria-pressed={isSelected}
-                                    onClick={() => setPeriod(value)}
+                                    aria-pressed={selected}
+                                    onClick={() => handlePeriodChange(value)}
                                     disabled={isLoading}
-                                    sx={{
-                                        minWidth: 76,
-                                        px: 1.5,
-                                        py: 0.625,
-                                        border: "1px solid",
-                                        borderColor: isSelected
-                                            ? "var(--color-primary, #111827)"
-                                            : "var(--color-border, #E5E7EB)",
-                                        borderRadius: 1.5,
-                                        bgcolor: isSelected
-                                            ? "var(--color-primary, #111827)"
-                                            : "transparent",
-                                        color: isSelected
-                                            ? "#FFFFFF"
-                                            : "var(--color-text-secondary, #6B7280)",
-                                        fontSize: 12,
-                                        lineHeight: 1.4,
-                                        fontWeight: isSelected ? 600 : 500,
-                                        textTransform: "none",
-                                        whiteSpace: "nowrap",
-                                        boxShadow: "none",
-                                        "&:hover": {
-                                            bgcolor: isSelected
-                                                ? "var(--color-primary, #111827)"
-                                                : "var(--color-surface-hover, #F9FAFB)",
-                                            borderColor: isSelected
-                                                ? "var(--color-primary, #111827)"
-                                                : "var(--color-border, #E5E7EB)",
-                                            boxShadow: "none",
-                                        },
-                                        "&.Mui-disabled": {
-                                            opacity: 1,
-                                            color: isSelected
-                                                ? "#FFFFFF"
-                                                : "var(--color-text-secondary, #6B7280)",
-                                            bgcolor: isSelected
-                                                ? "var(--color-primary, #111827)"
-                                                : "transparent",
-                                        },
-                                        "&.Mui-focusVisible": {
-                                            outline: "2px solid #9CA3AF",
-                                            outlineOffset: 2,
-                                        },
-                                    }}
+                                    sx={periodButtonSx(selected)}
                                 >
                                     {value} ngày
                                 </Button>
@@ -241,7 +259,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 sx={{
                                     fontSize: 12,
                                     lineHeight: 1.5,
-                                    color: "var(--color-text-secondary, #6B7280)",
+                                    color: "var(--color-text-secondary)",
                                 }}
                             >
                                 Tổng phản hồi trong kỳ
@@ -254,7 +272,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     lineHeight: 1.4,
                                     fontWeight: 700,
                                     letterSpacing: "-0.4px",
-                                    color: "var(--color-text-primary, #111827)",
+                                    color: "var(--color-text-primary)",
                                     fontVariantNumeric: "tabular-nums",
                                 }}
                             >
@@ -267,7 +285,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 sx={{
                                     fontSize: 12,
                                     lineHeight: 1.5,
-                                    color: "var(--color-text-secondary, #6B7280)",
+                                    color: "var(--color-text-secondary)",
                                 }}
                             >
                                 Trung bình mỗi ngày
@@ -280,7 +298,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     lineHeight: 1.4,
                                     fontWeight: 700,
                                     letterSpacing: "-0.4px",
-                                    color: "var(--color-text-primary, #111827)",
+                                    color: "var(--color-text-primary)",
                                     fontVariantNumeric: "tabular-nums",
                                 }}
                             >
@@ -299,10 +317,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                         height: { xs: 240, sm: 290 },
                         minWidth: 0,
                         position: "relative",
-                        "& .recharts-wrapper": {
-                            outline: "none",
-                        },
-                        "& .recharts-surface": {
+                        "& .recharts-wrapper, & .recharts-surface": {
                             outline: "none",
                         },
                     }}
@@ -322,7 +337,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                             <CircularProgress
                                 size={28}
                                 sx={{
-                                    color: "#00A878",
+                                    color: "var(--color-text-secondary)",
                                 }}
                             />
                         </Box>
@@ -341,7 +356,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 sx={{
                                     fontSize: 13,
                                     textAlign: "center",
-                                    color: "#B42318",
+                                    color: "var(--color-feedback-error, #B42318)",
                                 }}
                             >
                                 {errorMessage}
@@ -359,7 +374,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                             <Typography
                                 sx={{
                                     fontSize: 13,
-                                    color: "var(--color-text-secondary, #6B7280)",
+                                    color: "var(--color-text-secondary)",
                                 }}
                             >
                                 Chưa có dữ liệu phản hồi.
@@ -378,19 +393,14 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 barCategoryGap="38%"
                             >
                                 <CartesianGrid
-                                    stroke="#EAECF0"
+                                    stroke="var(--color-chart-track)"
                                     strokeDasharray="3 3"
                                     vertical={false}
                                 />
 
                                 <XAxis
                                     dataKey="label"
-                                    tick={{
-                                        fontSize: 11,
-                                        fill: "#667085",
-                                        fontFamily:
-                                            "var(--font-momo-trust-sans), sans-serif",
-                                    }}
+                                    tick={chartTickStyle}
                                     tickLine={false}
                                     axisLine={false}
                                     interval={
@@ -403,12 +413,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     allowDecimals={false}
                                     domain={[0, "auto"]}
                                     width={36}
-                                    tick={{
-                                        fontSize: 11,
-                                        fill: "#667085",
-                                        fontFamily:
-                                            "var(--font-momo-trust-sans), sans-serif",
-                                    }}
+                                    tick={chartTickStyle}
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={8}
@@ -416,7 +421,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
 
                                 <Tooltip
                                     cursor={{
-                                        fill: "rgba(0, 168, 120, 0.06)",
+                                        fill: "var(--color-surface-hover)",
                                     }}
                                     formatter={(value) => [
                                         `${numberFormatter.format(Number(value ?? 0))} lượt`,
@@ -424,17 +429,17 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     ]}
                                     labelFormatter={(label) => `Ngày ${label}`}
                                     contentStyle={{
-                                        border: "1px solid #E5E7EB",
+                                        border: "1px solid var(--color-border)",
                                         borderRadius: 10,
-                                        backgroundColor: "#FFFFFF",
+                                        backgroundColor: "var(--color-surface)",
+                                        color: "var(--color-text-primary)",
                                         fontSize: 12,
                                         fontFamily:
                                             "var(--font-momo-trust-sans), sans-serif",
-                                        boxShadow:
-                                            "0 4px 12px rgba(17, 24, 39, 0.08)",
+                                        boxShadow: "var(--shadow-card)",
                                     }}
                                     labelStyle={{
-                                        color: "#6B7280",
+                                        color: "var(--color-text-secondary)",
                                         marginBottom: 4,
                                     }}
                                     itemStyle={{

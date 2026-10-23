@@ -54,14 +54,28 @@ export default function QRDialog({
             onClose={onClose}
             fullWidth={fullWidth}
             maxWidth={maxWidth}
+            scroll="paper"
             slots={{
                 transition: DialogTransition,
             }}
             slotProps={{
                 paper: {
                     sx: {
+                        display: "flex",
+                        flexDirection: "column",
+                        minHeight: 0,
+                        maxHeight: "calc(100% - 64px)",
                         overflow: "hidden",
                         borderRadius: 1.5,
+                        backgroundColor: "var(--color-surface)",
+                        color: "var(--color-text-primary)",
+                        border: "1px solid var(--color-border)",
+                        backgroundImage: "none",
+
+                        "@media (max-width: 599px)": {
+                            maxHeight: "calc(100% - 32px)",
+                            m: 2,
+                        },
                     },
                 },
             }}
@@ -72,19 +86,22 @@ export default function QRDialog({
                     alignItems: "center",
                     justifyContent: "space-between",
                     minHeight: 64,
+                    flexShrink: 0,
                     px: 3,
                     py: 1.5,
-                    backgroundColor: "#ffffff",
-                    borderBottom: "1px solid #eaecf0",
+                    backgroundColor: "var(--color-surface)",
+                    color: "var(--color-text-primary)",
+                    borderBottom: "1px solid var(--color-border)",
                 }}
             >
                 <Box
                     component="span"
                     sx={{
+                        minWidth: 0,
                         fontSize: 18,
                         lineHeight: 1.5,
                         fontWeight: 700,
-                        color: "#193B56",
+                        color: "var(--color-text-primary)",
                     }}
                 >
                     {title}
@@ -99,12 +116,17 @@ export default function QRDialog({
                         width: 36,
                         height: 36,
                         flexShrink: 0,
-                        color: "#667085",
+                        color: "var(--color-text-secondary)",
                         borderRadius: 1,
 
                         "&:hover": {
-                            backgroundColor: "#f2f4f7",
-                            color: "#344054",
+                            backgroundColor: "var(--color-surface-hover)",
+                            color: "var(--color-text-primary)",
+                        },
+
+                        "&:focus-visible": {
+                            outline: "2px solid var(--color-input-focus)",
+                            outlineOffset: 2,
                         },
                     }}
                 >
@@ -115,13 +137,31 @@ export default function QRDialog({
             <DialogContent
                 sx={{
                     position: "relative",
-                    overflow: "visible",
-
+                    flex: "1 1 auto",
+                    minHeight: 0,
+                    overflowX: "hidden",
+                    overflowY: "auto",
+                    overscrollBehavior: "contain",
                     px: 3,
                     py: 3,
+                    backgroundColor: "var(--color-surface)",
+                    color: "var(--color-text-primary)",
 
                     "&.MuiDialogContent-root": {
                         paddingTop: 2,
+                    },
+
+                    "&::-webkit-scrollbar": {
+                        width: 6,
+                    },
+
+                    "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: "var(--color-text-muted)",
+                        borderRadius: 999,
+                    },
+
+                    "&::-webkit-scrollbar-track": {
+                        backgroundColor: "transparent",
                     },
                 }}
             >
@@ -138,7 +178,9 @@ export default function QRDialog({
                         alignItems: "center",
                         justifyContent: "flex-end",
                         gap: 1,
-                        backgroundColor: "#ffffff",
+                        flexShrink: 0,
+                        backgroundColor: "var(--color-surface)",
+                        borderTop: "1px solid var(--color-border)",
                     }}
                 >
                     {actions}

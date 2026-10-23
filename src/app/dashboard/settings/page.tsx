@@ -37,12 +37,7 @@ export default async function SettingsPage() {
             />
 
             <Card sx={cardSx}>
-                <Box
-                    sx={{
-                        minWidth: 0,
-                        p: { xs: 2, sm: 3 },
-                    }}
-                >
+                <Box sx={{ minWidth: 0 }}>
                     <RestaurantSettingsContent initialSettings={restaurant} />
                 </Box>
 
@@ -56,6 +51,7 @@ export default async function SettingsPage() {
                         py: 1.5,
                         borderTop: "1px solid var(--color-border)",
                         bgcolor: "var(--color-surface-hover)",
+                        borderRadius: "5px",
                     }}
                 >
                     <Bell

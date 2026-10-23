@@ -5,6 +5,7 @@ import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
 import { FEEDBACK_STATUS, type FeedbackStatus } from "@/lib/feedback/constants";
+import { FEEDBACK_STATUS_CONFIG } from "@/lib/feedback/status";
 import { buttonBaseSx } from "@/styles/button.styles";
 import { Box, Button, MenuItem, Stack } from "@mui/material";
 import type { FormikHelpers } from "formik";
@@ -30,11 +31,10 @@ type SnackbarState = {
     severity: "success" | "error";
 };
 
-const FEEDBACK_STATUS_OPTIONS = [
-    { value: FEEDBACK_STATUS.NEW, label: "Chưa xử lý" },
-    { value: FEEDBACK_STATUS.IN_PROGRESS, label: "Đang xử lý" },
-    { value: FEEDBACK_STATUS.RESOLVED, label: "Đã xử lý" },
-] as const;
+const FEEDBACK_STATUS_OPTIONS = Object.values(FEEDBACK_STATUS).map((value) => ({
+    value,
+    label: FEEDBACK_STATUS_CONFIG[value].label,
+}));
 
 const validationSchema = Yup.object({
     status: Yup.mixed<FeedbackStatus>()
@@ -123,7 +123,7 @@ export default function FeedbackManagementForm({
                     setFieldValue,
                 }) => (
                     <Form noValidate>
-                        <Stack sx={{ gap: 2.5 }}>
+                        <Stack sx={{ gap: 2 }}>
                             <QRSelect
                                 name="status"
                                 value={values.status}
@@ -158,8 +158,8 @@ export default function FeedbackManagementForm({
                                 label="Ghi chú nội bộ"
                                 placeholder="Nhập ghi chú xử lý..."
                                 multiline
-                                minRows={4}
-                                maxRows={8}
+                                minRows={3}
+                                maxRows={6}
                                 value={values.internalNote}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
@@ -172,9 +172,9 @@ export default function FeedbackManagementForm({
 
                             <Box
                                 sx={{
-                                    width: "100%",
                                     display: "flex",
                                     justifyContent: "flex-end",
+                                    pt: 0.5,
                                 }}
                             >
                                 <Button
@@ -183,9 +183,10 @@ export default function FeedbackManagementForm({
                                     disabled={isSubmitting}
                                     sx={{
                                         ...buttonBaseSx,
-                                        width: "130px",
-                                        maxWidth: "130px",
-                                        marginTop: "10px",
+                                        minWidth: 130,
+                                        width: "auto",
+                                        px: 2.5,
+                                        minHeight: 40,
                                     }}
                                 >
                                     {isSubmitting

@@ -2,18 +2,18 @@
 
 import { Chip } from "@mui/material";
 
-import { USER_ROLES } from "@/lib/auth/constants";
+import { UserRole } from "@/lib/auth/constants";
 import type { UserRoleMember } from "@/lib/auth/user-roles.types";
 
 type RoleChipProps = {
     role: UserRoleMember["role"];
 };
 
-const ROLE_LABELS = {
-    [USER_ROLES.OWNER]: "Owner",
-    [USER_ROLES.MANAGER]: "Manager",
-    [USER_ROLES.STAFF]: "Staff",
-} as const;
+const ROLE_LABELS: Record<UserRole, string> = {
+    owner: "Chủ nhà hàng",
+    manager: "Quản lý",
+    staff: "Nhân viên",
+};
 
 export default function RoleChip({ role }: RoleChipProps) {
     return (

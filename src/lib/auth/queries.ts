@@ -11,6 +11,7 @@ export type UserContext = {
     restaurantName: string;
     logoUrl: string | null;
     avatarUrl?: string | null;
+    email: string;
 };
 
 export async function getUserContext(): Promise<UserContext | null> {
@@ -45,7 +46,6 @@ export async function getUserContext(): Promise<UserContext | null> {
         console.error("Failed to get restaurant:", restaurantError);
         return null;
     }
-
     return {
         userId: user.id,
         fullName: profile.full_name,
@@ -54,6 +54,7 @@ export async function getUserContext(): Promise<UserContext | null> {
         restaurantName: restaurant.name,
         logoUrl: restaurant.logo_url,
         avatarUrl: profile.avatar_url,
+        email: user.email ?? "",
     };
 }
 

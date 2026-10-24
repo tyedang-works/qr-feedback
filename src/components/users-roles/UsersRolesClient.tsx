@@ -318,7 +318,7 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                     }}
                 >
                     <PageHeader
-                        title="Users & Roles"
+                        title="Người dùng & Phân quyền"
                         subtitle="Quản lý người dùng và quyền truy cập của nhà hàng."
                         icon={UserRoundCog}
                     />
@@ -333,7 +333,7 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                             flexShrink: 0,
                         }}
                     >
-                        Thêm người dùng
+                        + Thêm người dùng
                     </Button>
                 </Stack>
 

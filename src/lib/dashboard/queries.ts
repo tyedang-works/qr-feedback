@@ -128,7 +128,6 @@ export async function getFeedbackTrend(
     const today = vietnamFormatter.format(new Date());
     const [year, month, day] = today.split("-").map(Number);
 
-    // Tạo danh sách ngày theo lịch Việt Nam, không phụ thuộc múi giờ server.
     const dates: string[] = [];
 
     for (let index = period - 1; index >= 0; index -= 1) {

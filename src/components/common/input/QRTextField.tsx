@@ -90,8 +90,9 @@ export default function QRTextField({
                             },
                             "& textarea::placeholder": {
                                 fontSize: "13px",
-                                opacity: 0.8,
+                                opacity: 0.5,
                                 fontFamily: "var(--font-momo-trust-sans)",
+                                color: "var(--color-text-muted, #98A2B3)",
                             },
                         },
 
@@ -99,11 +100,12 @@ export default function QRTextField({
                             boxSizing: "border-box",
                             height: "42px",
                             padding: "10px 12px",
-                            fontSize: 14,
+                            fontSize: 13,
                             lineHeight: 1.4,
                             color: "var(--color-text-primary, #111827)",
                             WebkitTextFillColor:
                                 "var(--color-text-primary, #111827)",
+                            fontFamily: "var(--font-momo-trust-sans)",
                         },
 
                         "& .MuiOutlinedInput-inputMultiline": {
@@ -119,7 +121,8 @@ export default function QRTextField({
 
                         "& .MuiInputBase-input::placeholder": {
                             color: "var(--color-text-muted, #98A2B3)",
-                            opacity: 1,
+                            opacity: 0.5,
+                            fontSize: "13px",
                         },
 
                         "& .MuiInputBase-input.Mui-disabled": {

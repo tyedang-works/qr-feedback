@@ -305,7 +305,6 @@ export async function deleteUserAction(userId: string): Promise<{
 }> {
     const supabase = await createClient();
 
-    // 1. Get current authenticated user
     const {
         data: { user: currentUser },
     } = await supabase.auth.getUser();
@@ -317,7 +316,6 @@ export async function deleteUserAction(userId: string): Promise<{
         };
     }
 
-    // 2. Get current user's profile
     const { data: currentProfile, error: profileError } = await supabase
         .from("profiles")
         .select("restaurant_id, role")
@@ -333,7 +331,6 @@ export async function deleteUserAction(userId: string): Promise<{
         };
     }
 
-    // 3. Only Owner can delete users
     if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
@@ -341,7 +338,6 @@ export async function deleteUserAction(userId: string): Promise<{
         };
     }
 
-    // 4. Owner cannot delete himself
     if (userId === currentUser.id) {
         return {
             success: false,
@@ -351,7 +347,6 @@ export async function deleteUserAction(userId: string): Promise<{
 
     const adminSupabase = createAdminClient();
 
-    // 5. Get target user's profile
     const { data: targetProfile, error: targetProfileError } =
         await adminSupabase
             .from("profiles")
@@ -368,7 +363,6 @@ export async function deleteUserAction(userId: string): Promise<{
         };
     }
 
-    // 6. Target user must belong to the same restaurant
     if (targetProfile.restaurant_id !== currentProfile.restaurant_id) {
         return {
             success: false,
@@ -376,7 +370,6 @@ export async function deleteUserAction(userId: string): Promise<{
         };
     }
 
-    // 7. Owner cannot be deleted
     if (targetProfile.role === USER_ROLES.OWNER) {
         return {
             success: false,
@@ -384,7 +377,6 @@ export async function deleteUserAction(userId: string): Promise<{
         };
     }
 
-    // 8. Delete profile
     const { error: deleteProfileError } = await adminSupabase
         .from("profiles")
         .delete()
@@ -400,14 +392,11 @@ export async function deleteUserAction(userId: string): Promise<{
         };
     }
 
-    // 9. Delete Auth user
     const { error: deleteAuthUserError } =
         await adminSupabase.auth.admin.deleteUser(userId);
 
     if (deleteAuthUserError) {
         console.error("Failed to delete auth user:", deleteAuthUserError);
-
-        // Rollback profile if Auth deletion failed
         const { error: rollbackError } = await adminSupabase
             .from("profiles")
             .insert({

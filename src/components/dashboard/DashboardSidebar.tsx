@@ -2,46 +2,25 @@
 
 import DashboardNavigationProgress from "@/components/dashboard/DashboardNavigationProgress";
 import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
-import { createClient } from "@/lib/supabase/browser";
-import {
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    IconButton,
-    Menu,
-    MenuItem,
-    Stack,
-    Typography,
-} from "@mui/material";
+import { animatedAvatarRingSx } from "@/styles/avatar.styles";
+import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import type { LucideIcon } from "lucide-react";
 import {
     LayoutDashboard,
-    LogOut,
     MessagesSquare,
-    MoreHorizontal,
     QrCode,
-    Settings2,
     Table2,
-    UserRound,
     UsersRound,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import type { MouseEvent } from "react";
-import { useState, useTransition } from "react";
-import Logo from "../common/Logo";
-import RoleChip from "../common/RoleChip";
-import { LockKeyhole } from "lucide-react";
-import ChangePasswordDialog from "@/components/account/ChangePasswordDialog";
-import ThemeToggle from "../common/theme/ThemeToggle";
+import { useTransition } from "react";
 
 type DashboardSidebarProps = {
     role: UserRole | null;
-    fullName: string | null;
     restaurantName: string | null;
     logoUrl: string | null;
-    avatarUrl: string | null;
     onNavigate?: () => void;
+    collapsed?: boolean;
 };
 
 type NavigationItem = {
@@ -60,7 +39,7 @@ const navigationGroups: NavigationGroup[] = [
         label: "Tổng quan",
         items: [
             {
-                label: "Dashboard",
+                label: "Bảng điều khiển",
                 href: "/dashboard",
                 icon: LayoutDashboard,
             },
@@ -70,39 +49,29 @@ const navigationGroups: NavigationGroup[] = [
         label: "Quản lý nhà hàng",
         items: [
             {
-                label: "Feedback",
+                label: "Phản hồi",
                 href: "/dashboard/feedback",
                 icon: MessagesSquare,
             },
             {
-                label: "Tables",
+                label: "Bàn ăn",
                 href: "/dashboard/tables",
                 icon: Table2,
             },
             {
-                label: "QR Codes",
+                label: "Mã QR",
                 href: "/dashboard/qr-codes",
                 icon: QrCode,
             },
         ],
     },
     {
-        label: "Cài đặt hệ thống",
+        label: "Quản lý người dùng",
         items: [
             {
-                label: "Cài đặt",
-                href: "/dashboard/settings",
-                icon: Settings2,
-            },
-            {
-                label: "Users & Roles",
+                label: "Người dùng & phân quyền",
                 href: "/dashboard/users-roles",
                 icon: UsersRound,
-            },
-            {
-                label: "Hồ sơ cá nhân",
-                href: "/dashboard/profile",
-                icon: UserRound,
             },
         ],
     },
@@ -110,26 +79,16 @@ const navigationGroups: NavigationGroup[] = [
 
 export default function DashboardSidebar({
     role,
-    fullName,
     restaurantName,
     onNavigate,
     logoUrl,
-    avatarUrl,
+    collapsed = false,
 }: DashboardSidebarProps) {
     const router = useRouter();
     const pathname = usePathname();
-    const [isPending, startTransition] = useTransition();
-    const [accountAnchor, setAccountAnchor] = useState<HTMLElement | null>(
-        null,
-    );
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
-    const isOwner = role === USER_ROLES.OWNER;
-    const isAccountMenuOpen = Boolean(accountAnchor);
-    const displayName = fullName?.trim() || "Admin";
-    const displayRestaurantName = restaurantName?.trim() || "Restaurant";
-    const initial = displayName.charAt(0).toUpperCase();
-    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
+    const [isPending, startTransition] = useTransition();
+    const isOwner = role === USER_ROLES.OWNER;
     const isActive = (href: string) => {
         if (href === "/dashboard") {
             return pathname === href;
@@ -149,40 +108,6 @@ export default function DashboardSidebar({
         startTransition(() => {
             router.push(href);
         });
-    };
-
-    const handleOpenAccountMenu = (event: MouseEvent<HTMLElement>) => {
-        setAccountAnchor(event.currentTarget);
-    };
-
-    const handleCloseAccountMenu = () => {
-        setAccountAnchor(null);
-    };
-
-    const handleLogout = async () => {
-        if (isLoggingOut) {
-            return;
-        }
-
-        setIsLoggingOut(true);
-        handleCloseAccountMenu();
-
-        try {
-            const supabase = createClient();
-            const { error } = await supabase.auth.signOut();
-
-            if (error) {
-                console.error("Failed to log out:", error);
-                setIsLoggingOut(false);
-                return;
-            }
-
-            router.replace("/login");
-            router.refresh();
-        } catch (error) {
-            console.error("Failed to log out:", error);
-            setIsLoggingOut(false);
-        }
     };
 
     const OWNER_ONLY_ROUTES = ["/dashboard/settings", "/dashboard/users-roles"];
@@ -211,14 +136,15 @@ export default function DashboardSidebar({
             <Box
                 component="aside"
                 sx={{
-                    width: "var(--sidebar-width, 256px)",
+                    width: "100%",
+                    minWidth: 0,
                     height: "100dvh",
                     boxSizing: "border-box",
                     overflowY: "auto",
                     overflowX: "hidden",
                     display: "flex",
                     flexDirection: "column",
-                    px: 1.75,
+                    px: collapsed ? 1 : 1.75,
                     py: 2.5,
                     scrollbarWidth: "thin",
                     scrollbarColor: "var(--color-border, #374151) transparent",
@@ -227,115 +153,145 @@ export default function DashboardSidebar({
                     borderRight: "1px solid var(--color-border, #F0F1F3)",
                 }}
             >
-                <Stack
+                {/* main logo */}
+                <Box
                     sx={{
-                        flexDirection: "row",
+                        display: "flex",
+                        flexDirection: "column",
                         alignItems: "center",
-                        gap: 1.25,
-                        px: 1,
-                        minHeight: 48,
-                        minWidth: 0,
+                        px: collapsed
+                            ? 0.5
+                            : {
+                                  xs: 1.5,
+                                  md: 2,
+                              },
+                        pt: collapsed
+                            ? 2
+                            : {
+                                  xs: 2,
+                                  md: 3,
+                              },
+                        pb: collapsed
+                            ? 0
+                            : {
+                                  xs: 2,
+                                  md: 2.5,
+                              },
                     }}
                 >
                     <Box
                         sx={{
-                            width: 36,
-                            height: 36,
-                            flexShrink: 0,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            overflow: "hidden",
-                            borderRadius: 1.5,
+                            ...animatedAvatarRingSx,
+                            width: collapsed
+                                ? 48
+                                : {
+                                      xs: 72,
+                                      md: 108,
+                                  },
+                            height: collapsed
+                                ? 48
+                                : {
+                                      xs: 72,
+                                      md: 108,
+                                  },
+                            mb: collapsed
+                                ? 0
+                                : {
+                                      xs: 1,
+                                      md: 1.5,
+                                  },
                         }}
                     >
-                        {logoUrl ? (
-                            <Box
-                                component="img"
-                                src={logoUrl}
-                                alt={`Logo ${displayRestaurantName}`}
-                                sx={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "contain",
-                                }}
-                            />
-                        ) : (
-                            <Logo size={36} />
-                        )}
+                        <Box
+                            component="img"
+                            src={
+                                logoUrl || "/assets/default-restaurant-logo.png"
+                            }
+                            alt={restaurantName || "Logo nhà hàng"}
+                            sx={{
+                                width: collapsed
+                                    ? 40
+                                    : {
+                                          xs: 64,
+                                          md: 100,
+                                      },
+                                height: collapsed
+                                    ? 40
+                                    : {
+                                          xs: 64,
+                                          md: 100,
+                                      },
+                                flexShrink: 0,
+                                objectFit: "contain",
+                                borderRadius: "50%",
+                                bgcolor: "var(--color-surface, #FFFFFF)",
+                                position: "relative",
+                            }}
+                        />
                     </Box>
 
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                    {!collapsed && (
                         <Typography
+                            title={restaurantName ?? ""}
                             sx={{
-                                mb: 0.25,
-                                fontSize: 10,
+                                width: "100%",
+                                minWidth: 0,
+                                fontSize: {
+                                    xs: 14,
+                                    md: 18,
+                                },
                                 lineHeight: 1.5,
-                                fontWeight: 650,
-                                letterSpacing: "0.8px",
-                                color: "var(--color-text-muted, #9CA3AF)",
-                                textTransform: "uppercase",
-                            }}
-                        >
-                            QR Feedback
-                        </Typography>
-
-                        <Typography
-                            title={displayRestaurantName}
-                            sx={{
-                                fontSize: 16,
-                                lineHeight: 1.45,
                                 fontWeight: 700,
-                                letterSpacing: "-0.2px",
+                                textAlign: "center",
+                                overflowWrap: "anywhere",
                                 color: "var(--color-text-primary, #111827)",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
                             }}
                         >
-                            {displayRestaurantName}
+                            {restaurantName ?? "Nhà hàng"}
                         </Typography>
-                    </Box>
+                    )}
+                </Box>
 
-                    {/* theme */}
-                    <ThemeToggle />
-                </Stack>
                 <Divider
                     sx={{
                         my: 2.5,
                         borderColor: "var(--color-border, #F0F1F3)",
                     }}
                 />
+
+                {/* navigation */}
                 <Stack
                     component="nav"
                     aria-label="Dashboard navigation"
                     sx={{
                         flex: 1,
-                        gap: 2.75,
+                        gap: collapsed ? 1.5 : 2.5,
                     }}
                 >
                     {visibleGroups.map((group) => (
                         <Stack
                             key={group.label}
                             sx={{
-                                gap: 0.75,
+                                gap: 0.5,
                             }}
                         >
-                            <Typography
-                                component="h2"
-                                sx={{
-                                    px: 1.25,
-                                    mb: 0.5,
-                                    fontSize: 10.5,
-                                    lineHeight: 1.5,
-                                    fontWeight: 650,
-                                    letterSpacing: "0.65px",
-                                    textTransform: "uppercase",
-                                    color: "var(--color-text-muted, #9CA3AF)",
-                                }}
-                            >
-                                {group.label}
-                            </Typography>
+                            {!collapsed && (
+                                <Typography
+                                    component="h2"
+                                    sx={{
+                                        px: 1.25,
+                                        mb: 0.5,
+                                        fontSize: 10.5,
+                                        lineHeight: 1.5,
+                                        fontWeight: 650,
+                                        letterSpacing: "0.65px",
+                                        textTransform: "uppercase",
+                                        color: "var(--color-text-muted, #9CA3AF)",
+                                    }}
+                                >
+                                    {group.label}
+                                </Typography>
+                            )}
 
                             <Stack
                                 sx={{
@@ -351,6 +307,12 @@ export default function DashboardSidebar({
                                             key={item.href}
                                             fullWidth
                                             disableElevation
+                                            title={
+                                                collapsed
+                                                    ? item.label
+                                                    : undefined
+                                            }
+                                            aria-label={item.label}
                                             aria-current={
                                                 active ? "page" : undefined
                                             }
@@ -365,9 +327,12 @@ export default function DashboardSidebar({
                                                 />
                                             }
                                             sx={{
+                                                minWidth: 0,
                                                 minHeight: 42,
-                                                justifyContent: "flex-start",
-                                                px: 1.5,
+                                                justifyContent: collapsed
+                                                    ? "center"
+                                                    : "flex-start",
+                                                px: collapsed ? 0 : 1.5,
                                                 py: 1,
                                                 borderRadius: 1.5,
                                                 textAlign: "left",
@@ -381,24 +346,21 @@ export default function DashboardSidebar({
                                                     : "transparent",
                                                 transition:
                                                     "background-color 150ms ease",
-
                                                 "& .MuiButton-startIcon": {
                                                     display: "inline-flex",
                                                     alignItems: "center",
                                                     justifyContent: "center",
-                                                    mr: 1.5,
+                                                    mr: collapsed ? 0 : 1.5,
                                                     ml: 0,
                                                     color: active
                                                         ? "var(--color-primary, #111827)"
                                                         : "var(--color-text-secondary, #6B7280)",
                                                 },
-
                                                 "&:hover": {
                                                     bgcolor: active
                                                         ? "var(--color-surface-active, #F3F4F6)"
                                                         : "var(--color-surface-hover, #F9FAFB)",
                                                 },
-
                                                 "&:focus-visible": {
                                                     outline:
                                                         "2px solid var(--color-text-muted, #9CA3AF)",
@@ -406,7 +368,7 @@ export default function DashboardSidebar({
                                                 },
                                             }}
                                         >
-                                            {item.label}
+                                            {!collapsed && item.label}
                                         </Button>
                                     );
                                 })}
@@ -414,189 +376,7 @@ export default function DashboardSidebar({
                         </Stack>
                     ))}
                 </Stack>
-
-                <Divider
-                    sx={{
-                        mt: 2,
-                        mb: 1.5,
-                        borderColor: "var(--color-border, #F0F1F3)",
-                    }}
-                />
-                <Stack
-                    sx={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 1,
-                        minWidth: 0,
-                        px: 0.5,
-                        py: 0.5,
-                    }}
-                >
-                    <Avatar
-                        src={avatarUrl ?? undefined}
-                        alt={displayName}
-                        sx={{
-                            width: 38,
-                            height: 38,
-                            flexShrink: 0,
-                            bgcolor: "var(--color-primary, #111827)",
-                            color: "#FFFFFF",
-                            fontSize: 14,
-                            fontWeight: 650,
-                        }}
-                    >
-                        {initial}
-                    </Avatar>
-
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                        <Typography
-                            title={displayName}
-                            noWrap
-                            sx={{
-                                fontSize: 13,
-                                lineHeight: 1.5,
-                                fontWeight: 650,
-                                color: "var(--color-text-primary, #111827)",
-                            }}
-                        >
-                            {displayName}
-                        </Typography>
-
-                        {role && <RoleChip role={role} />}
-                    </Box>
-
-                    <IconButton
-                        onClick={handleOpenAccountMenu}
-                        aria-label="Mở menu tài khoản"
-                        aria-controls={
-                            isAccountMenuOpen ? "account-menu" : undefined
-                        }
-                        aria-haspopup="true"
-                        aria-expanded={isAccountMenuOpen ? "true" : undefined}
-                        size="small"
-                        sx={{
-                            width: 32,
-                            height: 32,
-                            flexShrink: 0,
-                            color: "var(--color-text-secondary, #6B7280)",
-                            borderRadius: 1.5,
-                            "&:hover": {
-                                bgcolor: "var(--color-surface-hover, #F9FAFB)",
-                                color: "var(--color-text-primary, #111827)",
-                            },
-                        }}
-                    >
-                        <MoreHorizontal size={19} />
-                    </IconButton>
-                </Stack>
-
-                <Menu
-                    id="account-menu"
-                    anchorEl={accountAnchor}
-                    open={isAccountMenuOpen}
-                    onClose={handleCloseAccountMenu}
-                    anchorOrigin={{
-                        vertical: "top",
-                        horizontal: "right",
-                    }}
-                    transformOrigin={{
-                        vertical: "bottom",
-                        horizontal: "right",
-                    }}
-                    slotProps={{
-                        paper: {
-                            sx: {
-                                width: 208,
-                                maxWidth: "calc(100vw - 24px)",
-                                mt: -1,
-                                overflow: "hidden",
-                                border: "1px solid var(--color-border, #E5E7EB)",
-                                borderRadius: 2.5,
-                                bgcolor: "var(--color-surface, #FFFFFF)",
-                                color: "var(--color-text-primary, #111827)",
-                                boxShadow: "var(--shadow-card)",
-                                backgroundImage: "none",
-                                "& .MuiMenu-list": {
-                                    p: 0.75,
-                                },
-                            },
-                        },
-                    }}
-                >
-                    <MenuItem
-                        onClick={() => {
-                            handleCloseAccountMenu();
-                            setIsChangePasswordOpen(true);
-                        }}
-                        sx={{
-                            minHeight: 42,
-                            px: 1.25,
-                            py: 1,
-                            gap: 1.25,
-                            borderRadius: 1.5,
-                            color: "var(--color-text-primary, #344054)",
-                            fontSize: 13.5,
-                            fontWeight: 550,
-                            "&:hover": {
-                                bgcolor: "var(--color-surface-hover, #F9FAFB)",
-                            },
-                            "&:focus-visible": {
-                                outline:
-                                    "2px solid var(--color-text-muted, #9CA3AF)",
-                                outlineOffset: -2,
-                            },
-                        }}
-                    >
-                        <LockKeyhole size={17} strokeWidth={1.8} />
-                        Đổi mật khẩu
-                    </MenuItem>
-
-                    <Divider
-                        sx={{
-                            my: 0.5,
-                            borderColor: "var(--color-border, #E5E7EB)",
-                        }}
-                    />
-
-                    <MenuItem
-                        onClick={handleLogout}
-                        disabled={isLoggingOut}
-                        sx={{
-                            minHeight: 42,
-                            px: 1.25,
-                            py: 1,
-                            gap: 1.25,
-                            borderRadius: 1.5,
-                            color: "#F04438",
-                            fontSize: 13.5,
-                            fontWeight: 550,
-                            "&:hover": {
-                                bgcolor: "rgba(240, 68, 56, 0.10)",
-                            },
-                            "&:focus-visible": {
-                                outline: "2px solid rgba(240, 68, 56, 0.35)",
-                                outlineOffset: -2,
-                            },
-                        }}
-                    >
-                        <LogOut size={17} strokeWidth={1.8} />
-                        <Typography
-                            component="span"
-                            sx={{
-                                fontSize: "inherit",
-                                fontWeight: "inherit",
-                                color: "inherit",
-                            }}
-                        >
-                            {isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
-                        </Typography>
-                    </MenuItem>
-                </Menu>
             </Box>
-            <ChangePasswordDialog
-                open={isChangePasswordOpen}
-                onClose={() => setIsChangePasswordOpen(false)}
-            />
         </>
     );
 }

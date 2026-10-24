@@ -104,7 +104,6 @@ export async function GET(request: Request) {
 
         const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
 
-        // Keep phone numbers as text to preserve leading zeros.
         for (let rowIndex = 1; rowIndex <= rows.length; rowIndex += 1) {
             const phoneCell = XLSX.utils.encode_cell({
                 r: rowIndex,
@@ -117,7 +116,6 @@ export async function GET(request: Request) {
             }
         }
 
-        // Configure readable column widths.
         worksheet["!cols"] = [
             { wch: 20 },
             { wch: 14 },

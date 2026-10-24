@@ -15,25 +15,21 @@ export const createUserFormSchema = (mode: UserFormMode) =>
         fullName: yup
             .string()
             .trim()
-            .required("Vui lòng nhập tên.")
+            .required(" ")
             .max(100, "Tên không được vượt quá 100 ký tự."),
 
         email:
             mode === "add"
-                ? yup
-                      .string()
-                      .trim()
-                      .email("Email không hợp lệ.")
-                      .required("Vui lòng nhập email.")
+                ? yup.string().trim().email("Email không hợp lệ.").required(" ")
                 : yup.string().defined(),
 
-        role: yup.string().required("Vui lòng chọn role."),
+        role: yup.string().required(" "),
 
         password:
             mode === "add"
                 ? yup
                       .string()
-                      .required("Vui lòng nhập mật khẩu.")
+                      .required(" ")
                       .min(8, "Mật khẩu phải có ít nhất 8 ký tự.")
                       .max(72, "Mật khẩu không được vượt quá 72 ký tự.")
                 : yup.string().notRequired(),
@@ -42,7 +38,7 @@ export const createUserFormSchema = (mode: UserFormMode) =>
             mode === "add"
                 ? yup
                       .string()
-                      .required("Vui lòng xác nhận mật khẩu.")
+                      .required(" ")
                       .oneOf(
                           [yup.ref("password")],
                           "Mật khẩu xác nhận không khớp.",

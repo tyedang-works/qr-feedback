@@ -51,7 +51,7 @@ const createInitialValues = (
 const validationSchema = Yup.object({
     name: Yup.string()
         .trim()
-        .required("Vui lòng nhập tên nhà hàng.")
+        .required(" ")
         .max(100, "Tên nhà hàng không được vượt quá 100 ký tự."),
 
     phone: Yup.string()

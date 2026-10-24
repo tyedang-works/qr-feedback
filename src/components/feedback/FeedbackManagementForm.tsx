@@ -39,9 +39,9 @@ const FEEDBACK_STATUS_OPTIONS = Object.values(FEEDBACK_STATUS).map((value) => ({
 const validationSchema = Yup.object({
     status: Yup.mixed<FeedbackStatus>()
         .oneOf(Object.values(FEEDBACK_STATUS), "Trạng thái không hợp lệ.")
-        .required("Vui lòng chọn trạng thái."),
+        .required(" "),
     internalNote: Yup.string()
-        .defined("Ghi chú nội bộ không hợp lệ.")
+        .defined(" ")
         .trim()
         .max(1000, "Ghi chú nội bộ không được vượt quá 1000 ký tự."),
 });

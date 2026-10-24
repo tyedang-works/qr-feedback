@@ -11,7 +11,7 @@ export const formLabelSx: SxProps<Theme> = {
 
 export const formErrorSx: SxProps<Theme> = {
     position: "absolute",
-    top: "calc(100% + 6px)",
+    top: "calc(100% + 2px)",
     left: 0,
     mt: 0,
     mb: 0,

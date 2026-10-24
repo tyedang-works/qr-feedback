@@ -43,10 +43,10 @@ const initialValues: FormValues = {
 };
 
 const validationSchema = yup.object({
-    currentPassword: yup.string().required("Vui lòng nhập mật khẩu hiện tại."),
+    currentPassword: yup.string().required(" "),
     newPassword: yup
         .string()
-        .required("Vui lòng nhập mật khẩu mới.")
+        .required(" ")
         .min(8, "Mật khẩu phải có ít nhất 8 ký tự.")
         .max(72, "Mật khẩu không được vượt quá 72 ký tự.")
         .test(
@@ -57,7 +57,7 @@ const validationSchema = yup.object({
         ),
     confirmPassword: yup
         .string()
-        .required("Vui lòng xác nhận mật khẩu mới.")
+        .required(" ")
         .oneOf([yup.ref("newPassword")], "Mật khẩu xác nhận không khớp."),
 });
 

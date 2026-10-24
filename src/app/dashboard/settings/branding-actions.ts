@@ -1,9 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { canManageSettings } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidatePath } from "next/cache";
 
 export type BrandingType = "logo" | "favicon";
 
@@ -185,7 +185,6 @@ export async function deleteRestaurantBranding(
     const restaurantId = userContext.restaurantId;
     const column = type === "logo" ? "logo_url" : "favicon_url";
 
-    // Chỉ lấy URL của nhà hàng thuộc tài khoản đã xác thực.
     const { data: restaurant, error: readError } = await admin
         .from("restaurants")
         .select("logo_url, favicon_url")
@@ -211,7 +210,6 @@ export async function deleteRestaurantBranding(
         };
     }
 
-    // Chỉ chấp nhận URL thuộc đúng bucket của dự án.
     const { data: storageData } = admin.storage
         .from(BUCKET_NAME)
         .getPublicUrl("");
@@ -226,8 +224,6 @@ export async function deleteRestaurantBranding(
     }
 
     const filePath = imageUrl.slice(baseUrl.length + 1);
-
-    // Chỉ cho phép xóa file nằm trong thư mục của nhà hàng hiện tại.
     if (!filePath.startsWith(`${restaurantId}/`) || filePath.includes("..")) {
         return {
             success: false,
@@ -235,7 +231,6 @@ export async function deleteRestaurantBranding(
         };
     }
 
-    // Xóa tham chiếu trong database trước.
     const { data: updatedRestaurant, error: updateError } = await admin
         .from("restaurants")
         .update({ [column]: null })
@@ -253,7 +248,6 @@ export async function deleteRestaurantBranding(
         };
     }
 
-    // Database đã cập nhật thành công; tiếp tục dọn file Storage.
     const { error: deleteError } = await admin.storage
         .from(BUCKET_NAME)
         .remove([filePath]);

@@ -109,7 +109,7 @@ export default async function FeedbackPage({
             }}
         >
             <PageHeader
-                title="Feedback"
+                title="Phản hồi"
                 subtitle="Theo dõi và xử lý phản hồi của khách hàng."
                 icon={MessageCircle}
             />

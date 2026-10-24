@@ -42,7 +42,7 @@ function createValidationSchema(tableName: string, tableNames: string[]) {
         name: yup
             .string()
             .trim()
-            .required("Vui lòng nhập tên bàn.")
+            .required(" ")
             .test("unique-table-name", "Tên bàn này đã tồn tại.", (value) => {
                 if (!value) {
                     return true;

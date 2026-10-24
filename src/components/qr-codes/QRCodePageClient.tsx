@@ -24,7 +24,7 @@ export default function QRCodePageClient({
             {!isPrintMode && (
                 <>
                     <PageHeader
-                        title="QR Codes"
+                        title="Mã QR"
                         subtitle="Quản lý mã QR và trạng thái bàn của nhà hàng."
                         icon={QrCode}
                     />

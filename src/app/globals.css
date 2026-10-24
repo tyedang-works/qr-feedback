@@ -34,7 +34,8 @@ body {
     --shadow-card:
         0 0 2px 0 rgba(145, 158, 171, 0.2),
         0 12px 24px -4px rgba(145, 158, 171, 0.12);
-    --sidebar-width: 230px;
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 72px;
     --color-chart-track: #e5e7eb;
 
     /* input */
@@ -49,7 +50,7 @@ body {
     --color-button-primary-hover: #244e6c;
     --color-button-primary-active: #16344b;
 
-    /* feedback status */
+    /* feedback status dashboard */
     --feedback-status-new-text: #9a5b13;
     --feedback-status-new-bg: #f8f0e4;
     --feedback-status-new-border: #e9d8be;
@@ -170,7 +171,7 @@ body {
     --color-button-primary-hover: #405570;
     --color-button-primary-active: #29394e;
 
-    /* feedback status */
+    /* feedback status dashboard */
     --feedback-status-new-text: #d9b27c;
     --feedback-status-new-bg: #352d23;
     --feedback-status-new-border: #594633;

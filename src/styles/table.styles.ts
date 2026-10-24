@@ -53,6 +53,11 @@ export const tableStatusSwitchSx: SxProps<Theme> = (theme) => {
         "& .MuiSwitch-switchBase.Mui-checked": {
             color: "#ffffff",
         },
+        "& .MuiSwitch-switchBase.Mui-disabled:not(.Mui-checked) + .MuiSwitch-track":
+            {
+                backgroundColor: isDark ? "#4B5563" : "#C4C9D1",
+                opacity: 1,
+            },
     };
 };
 

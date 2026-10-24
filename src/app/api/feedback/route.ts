@@ -23,7 +23,6 @@ type FeedbackPayload = {
 
 export async function POST(request: Request) {
     try {
-        // Parse request body
         const body = (await request.json()) as FeedbackPayload;
 
         const tableToken =
@@ -41,7 +40,6 @@ export async function POST(request: Request) {
         const phone =
             typeof body.phone === "string" ? body.phone.replace(/\s/g, "") : "";
 
-        // Validate table token
         if (!tableToken) {
             return NextResponse.json(
                 { message: "Thiếu thông tin bàn." },
@@ -49,7 +47,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Validate selected options
         if (selectedOptions.some((option) => !ALLOWED_OPTIONS.has(option))) {
             return NextResponse.json(
                 { message: "Lựa chọn phản hồi không hợp lệ." },
@@ -57,7 +54,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Validate feedback
         if (selectedOptions.length === 0 && !feedback) {
             return NextResponse.json(
                 {
@@ -68,7 +64,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Validate phone
         if (!phone) {
             return NextResponse.json(
                 { message: "Vui lòng nhập số điện thoại." },
@@ -83,7 +78,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Validate feedback length
         if (feedback.length > 1000) {
             return NextResponse.json(
                 {
@@ -94,12 +88,10 @@ export async function POST(request: Request) {
             );
         }
 
-        // Get client IP
         const forwardedFor = request.headers.get("x-forwarded-for");
 
         const ip = forwardedFor?.split(",")[0]?.trim() || "unknown";
 
-        // Rate limit by IP + table
         const identifier = `${ip}:${tableToken}`;
 
         const { success, limit, remaining, reset } =
@@ -127,7 +119,6 @@ export async function POST(request: Request) {
 
         const supabase = createAdminClient();
 
-        // Find table
         const { data: table, error: tableError } = await supabase
             .from("tables")
             .select("id, restaurant_id, name")
@@ -141,7 +132,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Find restaurant
         const { data: restaurant, error: restaurantError } = await supabase
             .from("restaurants")
             .select("name")
@@ -152,7 +142,6 @@ export async function POST(request: Request) {
             console.error("Failed to get restaurant:", restaurantError);
         }
 
-        // Save feedback
         const { error: insertError } = await supabase.from("feedback").insert({
             restaurant_id: table.restaurant_id,
             table_id: table.id,
@@ -169,8 +158,6 @@ export async function POST(request: Request) {
                 { status: 500 },
             );
         }
-
-        // Prepare email data
         const createdAt = new Date().toLocaleString("vi-VN", {
             timeZone: "Asia/Ho_Chi_Minh",
         });
@@ -184,7 +171,6 @@ export async function POST(request: Request) {
             createdAt,
         });
 
-        // Send email
         const { error: emailError } = await resend.emails.send({
             from: "QR Feedback <onboarding@resend.dev>",
             to: process.env.FEEDBACK_EMAIL!,
@@ -192,8 +178,6 @@ export async function POST(request: Request) {
             html: emailHtml,
         });
 
-        // Feedback is already saved.
-        // Email failure should not make the submission fail.
         if (emailError) {
             console.error("Failed to send feedback email:", emailError);
         }

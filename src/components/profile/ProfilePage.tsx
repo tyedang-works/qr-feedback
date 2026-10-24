@@ -37,7 +37,7 @@ const validationSchema = yup.object({
     fullName: yup
         .string()
         .trim()
-        .required("Vui lòng nhập họ và tên.")
+        .required(" ")
         .max(100, "Họ và tên không được vượt quá 100 ký tự."),
 });
 

@@ -1,0 +1,35 @@
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="104"
+  height="96"
+  viewBox="4 4 102 96"
+  fill="none"
+>
+  <title>QR Feedback Icon</title>
+
+  <g fill="#111827" fill-rule="evenodd">
+    <path d="M8 8h38v38H8V8Zm8 8v22h22V16H16Z"/>
+    <rect x="22" y="22" width="10" height="10" rx="1"/>
+
+    <path d="M58 8h38v38H58V8Zm8 8v22h22V16H66Z"/>
+    <rect x="72" y="22" width="10" height="10" rx="1"/>
+
+    <path d="M8 58h38v38H8V58Zm8 8v22h22V66H16Z"/>
+    <rect x="22" y="72" width="10" height="10" rx="1"/>
+
+    <rect x="56" y="54" width="9" height="9" rx="1"/>
+    <rect x="70" y="54" width="9" height="9" rx="1"/>
+    <rect x="56" y="68" width="9" height="9" rx="1"/>
+    <rect x="70" y="68" width="9" height="9" rx="1"/>
+  </g>
+
+  <path
+    d="M65 84.5 76.5 96 101.5 69.5"
+    stroke="#39745c"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
+

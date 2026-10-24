@@ -1,20 +1,26 @@
 import { Box } from "@mui/material";
 
 type LogoProps = {
-    size?: number;
+    size?: number | string;
+    width?: number | string;
+    height?: number | string;
 };
 
-export default function Logo({ size = 68 }: LogoProps) {
+export default function Logo({ size = 68, width, height }: LogoProps) {
     return (
         <Box
             component="img"
-            src="/main-logo.svg"
+            src="/assets/logo.svg"
             alt="QR Feedback"
             sx={{
-                width: size,
-                height: size,
+                width: width ?? size,
+                height: height ?? size,
+                maxWidth: "100%",
                 objectFit: "contain",
                 display: "block",
+                flexShrink: 0,
+                p: 0,
+                m: 0,
             }}
         />
     );

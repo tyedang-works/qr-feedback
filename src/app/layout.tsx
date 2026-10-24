@@ -1,5 +1,6 @@
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata } from "next";
+import Script from "next/script";
 
 import MuiThemeProvider from "@/components/common/providers/MuiThemeProvider";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
     return (
         <html lang="vi" suppressHydrationWarning>
             <body className={momoTrustSans.variable}>
-                <script
+                <Script
+                    id="qr-feedback-theme-init"
+                    strategy="afterInteractive"
                     dangerouslySetInnerHTML={{
                         __html: themeInitScript,
                     }}

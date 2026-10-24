@@ -585,7 +585,6 @@ export default function SurveyForm({
                                         </Typography>
                                     </Box>
 
-                                    {/* Submit error */}
                                     {submitError && (
                                         <Box
                                             role="alert"
@@ -610,7 +609,6 @@ export default function SurveyForm({
                                         </Box>
                                     )}
 
-                                    {/* Submit button */}
                                     <Button
                                         fullWidth
                                         type="submit"
@@ -619,7 +617,7 @@ export default function SurveyForm({
                                         sx={{
                                             minHeight: 46,
                                             borderRadius: 2,
-                                            bgcolor: "#193B56",
+                                            bgcolor: "#111827",
                                             color: "#FFFFFF",
                                             textTransform: "none",
                                             fontSize: 14,
@@ -628,7 +626,7 @@ export default function SurveyForm({
                                             transition:
                                                 "background-color 160ms ease, transform 160ms ease",
                                             "&:hover": {
-                                                bgcolor: "#244E6C",
+                                                bgcolor: "#212427",
                                                 boxShadow: "none",
                                             },
                                             "&:active": {

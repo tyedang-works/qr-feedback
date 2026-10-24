@@ -6,7 +6,7 @@ export const formLabelSx: SxProps<Theme> = {
     fontSize: 13,
     lineHeight: 1.5,
     fontWeight: 500,
-    color: "var(--color-text-secondary, #667085)",
+    color: "#B1B9CA",
 };
 
 export const formErrorSx: SxProps<Theme> = {
@@ -16,7 +16,7 @@ export const formErrorSx: SxProps<Theme> = {
     mt: 0,
     mb: 0,
     fontSize: 12,
-    lineHeight: 1.5,
+    lineHeight: 1.3,
     fontWeight: 400,
     color: "error.main",
 };

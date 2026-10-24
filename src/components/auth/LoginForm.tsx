@@ -1,379 +1,353 @@
 "use client";
 
-import Logo from "@/components/common/Logo";
-import { createClient } from "@/lib/supabase/browser";
-import {
-    Box,
-    Button,
-    Divider,
-    Grid,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
+import { Form, Formik, type FormikHelpers } from "formik";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import * as Yup from "yup";
 
-const inputSx = {
-    "& .MuiInputBase-root": {
-        minHeight: 44,
-        borderRadius: 3,
-        backgroundColor: "#f5f6f7",
-    },
+import Logo from "@/components/common/Logo";
+import QRTextField from "@/components/common/input/QRTextField";
+import { createClient } from "@/lib/supabase/browser";
+import { loginButtonSx, loginTextFieldSx } from "@/styles/login.styles";
 
-    "& .MuiInputBase-input": {
-        fontSize: 14,
-        px: 1.75,
-
-        "&:-webkit-autofill": {
-            WebkitBoxShadow: "0 0 0 100px #f5f6f7 inset",
-            WebkitTextFillColor: "#263238",
-            caretColor: "#263238",
-        },
-
-        "&:-webkit-autofill:hover": {
-            WebkitBoxShadow: "0 0 0 100px #f5f6f7 inset",
-        },
-
-        "&:-webkit-autofill:focus": {
-            WebkitBoxShadow: "0 0 0 100px #f5f6f7 inset",
-        },
-    },
+type LoginFormValues = {
+    email: string;
+    password: string;
 };
+
+const initialValues: LoginFormValues = {
+    email: "",
+    password: "",
+};
+
+const validationSchema = Yup.object({
+    email: Yup.string().trim().required(" ").email("Email không hợp lệ."),
+    password: Yup.string().required(" "),
+});
+
+const LOGIN_COLORS = {
+    background: "#ffffff",
+    surface: "#ffffff",
+    textPrimary: "#111827",
+    textSecondary: "#6b7280",
+    textMuted: "#9ca3af",
+    border: "#e5e7eb",
+    primary: "#193b56",
+    primaryHover: "#244e6c",
+    primaryActive: "#16344b",
+    error: "#d92d20",
+    heroBackground: "#e9e3d9",
+} as const;
 
 export default function LoginForm() {
     const router = useRouter();
-    const supabase = createClient();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-
-    const [error, setError] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        if (isSubmitting) {
-            return;
-        }
-
-        setError("");
-
-        if (!email.trim()) {
-            setError("Vui lòng nhập email.");
-            return;
-        }
-
-        if (!password) {
-            setError("Vui lòng nhập mật khẩu.");
-            return;
-        }
-
-        setIsSubmitting(true);
+    const handleSubmit = async (
+        values: LoginFormValues,
+        { setSubmitting, setStatus }: FormikHelpers<LoginFormValues>,
+    ) => {
+        setStatus(undefined);
 
         try {
-            const { error: loginError } =
-                await supabase.auth.signInWithPassword({
-                    email: email.trim(),
-                    password,
-                });
+            const supabase = createClient();
 
-            if (loginError) {
-                setError("Email hoặc mật khẩu không chính xác.");
+            const { error } = await supabase.auth.signInWithPassword({
+                email: values.email.trim(),
+                password: values.password,
+            });
+
+            if (error) {
+                setStatus("Email hoặc mật khẩu không chính xác.");
                 return;
             }
 
             router.push("/dashboard");
             router.refresh();
-        } catch (error) {
-            console.error("Login failed:", error);
-
-            setError("Không thể đăng nhập. Vui lòng thử lại.");
+        } catch {
+            setStatus("Không thể đăng nhập. Vui lòng thử lại.");
         } finally {
-            setIsSubmitting(false);
+            setSubmitting(false);
         }
     };
 
     return (
         <Box
             sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                    xs: "1fr",
+                    md: "minmax(420px, 0.9fr) minmax(0, 1.1fr)",
+                },
                 minHeight: "100dvh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                px: 2,
-                py: 3,
-                backgroundColor: "#f5f6f7",
+                backgroundColor: LOGIN_COLORS.background,
+                color: LOGIN_COLORS.textPrimary,
+                colorScheme: "light",
+                "&, & *": {
+                    boxSizing: "border-box",
+                },
             }}
         >
+            {/* left */}
             <Box
                 sx={{
-                    position: "relative",
-                    width: "100%",
-                    maxWidth: 420,
-                    minHeight: 620,
-                    overflow: "hidden",
-                    backgroundColor: "#fff",
-                    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minWidth: 0,
+                    px: { xs: 2.5, sm: 4, md: 5, lg: 7 },
+                    py: { xs: 4, md: 6 },
+                    backgroundColor: LOGIN_COLORS.background,
                 }}
             >
                 <Box
                     sx={{
-                        position: "relative",
-                        zIndex: 1,
-                        px: {
-                            xs: 4,
-                            sm: 5,
+                        width: "100%",
+                        maxWidth: 440,
+                        p: { xs: 3, sm: 4, md: 4.5 },
+                        border: `1px solid ${LOGIN_COLORS.border}`,
+                        borderRadius: 3,
+                        backgroundColor: LOGIN_COLORS.surface,
+                        boxShadow:
+                            "0 2px 4px rgba(16, 24, 40, 0.02), 0 12px 32px rgba(16, 24, 40, 0.07), 0 32px 64px -24px rgba(16, 24, 40, 0.10)",
+                        transition: "box-shadow 200ms ease",
+                        "@media (prefers-reduced-motion: reduce)": {
+                            transition: "none",
                         },
-                        pt: 5,
-                        pb: 4,
                     }}
                 >
-                    <Grid container spacing={2}>
-                        <Grid size={12}>
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <Logo size={68} />
-                            </Box>
-                        </Grid>
-                        <Grid
-                            size={12}
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Box component="div" sx={{ display: "block" }}>
-                                <Typography
-                                    sx={{
-                                        fontSize: 14,
-                                        fontWeight: 500,
-                                        opacity: 0.9,
-                                        color: "#263238",
-                                    }}
-                                >
-                                    Welcome Back!
-                                </Typography>
-
-                                <Typography
-                                    component="h2"
-                                    sx={{
-                                        fontSize: {
-                                            xs: 28,
-                                            sm: 32,
-                                        },
-                                        lineHeight: 1.1,
-                                        fontWeight: 700,
-                                        color: "#263238",
-                                        display: "block",
-                                    }}
-                                >
-                                    Sign In
-                                </Typography>
-                            </Box>
-                        </Grid>
-                    </Grid>
-
+                    {/* logo */}
                     <Box
-                        component="form"
-                        onSubmit={handleSubmit}
-                        noValidate
-                        sx={{ marginTop: "26px" }}
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            mb: 4,
+                        }}
                     >
-                        <Typography
-                            component="label"
-                            htmlFor="email"
-                            sx={{
-                                display: "block",
-                                mb: 0.75,
-                                fontSize: 13,
-                                fontWeight: 600,
-                                color: "#263238",
-                            }}
-                        >
-                            Email Address
-                        </Typography>
-
-                        <TextField
-                            id="email"
-                            fullWidth
-                            type="email"
-                            value={email}
-                            onChange={(event) => {
-                                setEmail(event.target.value);
-
-                                if (error) {
-                                    setError("");
-                                }
-                            }}
-                            placeholder="Nhập email"
-                            autoComplete="email"
-                            size="small"
-                            sx={{ ...inputSx, mb: 3 }}
-                        />
+                        <Logo height="50px" width="50px" />
 
                         <Typography
-                            component="label"
-                            htmlFor="password"
+                            component="span"
                             sx={{
-                                display: "block",
-                                mb: 0.75,
-                                fontSize: 13,
-                                fontWeight: 600,
-                                color: "#263238",
-                            }}
-                        >
-                            Password
-                        </Typography>
-
-                        <TextField
-                            id="password"
-                            fullWidth
-                            type="password"
-                            value={password}
-                            onChange={(event) => {
-                                setPassword(event.target.value);
-
-                                if (error) {
-                                    setError("");
-                                }
-                            }}
-                            placeholder="Nhập mật khẩu"
-                            autoComplete="current-password"
-                            size="small"
-                            sx={inputSx}
-                        />
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                justifyContent: "flex-end",
-                                mt: 1,
-                            }}
-                        >
-                            <Button
-                                type="button"
-                                variant="text"
-                                size="small"
-                                sx={{
-                                    p: 0,
-                                    minWidth: 0,
-                                    textTransform: "none",
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    color: "#183750",
-                                }}
-                            >
-                                Forgot password?
-                            </Button>
-                        </Box>
-
-                        <Box
-                            sx={{
-                                height: 30,
-                                mb: 1.5,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    fontSize: 12,
-                                    lineHeight: 1.5,
-                                    color: "error.main",
-                                    textAlign: "center",
-                                    visibility: error ? "visible" : "hidden",
-                                }}
-                            >
-                                {error || " "}
-                            </Typography>
-                        </Box>
-
-                        <Button
-                            fullWidth
-                            type="submit"
-                            variant="contained"
-                            disabled={isSubmitting}
-                            sx={{
-                                minHeight: 44,
-                                borderRadius: 3,
-                                backgroundColor: "#183750",
-                                textTransform: "none",
-                                fontSize: 14,
+                                fontSize: 20,
                                 fontWeight: 700,
-                                boxShadow: "none",
-                                "&:hover": {
-                                    backgroundColor: "#122b3f",
-                                    boxShadow: "none",
-                                },
+                                letterSpacing: "-0.4px",
+                                color: LOGIN_COLORS.textPrimary,
                             }}
                         >
-                            {isSubmitting ? "Signing in..." : "Sign in"}
-                        </Button>
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 2,
-                                my: 4,
-                            }}
-                        >
-                            <Divider sx={{ flex: 1 }} />
-
-                            <Typography
-                                sx={{
-                                    fontSize: 13,
-                                    color: "text.secondary",
-                                }}
-                            >
-                                Or
-                            </Typography>
-
-                            <Divider sx={{ flex: 1 }} />
-                        </Box>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            disabled
-                            sx={{
-                                minHeight: 44,
-                                borderRadius: 3,
-                                textTransform: "none",
-                                fontSize: 14,
-                                fontWeight: 600,
-                            }}
-                        >
-                            Continue with Google
-                        </Button>
-
-                        <Typography
-                            sx={{
-                                mt: 4,
-                                textAlign: "center",
-                                fontSize: 12,
-                                color: "text.secondary",
-                            }}
-                        >
-                            Don&apos;t have an account?{" "}
-                            <Box
-                                component="span"
-                                sx={{
-                                    fontWeight: 700,
-                                    color: "#183750",
-                                }}
-                            >
-                                Sign up
-                            </Box>
+                            QR Feedback
                         </Typography>
                     </Box>
+
+                    {/* title */}
+                    <Box sx={{ mb: 3.5 }}>
+                        <Typography
+                            component="h1"
+                            sx={{
+                                mb: 1,
+                                fontSize: { xs: 22, sm: 26 },
+                                lineHeight: 1.3,
+                                fontWeight: 700,
+                                letterSpacing: "-0.6px",
+                                color: LOGIN_COLORS.textPrimary,
+                            }}
+                        >
+                            Chào mừng bạn trở lại
+                        </Typography>
+
+                        <Typography
+                            sx={{
+                                fontSize: 13,
+                                lineHeight: 1.7,
+                                color: LOGIN_COLORS.textSecondary,
+                            }}
+                        >
+                            Đăng nhập để quản lý phản hồi của nhà hàng.
+                        </Typography>
+                    </Box>
+
+                    <Formik<LoginFormValues>
+                        initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmit}
+                    >
+                        {({
+                            values,
+                            errors,
+                            touched,
+                            status,
+                            isSubmitting,
+                            handleChange,
+                            handleBlur,
+                            setStatus,
+                        }) => (
+                            <Form noValidate>
+                                <Box sx={{ mb: 2.5 }}>
+                                    <QRTextField
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        label="Email"
+                                        required
+                                        fullWidth
+                                        value={values.email}
+                                        onChange={(event) => {
+                                            handleChange(event);
+
+                                            if (status) {
+                                                setStatus(undefined);
+                                            }
+                                        }}
+                                        onBlur={handleBlur}
+                                        placeholder="Nhập email"
+                                        autoComplete="email"
+                                        errorMessage={
+                                            touched.email
+                                                ? errors.email
+                                                : undefined
+                                        }
+                                        sx={loginTextFieldSx}
+                                    />
+                                </Box>
+
+                                <QRTextField
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    label="Mật khẩu"
+                                    required
+                                    fullWidth
+                                    value={values.password}
+                                    onChange={(event) => {
+                                        handleChange(event);
+
+                                        if (status) {
+                                            setStatus(undefined);
+                                        }
+                                    }}
+                                    onBlur={handleBlur}
+                                    placeholder="Nhập mật khẩu"
+                                    autoComplete="current-password"
+                                    errorMessage={
+                                        touched.password
+                                            ? errors.password
+                                            : undefined
+                                    }
+                                    sx={loginTextFieldSx}
+                                />
+
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "flex-end",
+                                        mt: 1.5,
+                                    }}
+                                >
+                                    <Button
+                                        type="button"
+                                        variant="text"
+                                        size="small"
+                                        sx={{
+                                            p: 0,
+                                            minWidth: 0,
+                                            textTransform: "none",
+                                            fontSize: 12,
+                                            fontWeight: 600,
+                                            color: LOGIN_COLORS.primary,
+                                            textDecoration: "underline",
+                                            textUnderlineOffset: "3px",
+                                            backgroundColor: "transparent",
+                                            "&:hover": {
+                                                color: LOGIN_COLORS.primaryHover,
+                                                backgroundColor: "transparent",
+                                                textDecoration: "underline",
+                                            },
+                                            "&:active": {
+                                                color: LOGIN_COLORS.primaryActive,
+                                            },
+                                        }}
+                                    >
+                                        Quên mật khẩu?
+                                    </Button>
+                                </Box>
+
+                                <Box
+                                    sx={{
+                                        minHeight: 40,
+                                        mt: 1.5,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    {typeof status === "string" && (
+                                        <Typography
+                                            role="alert"
+                                            sx={{
+                                                fontSize: 12,
+                                                lineHeight: 1.5,
+                                                color: LOGIN_COLORS.error,
+                                                textAlign: "center",
+                                            }}
+                                        >
+                                            {status}
+                                        </Typography>
+                                    )}
+                                </Box>
+
+                                <Button
+                                    fullWidth
+                                    type="submit"
+                                    variant="contained"
+                                    disabled={isSubmitting}
+                                    sx={loginButtonSx}
+                                >
+                                    {isSubmitting
+                                        ? "Đang đăng nhập..."
+                                        : "Đăng nhập"}
+                                </Button>
+                            </Form>
+                        )}
+                    </Formik>
+
+                    <Typography
+                        sx={{
+                            mt: 3.5,
+                            fontSize: 11,
+                            lineHeight: 1.6,
+                            textAlign: "center",
+                            color: LOGIN_COLORS.textMuted,
+                        }}
+                    >
+                        © {new Date().getFullYear()} QR Feedback
+                    </Typography>
                 </Box>
+            </Box>
+
+            {/* right */}
+            <Box
+                sx={{
+                    position: "relative",
+                    display: { xs: "none", md: "block" },
+                    minWidth: 0,
+                    minHeight: "100dvh",
+                    overflow: "hidden",
+                    backgroundColor: LOGIN_COLORS.heroBackground,
+                }}
+            >
+                <Box
+                    component="img"
+                    src="/assets/qr-feedback-login-hero.svg"
+                    alt="QR Feedback — restaurant customer experience"
+                    sx={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        display: "block",
+                    }}
+                />
             </Box>
         </Box>
     );

@@ -77,6 +77,7 @@ const navigationGroups: NavigationGroup[] = [
     },
 ];
 
+const DEFAULT_RESTAURANT_LOGO = "/assets/default-restaurant-logo.png";
 export default function DashboardSidebar({
     role,
     restaurantName,
@@ -200,14 +201,30 @@ export default function DashboardSidebar({
                                       xs: 1,
                                       md: 1.5,
                                   },
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                            overflow: "hidden",
+                            borderRadius: "50%",
                         }}
                     >
                         <Box
                             component="img"
-                            src={
-                                logoUrl || "/assets/default-restaurant-logo.png"
-                            }
+                            src={logoUrl || DEFAULT_RESTAURANT_LOGO}
                             alt={restaurantName || "Logo nhà hàng"}
+                            onError={(event) => {
+                                const image = event.currentTarget;
+
+                                if (
+                                    image.src.endsWith(DEFAULT_RESTAURANT_LOGO)
+                                ) {
+                                    image.style.visibility = "hidden";
+                                    return;
+                                }
+
+                                image.src = DEFAULT_RESTAURANT_LOGO;
+                            }}
                             sx={{
                                 width: collapsed
                                     ? 40
@@ -224,8 +241,8 @@ export default function DashboardSidebar({
                                 flexShrink: 0,
                                 objectFit: "contain",
                                 borderRadius: "50%",
-                                bgcolor: "var(--color-surface, #FFFFFF)",
-                                position: "relative",
+                                bgcolor: "var(--color-surface)",
+                                display: "block",
                             }}
                         />
                     </Box>

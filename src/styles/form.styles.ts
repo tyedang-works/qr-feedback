@@ -2,7 +2,7 @@ import type { SxProps, Theme } from "@mui/material/styles";
 
 export const formLabelSx: SxProps<Theme> = {
     display: "block",
-    mb: 0.75,
+    mb: 0.5,
     fontSize: 13,
     lineHeight: 1.5,
     fontWeight: 500,
@@ -25,6 +25,8 @@ export const formRequiredSx = {
     ml: 0.25,
     color: "error.main",
     fontSize: 13,
+    lineHeight: 1.5,
+    fontWeight: 500,
 };
 
 export const checkboxStyleSx: SxProps<Theme> = {

@@ -281,7 +281,7 @@ export default function DashboardLayout({
                                             height: 42,
                                             bgcolor:
                                                 "var(--color-primary, #193B56)",
-                                            color: "#FFFFFF",
+                                            color: "var(--color-surface, #FFF)",
                                             fontSize: 13,
                                             fontWeight: 600,
                                         }}

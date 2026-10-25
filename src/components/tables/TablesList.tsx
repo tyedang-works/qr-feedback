@@ -97,6 +97,9 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 "& .MuiOutlinedInput-root": {
                                     borderRadius: 1.5,
                                 },
+                                "& .MuiOutlinedInput-input": {
+                                    paddingTop: "14px",
+                                },
                             }}
                         />
 

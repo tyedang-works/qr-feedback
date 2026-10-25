@@ -1,6 +1,12 @@
 "use client";
 
-import { Box, Button, Typography } from "@mui/material";
+import {
+    Box,
+    Button,
+    IconButton,
+    InputAdornment,
+    Typography,
+} from "@mui/material";
 import { Form, Formik, type FormikHelpers } from "formik";
 import { useRouter } from "next/navigation";
 import * as Yup from "yup";
@@ -9,6 +15,8 @@ import Logo from "@/components/common/Logo";
 import QRTextField from "@/components/common/input/QRTextField";
 import { createClient } from "@/lib/supabase/browser";
 import { loginButtonSx, loginTextFieldSx } from "@/styles/login.styles";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 type LoginFormValues = {
     email: string;
@@ -42,6 +50,18 @@ const LOGIN_COLORS = {
 export default function LoginForm() {
     const router = useRouter();
 
+    const [resetEmail] = useState(() => {
+        if (typeof window === "undefined") return "";
+
+        const email = sessionStorage.getItem("reset-password-email") ?? "";
+
+        if (email) {
+            sessionStorage.removeItem("reset-password-email");
+        }
+
+        return email;
+    });
+
     const handleSubmit = async (
         values: LoginFormValues,
         { setSubmitting, setStatus }: FormikHelpers<LoginFormValues>,
@@ -69,6 +89,12 @@ export default function LoginForm() {
             setSubmitting(false);
         }
     };
+
+    const handleForgotPassword = () => {
+        router.push("/forgot-password");
+    };
+
+    const [showPassword, setShowPassword] = useState(false);
 
     return (
         <Box
@@ -167,7 +193,11 @@ export default function LoginForm() {
                     </Box>
 
                     <Formik<LoginFormValues>
-                        initialValues={initialValues}
+                        initialValues={{
+                            ...initialValues,
+                            email: resetEmail,
+                        }}
+                        enableReinitialize
                         validationSchema={validationSchema}
                         onSubmit={handleSubmit}
                     >
@@ -213,7 +243,7 @@ export default function LoginForm() {
                                 <QRTextField
                                     id="password"
                                     name="password"
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     label="Mật khẩu"
                                     required
                                     fullWidth
@@ -233,6 +263,43 @@ export default function LoginForm() {
                                             ? errors.password
                                             : undefined
                                     }
+                                    slotProps={{
+                                        input: {
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        type="button"
+                                                        edge="end"
+                                                        size="small"
+                                                        aria-label={
+                                                            showPassword
+                                                                ? "Ẩn mật khẩu"
+                                                                : "Hiện mật khẩu"
+                                                        }
+                                                        onClick={() =>
+                                                            setShowPassword(
+                                                                (previous) =>
+                                                                    !previous,
+                                                            )
+                                                        }
+                                                        sx={{
+                                                            color: "var(--color-text-secondary)",
+                                                            "&:hover": {
+                                                                backgroundColor:
+                                                                    "rgba(25, 59, 86, 0.06)",
+                                                            },
+                                                        }}
+                                                    >
+                                                        {showPassword ? (
+                                                            <EyeOff size={18} />
+                                                        ) : (
+                                                            <Eye size={18} />
+                                                        )}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        },
+                                    }}
                                     sx={loginTextFieldSx}
                                 />
 
@@ -247,6 +314,7 @@ export default function LoginForm() {
                                         type="button"
                                         variant="text"
                                         size="small"
+                                        onClick={handleForgotPassword}
                                         sx={{
                                             p: 0,
                                             minWidth: 0,

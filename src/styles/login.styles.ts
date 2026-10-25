@@ -3,13 +3,13 @@ import type { SxProps, Theme } from "@mui/material";
 const LOGIN_COLORS = {
     text: "#111827",
     textSecondary: "#6b7280",
-    placeholder: "#9ca3af",
+    placeholder: "#98A2B3",
     border: "#d0d5dd",
     borderHover: "#98a2b3",
     focus: "#193b56",
     background: "#ffffff",
-    primary: "#193b56",
-    primaryHover: "#244e6c",
+    primary: "#111827",
+    primaryHover: "#454F5B",
     primaryActive: "#16344b",
     disabled: "#f9fafb",
     error: "#d92d20",
@@ -48,7 +48,7 @@ export const loginTextFieldSx: SxProps<Theme> = {
 
         "&::placeholder": {
             color: LOGIN_COLORS.placeholder,
-            opacity: 1,
+            opacity: 0.5,
         },
     },
 

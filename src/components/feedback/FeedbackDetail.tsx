@@ -1,10 +1,14 @@
 import FeedbackManagementForm from "@/components/feedback/FeedbackManagementForm";
-import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
-import { FEEDBACK_STATUS_CONFIG } from "@/lib/feedback/status";
+import {
+    FEEDBACK_ISSUE_LABEL_MAP,
+    isFeedbackIssueOption,
+} from "@/lib/feedback/constants";
 import type { FeedbackDetail as FeedbackDetailData } from "@/lib/feedback/types";
 import { cardSx } from "@/styles/card.styles";
-import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 import Link from "next/link";
+import FeedbackStatusChip from "../common/feedback/FeedbackStatusChip";
+import FeedbackIssueChip from "./FeedbackIssueChip";
 
 type FeedbackDetailProps = {
     data: FeedbackDetailData;
@@ -78,8 +82,6 @@ function SectionHeading({
 }
 
 export default function FeedbackDetail({ data }: FeedbackDetailProps) {
-    const status = FEEDBACK_STATUS_CONFIG[data.status];
-
     return (
         <Stack sx={{ width: "100%", gap: { xs: 2.5, md: 3 } }}>
             <Box>
@@ -111,9 +113,9 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                     <Box sx={{ minWidth: 0 }}>
                         <Typography
                             sx={{
-                                fontSize: { xs: 20, sm: 24 },
+                                fontSize: { xs: 18, sm: 22 },
                                 lineHeight: 1.3,
-                                fontWeight: 700,
+                                fontWeight: 600,
                                 color: "var(--color-text-primary, #111827)",
                             }}
                         >
@@ -133,21 +135,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                         </Typography>
                     </Box>
 
-                    <Chip
-                        label={status.label}
-                        size="small"
-                        sx={{
-                            height: 30,
-                            flexShrink: 0,
-                            borderRadius: 1.5,
-                            color: status.color,
-                            bgcolor: status.backgroundColor,
-                            border: "1px solid",
-                            borderColor: status.borderColor,
-                            fontSize: 12,
-                            fontWeight: 600,
-                        }}
-                    />
+                    <FeedbackStatusChip status={data.status} />
                 </Stack>
             </Box>
 
@@ -273,34 +261,25 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                             gap: 1,
                                         }}
                                     >
-                                        {data.selectedOptions.map((option) => (
-                                            <Chip
-                                                key={option}
-                                                label={
-                                                    FEEDBACK_ISSUE_LABEL_MAP[
-                                                        option
-                                                    ] ?? option
-                                                }
-                                                size="small"
-                                                variant="outlined"
-                                                sx={{
-                                                    minHeight: 30,
-                                                    height: "auto",
-                                                    borderRadius: 1.5,
-                                                    borderColor:
-                                                        "var(--color-border, #E5E7EB)",
-                                                    backgroundColor:
-                                                        "var(--color-surface, #FFFFFF)",
-                                                    color: "var(--color-text-secondary, #4B5563)",
-                                                    fontSize: 12,
-                                                    fontWeight: 500,
-                                                    "& .MuiChip-label": {
-                                                        py: 0.75,
-                                                        whiteSpace: "normal",
-                                                    },
-                                                }}
-                                            />
-                                        ))}
+                                        {data.selectedOptions.map((option) => {
+                                            if (
+                                                !isFeedbackIssueOption(option)
+                                            ) {
+                                                return null;
+                                            }
+
+                                            return (
+                                                <FeedbackIssueChip
+                                                    key={option}
+                                                    option={option}
+                                                    label={
+                                                        FEEDBACK_ISSUE_LABEL_MAP[
+                                                            option
+                                                        ]
+                                                    }
+                                                />
+                                            );
+                                        })}
                                     </Stack>
                                 ) : (
                                     <Typography

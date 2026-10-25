@@ -139,6 +139,27 @@ body {
     --color-feedback-item-hover-bg: #f1f5f9;
     --color-feedback-item-hover-border: #cbd5e1;
     --shadow-feedback-item-hover: 0 2px 8px rgba(15, 23, 42, 0.08);
+
+    /* feedback issue chips */
+    --color-issue-food-quality-bg: #fef0f0;
+    --color-issue-food-quality-border: #f3caca;
+    --color-issue-food-quality-text: #b42318;
+
+    --color-issue-food-presentation-bg: #f4f0ff;
+    --color-issue-food-presentation-border: #d9ccff;
+    --color-issue-food-presentation-text: #6941c6;
+
+    --color-issue-service-bg: #eff8ff;
+    --color-issue-service-border: #b2ddff;
+    --color-issue-service-text: #175cd3;
+
+    --color-issue-cleanliness-bg: #ecfdf3;
+    --color-issue-cleanliness-border: #abefc6;
+    --color-issue-cleanliness-text: #067647;
+
+    --color-issue-service-time-bg: #fff1f3;
+    --color-issue-service-time-border: #fecdd6;
+    --color-issue-service-time-text: #c01048;
 }
 
 :root[data-theme="dark"] {
@@ -261,6 +282,27 @@ body {
     --color-feedback-item-hover-bg: #354256;
     --color-feedback-item-hover-border: #64748b;
     --shadow-feedback-item-hover: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    /* feedback issue chips */
+    --color-issue-food-quality-bg: #3b2529;
+    --color-issue-food-quality-border: #704047;
+    --color-issue-food-quality-text: #fda29b;
+
+    --color-issue-food-presentation-bg: #302747;
+    --color-issue-food-presentation-border: #514071;
+    --color-issue-food-presentation-text: #c6b5ff;
+
+    --color-issue-service-bg: #1e3047;
+    --color-issue-service-border: #345579;
+    --color-issue-service-text: #84caff;
+
+    --color-issue-cleanliness-bg: #20382f;
+    --color-issue-cleanliness-border: #345b49;
+    --color-issue-cleanliness-text: #75e0a7;
+
+    --color-issue-service-time-bg: #402630;
+    --color-issue-service-time-border: #70404f;
+    --color-issue-service-time-text: #fea3b4;
 }
 
 @media print {

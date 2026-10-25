@@ -1,11 +1,15 @@
 "use client";
 
 import FeedbackManagementForm from "@/components/feedback/FeedbackManagementForm";
-import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
+import {
+    FEEDBACK_ISSUE_LABEL_MAP,
+    isFeedbackIssueOption,
+} from "@/lib/feedback/constants";
 import type { FeedbackListItem } from "@/lib/feedback/types";
 import { cardSx } from "@/styles/card.styles";
-import { Box, Card, Chip, Divider, Stack, Typography } from "@mui/material";
+import { Box, Card, Divider, Stack, Typography } from "@mui/material";
 import FeedbackStatusChip from "../common/feedback/FeedbackStatusChip";
+import FeedbackIssueChip from "./FeedbackIssueChip";
 
 type FeedbackDetailPanelProps = {
     data: FeedbackListItem;
@@ -156,38 +160,21 @@ export default function FeedbackDetailPanel({
                                     gap: 0.75,
                                 }}
                             >
-                                {data.selectedOptions.map((option) => (
-                                    <Chip
-                                        key={option}
-                                        label={
-                                            FEEDBACK_ISSUE_LABEL_MAP[option] ??
-                                            option
-                                        }
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{
-                                            height: "auto",
-                                            minHeight: 27,
-                                            maxWidth: "100%",
-                                            borderColor:
-                                                "var(--color-border, #D9DEE5)",
-                                            borderRadius: 1,
-                                            bgcolor: "transparent",
-                                            color: "var(--color-text-secondary, #667085)",
-                                            fontSize: 12,
-                                            fontWeight: 400,
-                                            "& .MuiChip-label": {
-                                                display: "block",
-                                                whiteSpace: "normal",
-                                                py: 0.5,
-                                            },
-                                            '[data-theme="dark"] &': {
-                                                borderColor: "#414955",
-                                                color: "#B8C0CA",
-                                            },
-                                        }}
-                                    />
-                                ))}
+                                {data.selectedOptions.map((option) => {
+                                    if (!isFeedbackIssueOption(option)) {
+                                        return null;
+                                    }
+
+                                    return (
+                                        <FeedbackIssueChip
+                                            key={option}
+                                            option={option}
+                                            label={
+                                                FEEDBACK_ISSUE_LABEL_MAP[option]
+                                            }
+                                        />
+                                    );
+                                })}
                             </Stack>
                         ) : (
                             <Typography

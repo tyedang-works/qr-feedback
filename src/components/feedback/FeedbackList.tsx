@@ -1,13 +1,17 @@
 "use client";
 
-import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
+import {
+    FEEDBACK_ISSUE_LABEL_MAP,
+    isFeedbackIssueOption,
+} from "@/lib/feedback/constants";
 import type { FeedbackListItem } from "@/lib/feedback/types";
-import { Box, Card, Chip, Divider, Stack, Typography } from "@mui/material";
+import { Box, Card, Divider, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
 import FeedbackStatusChip from "../common/feedback/FeedbackStatusChip";
 import FeedbackDetailPanel from "./FeedbackDetailPanel";
+import FeedbackIssueChip from "./FeedbackIssueChip";
 
 type FeedbackListProps = {
     data: FeedbackListItem[];
@@ -78,19 +82,31 @@ function FeedbackRowContent({
                     gap: 1,
                 }}
             >
-                <Typography
+                <Stack
                     sx={{
-                        minWidth: 0,
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: "var(--color-text-primary, #193B56)",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
+                        flexDirection: "row",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        gap: 1,
                     }}
                 >
-                    {item.tableName}
-                </Typography>
+                    <Typography
+                        sx={{
+                            minWidth: 0,
+                            fontSize: 14,
+                            fontWeight: 700,
+                            color: "var(--color-text-primary, #193B56)",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {item.tableName}
+                    </Typography>
+
+                    <FeedbackStatusChip status={item.status} />
+                </Stack>
 
                 <Typography
                     sx={{
@@ -111,39 +127,19 @@ function FeedbackRowContent({
                     gap: 0.75,
                 }}
             >
-                <FeedbackStatusChip status={item.status} />
+                {visibleIssues.map((option) => {
+                    if (!isFeedbackIssueOption(option)) {
+                        return null;
+                    }
 
-                {visibleIssues.map((option) => (
-                    <Chip
-                        key={option}
-                        label={FEEDBACK_ISSUE_LABEL_MAP[option] ?? option}
-                        size="small"
-                        variant="outlined"
-
-                        sx={{
-                            maxWidth: "100%",
-                            height: 23,
-                            borderColor: "var(--color-border, #D9DEE5)",
-                            borderRadius: 1,
-                            color: "var(--color-text-secondary, #667085)",
-                            fontSize: 11,
-                            fontWeight: 400,
-                            bgcolor: "transparent",
-
-                            "& .MuiChip-label": {
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                px: 1,
-                            },
-
-                            '[data-theme="dark"] &': {
-                                borderColor: "#414955",
-                                color: "#B8C0CA",
-                                bgcolor: "transparent",
-                            },
-                        }}
-                    />
-                ))}
+                    return (
+                        <FeedbackIssueChip
+                            key={option}
+                            option={option}
+                            label={FEEDBACK_ISSUE_LABEL_MAP[option]}
+                        />
+                    );
+                })}
 
                 {remainingIssues > 0 && (
                     <Typography

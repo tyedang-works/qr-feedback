@@ -4,8 +4,11 @@ import { updateFeedback } from "@/app/dashboard/feedback/[id]/actions";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
-import { FEEDBACK_STATUS, type FeedbackStatus } from "@/lib/feedback/constants";
-import { FEEDBACK_STATUS_CONFIG } from "@/lib/feedback/status";
+import {
+    FEEDBACK_STATUS,
+    STATUS_CONFIG,
+    type FeedbackStatus,
+} from "@/lib/feedback/constants";
 import { buttonBaseSx } from "@/styles/button.styles";
 import { Box, Button, MenuItem, Stack } from "@mui/material";
 import type { FormikHelpers } from "formik";
@@ -33,7 +36,7 @@ type SnackbarState = {
 
 const FEEDBACK_STATUS_OPTIONS = Object.values(FEEDBACK_STATUS).map((value) => ({
     value,
-    label: FEEDBACK_STATUS_CONFIG[value].label,
+    label: STATUS_CONFIG[value].label,
 }));
 
 const validationSchema = Yup.object({

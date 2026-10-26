@@ -21,6 +21,7 @@ import type { SelectChangeEvent } from "@mui/material/Select";
 import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useDashboardLoading } from "../dashboard/DashboardLoadingProvider";
 
 const PAGE_SIZES: QRCodePageSize[] = [10, 25, 50];
 
@@ -57,6 +58,7 @@ export default function QRCodeFilterBar() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { startNavigation } = useDashboardLoading();
 
     const keywordParam = searchParams.get("keyword") ?? "";
     const statusParam = searchParams.get("status") ?? "all";
@@ -87,13 +89,17 @@ export default function QRCodeFilterBar() {
 
             const query = params.toString();
             const nextUrl = query ? `${pathname}?${query}` : pathname;
-            const currentUrl = `${pathname}?${searchParams.toString()}`;
+            const currentQuery = searchParams.toString();
+            const currentUrl = currentQuery
+                ? `${pathname}?${currentQuery}`
+                : pathname;
 
             if (nextUrl !== currentUrl) {
+                startNavigation();
                 router.replace(nextUrl, { scroll: false });
             }
         },
-        [pathname, router, searchParams],
+        [pathname, router, searchParams, startNavigation],
     );
 
     const handleKeywordChange = (

@@ -16,6 +16,7 @@ import {
 } from "@/styles/button.styles";
 import { cardSx } from "@/styles/card.styles";
 
+import { useDashboardLoading } from "@/components/dashboard/DashboardLoadingProvider";
 import {
     Box,
     Button,
@@ -39,9 +40,8 @@ import {
     Search,
     X,
 } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 
 type FeedbackToolbarProps = {
     keyword: string;
@@ -95,14 +95,14 @@ export default function FeedbackToolbar({
     const [filterAnchorEl, setFilterAnchorEl] =
         useState<HTMLButtonElement | null>(null);
 
-    const [isPending, startTransition] = useTransition();
     const [keywordValue, setKeywordValue] = useState(keyword);
     const [filterOpen, setFilterOpen] = useState(false);
 
     const [draftIssues, setDraftIssues] = useState<string[]>(issues);
     const [draftTableId, setDraftTableId] = useState(tableId || "all");
 
-    const isLoading = isPending || keywordValue.trim() !== keyword.trim();
+    const { startNavigation } = useDashboardLoading();
+    const isLoading = keywordValue.trim() !== keyword.trim();
 
     const selectedIssues = FEEDBACK_ISSUES.filter(({ option }) =>
         issues.includes(option),
@@ -136,21 +136,21 @@ export default function FeedbackToolbar({
 
             const query = params.toString();
             const href = query ? `${pathname}?${query}` : pathname;
-
-            startTransition(() => {
-                router.replace(href, { scroll: false });
-            });
+            startNavigation();
+            router.replace(href, { scroll: false });
         }, SEARCH_DEBOUNCE_MS);
 
         return () => {
             window.clearTimeout(timeoutId);
         };
-    }, [keywordValue, pathname, router]);
+    }, [keywordValue, pathname, router, startNavigation]);
 
     const navigateTo = (href: string) => {
-        startTransition(() => {
-            router.replace(href, { scroll: false });
-        });
+        if (href === `${pathname}${window.location.search}`) {
+            return;
+        }
+        startNavigation();
+        router.replace(href, { scroll: false });
     };
 
     const buildHref = (overrides: FilterOverrides = {}) => {
@@ -645,14 +645,17 @@ export default function FeedbackToolbar({
                         return (
                             <Chip
                                 key={option.value}
-                                component={Link}
-                                href={buildHref({
-                                    status:
-                                        option.value === "all"
-                                            ? null
-                                            : option.value,
-                                })}
                                 clickable
+                                onClick={() =>
+                                    navigateTo(
+                                        buildHref({
+                                            status:
+                                                option.value === "all"
+                                                    ? null
+                                                    : option.value,
+                                        }),
+                                    )
+                                }
                                 label={`${option.label} · ${count}`}
                                 size="small"
                                 sx={{

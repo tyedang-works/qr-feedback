@@ -33,6 +33,7 @@ import ChangePasswordDialog from "../account/ChangePasswordDialog";
 import RoleChip from "../common/RoleChip";
 import DashboardFooter from "./DashboardFooter";
 import DashboardSidebar from "./DashboardSidebar";
+import { useDashboardLoading } from "./DashboardLoadingProvider";
 
 type DashboardLayoutProps = {
     children: React.ReactNode;
@@ -81,8 +82,10 @@ export default function DashboardLayout({
         setIsProfileOpen(false);
     };
 
+    const { startNavigation } = useDashboardLoading();
     const handleProfileNavigation = (href: string) => {
         handleCloseProfile();
+        startNavigation();
         router.push(href);
     };
 

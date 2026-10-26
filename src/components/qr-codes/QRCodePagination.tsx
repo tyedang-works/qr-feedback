@@ -1,5 +1,6 @@
 "use client";
 
+import { useDashboardLoading } from "@/components/dashboard/DashboardLoadingProvider";
 import type { QRCodePageSize } from "@/lib/qr-codes/types";
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -20,24 +21,33 @@ export default function QRCodePagination({
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { startNavigation } = useDashboardLoading();
 
     if (total === 0 || totalPages <= 1) {
         return null;
     }
 
+    const currentPage = Math.min(page, totalPages);
+
     const handlePageChange = (
         _event: React.ChangeEvent<unknown>,
         nextPage: number,
     ) => {
+        if (nextPage === currentPage) return;
+
         const params = new URLSearchParams(searchParams.toString());
 
         params.set("page", String(nextPage));
 
-        router.push(`${pathname}?${params.toString()}`);
+        startNavigation();
+
+        router.push(`${pathname}?${params.toString()}`, {
+            scroll: false,
+        });
     };
 
-    const from = (page - 1) * pageSize + 1;
-    const to = Math.min(page * pageSize, total);
+    const from = (currentPage - 1) * pageSize + 1;
+    const to = Math.min(currentPage * pageSize, total);
 
     return (
         <Box sx={{ width: "100%", pt: 1 }}>
@@ -87,14 +97,13 @@ export default function QRCodePagination({
 
                 <Pagination
                     count={totalPages}
-                    page={Math.min(page, totalPages)}
+                    page={currentPage}
                     onChange={handlePageChange}
                     size="small"
                     shape="rounded"
                     color="primary"
                     siblingCount={1}
                     boundaryCount={1}
-
                     sx={{
                         "& .MuiPagination-ul": {
                             justifyContent: {

@@ -4,6 +4,7 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { getUserContext } from "@/lib/auth/queries";
 import { getRestaurantSettings } from "@/lib/restaurant/queries";
 import SessionRefreshReminder from "@/components/auth/SessionRefreshReminder";
+import { DashboardLoadingProvider } from "@/components/dashboard/DashboardLoadingProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -50,12 +51,14 @@ export default async function DashboardRouteLayout({
     const feedbackEmail = process.env.FEEDBACK_EMAIL ?? "";
 
     return (
-        <DashboardLayout
-            userContext={userContext}
-            feedbackEmail={feedbackEmail}
-        >
-            {children}
-            <SessionRefreshReminder />
-        </DashboardLayout>
+        <DashboardLoadingProvider>
+            <DashboardLayout
+                userContext={userContext}
+                feedbackEmail={feedbackEmail}
+            >
+                {children}
+                <SessionRefreshReminder />
+            </DashboardLayout>
+        </DashboardLoadingProvider>
     );
 }

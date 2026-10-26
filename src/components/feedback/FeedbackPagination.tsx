@@ -1,5 +1,6 @@
 "use client";
 
+import { useDashboardLoading } from "@/components/dashboard/DashboardLoadingProvider";
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ChangeEvent } from "react";
@@ -20,6 +21,7 @@ export default function FeedbackPagination({
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { startNavigation } = useDashboardLoading();
 
     if (total === 0 || totalPages <= 1) {
         return null;
@@ -32,9 +34,12 @@ export default function FeedbackPagination({
         _event: ChangeEvent<unknown>,
         nextPage: number,
     ) => {
-        const params = new URLSearchParams(searchParams.toString());
+        if (nextPage === page) return;
 
+        const params = new URLSearchParams(searchParams.toString());
         params.set("page", String(nextPage));
+
+        startNavigation();
 
         router.push(`${pathname}?${params.toString()}`, {
             scroll: false,
@@ -95,7 +100,6 @@ export default function FeedbackPagination({
                     boundaryCount={1}
                     size="small"
                     shape="rounded"
-
                     sx={{
                         "& .MuiPagination-ul": {
                             justifyContent: {

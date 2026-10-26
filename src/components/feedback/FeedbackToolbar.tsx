@@ -5,7 +5,7 @@ import QRTextField from "@/components/common/input/QRTextField";
 import {
     FEEDBACK_ISSUES,
     FEEDBACK_STATUS,
-    FeedbackStatus,
+    STATUS_CONFIG,
 } from "@/lib/feedback/constants";
 import type { FeedbackSummary } from "@/lib/feedback/types";
 import type { RestaurantTableOption } from "@/lib/tables/queries";
@@ -66,48 +66,20 @@ const STATUS_OPTIONS = [
     },
     {
         value: FEEDBACK_STATUS.NEW,
-        label: "Chưa xử lý",
+        label: STATUS_CONFIG[FEEDBACK_STATUS.NEW].label,
         getCount: (summary: FeedbackSummary) => summary.new,
     },
     {
         value: FEEDBACK_STATUS.IN_PROGRESS,
-        label: "Đang xử lý",
+        label: STATUS_CONFIG[FEEDBACK_STATUS.IN_PROGRESS].label,
         getCount: (summary: FeedbackSummary) => summary.inProgress,
     },
     {
         value: FEEDBACK_STATUS.RESOLVED,
-        label: "Đã xử lý",
+        label: STATUS_CONFIG[FEEDBACK_STATUS.RESOLVED].label,
         getCount: (summary: FeedbackSummary) => summary.resolved,
     },
 ] as const;
-
-type StatusColorConfig = {
-    color: string;
-    backgroundColor: string;
-    darkColor: string;
-    darkBackgroundColor: string;
-};
-
-const STATUS_COLORS: Partial<Record<FeedbackStatus, StatusColorConfig>> = {
-    [FEEDBACK_STATUS.NEW]: {
-        color: "#B54708",
-        backgroundColor: "#FFF4E5",
-        darkColor: "#FDBA74",
-        darkBackgroundColor: "#422B18",
-    },
-    [FEEDBACK_STATUS.IN_PROGRESS]: {
-        color: "#175CD3",
-        backgroundColor: "#EFF8FF",
-        darkColor: "#93C5FD",
-        darkBackgroundColor: "#1E3552",
-    },
-    [FEEDBACK_STATUS.RESOLVED]: {
-        color: "#027A48",
-        backgroundColor: "#ECFDF3",
-        darkColor: "#6EE7B7",
-        darkBackgroundColor: "#173B30",
-    },
-};
 
 export default function FeedbackToolbar({
     keyword,
@@ -350,7 +322,7 @@ export default function FeedbackToolbar({
                                         sx={{
                                             display: "inline-flex",
                                             alignItems: "center",
-                                            color: "var(--color-text-muted, #98A2B3)",
+                                            color: "var(--color-text-muted)",
                                         }}
                                     >
                                         <Search size={16} />
@@ -370,7 +342,7 @@ export default function FeedbackToolbar({
                                 right: 14,
                                 top: "30%",
                                 transform: "translateY(-50%)",
-                                color: "var(--color-input-focus, #1976D2)",
+                                color: "var(--color-input-focus)",
                                 pointerEvents: "none",
                             }}
                         />
@@ -405,11 +377,11 @@ export default function FeedbackToolbar({
                         px: 1.5,
                         borderRadius: 1.5,
                         borderColor: filterOpen
-                            ? "var(--color-input-focus, #193B56)"
-                            : "var(--color-input-border, #D0D5DD)",
-                        color: "var(--color-text-secondary, #475467)",
+                            ? "var(--color-input-focus)"
+                            : "var(--color-input-border)",
+                        color: "var(--color-text-secondary)",
                         bgcolor: filterOpen
-                            ? "var(--color-surface-active, #F2F4F7)"
+                            ? "var(--color-surface-active)"
                             : "transparent",
                         fontSize: 13,
                         fontWeight: 600,
@@ -417,9 +389,8 @@ export default function FeedbackToolbar({
                         whiteSpace: "nowrap",
                         flexShrink: 0,
                         "&:hover": {
-                            borderColor:
-                                "var(--color-input-border-hover, #98A2B3)",
-                            bgcolor: "var(--color-surface-hover, #F9FAFB)",
+                            borderColor: "var(--color-input-border-hover)",
+                            bgcolor: "var(--color-surface-hover)",
                         },
                     }}
                 >
@@ -432,8 +403,8 @@ export default function FeedbackToolbar({
                                 width: 20,
                                 height: 20,
                                 borderRadius: "50%",
-                                bgcolor: "#193B56",
-                                color: "#FFFFFF",
+                                bgcolor: "var(--color-button-primary-bg)",
+                                color: "var(--color-button-primary-text)",
                                 display: "inline-flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -468,10 +439,10 @@ export default function FeedbackToolbar({
                             },
                             maxWidth: 320,
                             p: 2.5,
-                            border: "1px solid var(--color-border, #EAECF0)",
+                            border: "1px solid var(--color-border)",
                             borderRadius: 2,
-                            bgcolor: "var(--color-surface, #FFFFFF)",
-                            color: "var(--color-text-primary, #111827)",
+                            bgcolor: "var(--color-surface)",
+                            color: "var(--color-text-primary)",
                             boxShadow: "var(--shadow-card)",
                             backgroundImage: "none",
                         },
@@ -491,7 +462,7 @@ export default function FeedbackToolbar({
                             sx={{
                                 fontSize: 15,
                                 fontWeight: 700,
-                                color: "var(--color-text-primary, #193B56)",
+                                color: "var(--color-text-primary)",
                             }}
                         >
                             Bộ lọc phản hồi
@@ -501,7 +472,7 @@ export default function FeedbackToolbar({
                             sx={{
                                 mt: 0.25,
                                 fontSize: 12,
-                                color: "var(--color-text-secondary, #667085)",
+                                color: "var(--color-text-secondary)",
                             }}
                         >
                             Thu hẹp kết quả theo vấn đề và bàn.
@@ -512,6 +483,9 @@ export default function FeedbackToolbar({
                         size="small"
                         aria-label="Đóng bộ lọc"
                         onClick={() => setFilterOpen(false)}
+                        sx={{
+                            color: "var(--color-text-secondary)",
+                        }}
                     >
                         <X size={20} />
                     </IconButton>
@@ -520,7 +494,7 @@ export default function FeedbackToolbar({
                 <Divider
                     sx={{
                         mb: 2.5,
-                        borderColor: "var(--color-border, #EAECF0)",
+                        borderColor: "var(--color-border)",
                     }}
                 />
 
@@ -560,12 +534,9 @@ export default function FeedbackToolbar({
                                     sx={{
                                         p: 0.5,
                                         mr: 1,
-                                        color: "var(--color-text-muted, #98A2B3)",
+                                        color: "var(--color-text-muted)",
                                         "&.Mui-checked": {
-                                            color: "var(--color-input-focus, #193B56)",
-                                        },
-                                        '[data-theme="dark"] &.Mui-checked': {
-                                            color: "var(--color-input-focus, #93C5FD)",
+                                            color: "var(--color-input-focus)",
                                         },
                                     }}
                                 />
@@ -605,7 +576,7 @@ export default function FeedbackToolbar({
                 <Divider
                     sx={{
                         my: 2.5,
-                        borderColor: "var(--color-border, #EAECF0)",
+                        borderColor: "var(--color-border)",
                     }}
                 />
 
@@ -645,7 +616,7 @@ export default function FeedbackToolbar({
                         mb: 1,
                         fontSize: 12,
                         fontWeight: 600,
-                        color: "var(--color-text-secondary, #667085)",
+                        color: "var(--color-text-secondary)",
                     }}
                 >
                     Trạng thái phản hồi
@@ -665,10 +636,11 @@ export default function FeedbackToolbar({
                                 : status === option.value;
 
                         const count = option.getCount(summary);
+
                         const colors =
                             option.value === "all"
                                 ? undefined
-                                : STATUS_COLORS[option.value as FeedbackStatus];
+                                : STATUS_CONFIG[option.value];
 
                         return (
                             <Chip
@@ -690,13 +662,13 @@ export default function FeedbackToolbar({
                                     fontWeight: selected ? 600 : 500,
                                     border: "1px solid",
                                     borderColor: selected
-                                        ? (colors?.color ??
-                                          "var(--color-border, #374151)")
-                                        : "var(--color-border, #374151)",
+                                        ? (colors?.borderColor ??
+                                          "var(--color-border)")
+                                        : "var(--color-border)",
                                     color: selected
                                         ? (colors?.color ??
-                                          "var(--color-text-primary, #F9FAFB)")
-                                        : "var(--color-text-secondary, #D1D5DB)",
+                                          "var(--color-text-primary)")
+                                        : "var(--color-text-secondary)",
                                     bgcolor: selected
                                         ? (colors?.backgroundColor ??
                                           "var(--color-surface-active)")
@@ -705,7 +677,7 @@ export default function FeedbackToolbar({
                                         "background-color 150ms ease, border-color 150ms ease, color 150ms ease",
                                     "&:hover": {
                                         borderColor: selected
-                                            ? (colors?.color ??
+                                            ? (colors?.borderColor ??
                                               "var(--color-border)")
                                             : "var(--color-text-muted)",
                                         bgcolor: selected
@@ -715,26 +687,6 @@ export default function FeedbackToolbar({
                                     },
                                     "& .MuiChip-label": {
                                         px: 1.5,
-                                    },
-                                    '[data-theme="dark"] &': {
-                                        borderColor: selected
-                                            ? (colors?.darkColor ??
-                                              "var(--color-border)")
-                                            : "var(--color-border, #374151)",
-                                        color: selected
-                                            ? (colors?.darkColor ??
-                                              "var(--color-text-primary)")
-                                            : "var(--color-text-secondary, #D1D5DB)",
-                                        bgcolor: selected
-                                            ? (colors?.darkBackgroundColor ??
-                                              "var(--color-surface-active)")
-                                            : "transparent",
-                                        "&:hover": {
-                                            bgcolor: selected
-                                                ? (colors?.darkBackgroundColor ??
-                                                  "var(--color-surface-active)")
-                                                : "var(--color-surface-hover)",
-                                        },
                                     },
                                 }}
                             />
@@ -748,7 +700,7 @@ export default function FeedbackToolbar({
                     <Divider
                         sx={{
                             my: 1.75,
-                            borderColor: "#F2F4F7",
+                            borderColor: "var(--color-border)",
                         }}
                     />
 
@@ -763,7 +715,7 @@ export default function FeedbackToolbar({
                         <Typography
                             sx={{
                                 fontSize: 12,
-                                color: "var(--color-text-secondary, #667085)",
+                                color: "var(--color-text-secondary)",
                             }}
                         >
                             Đang lọc:
@@ -814,7 +766,7 @@ export default function FeedbackToolbar({
                                 fontSize: 12,
                                 fontWeight: 600,
                                 textTransform: "none",
-                                color: "var(--color-text-secondary, #475467)",
+                                color: "var(--color-text-secondary)",
                             }}
                         >
                             Xóa tất cả

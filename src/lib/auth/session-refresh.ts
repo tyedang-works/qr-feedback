@@ -1,7 +1,7 @@
-// export const SESSION_DURATION_MS = 5 * 60 * 60 * 1000;
-// export const SESSION_REMINDER_BEFORE_MS = 5 * 60 * 1000;
-export const SESSION_DURATION_MS = 1 * 60 * 1000;
-export const SESSION_REMINDER_BEFORE_MS = 30 * 1000;
+export const SESSION_DURATION_MS = 5 * 60 * 60 * 1000;
+export const SESSION_REMINDER_BEFORE_MS = 5 * 60 * 1000;
+// export const SESSION_DURATION_MS = 1 * 60 * 1000;
+// export const SESSION_REMINDER_BEFORE_MS = 30 * 1000;
 
 const SESSION_STARTED_AT_KEY = "qr-session-started-at";
 

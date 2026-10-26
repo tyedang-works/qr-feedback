@@ -1,64 +1,59 @@
 import type { SxProps, Theme } from "@mui/material/styles";
 
-export const tableStatusSwitchSx: SxProps<Theme> = (theme) => {
-    const isDark = theme.palette.mode === "dark";
+export const tableStatusSwitchSx: SxProps<Theme> = {
+    width: 38,
+    height: 22,
+    padding: 0,
+    overflow: "visible",
 
-    return {
-        width: 38,
-        height: 22,
+    "& .MuiSwitch-switchBase": {
         padding: 0,
+        margin: "2px",
+        transitionDuration: "200ms",
 
-        "& .MuiSwitch-switchBase": {
-            padding: 0,
-            margin: "2px",
-            transitionDuration: "200ms",
+        "&.Mui-checked": {
+            transform: "translateX(16px)",
+            color: "var(--color-switch-thumb)",
 
-            "&.Mui-checked": {
-                transform: "translateX(16px)",
-                color: "#ffffff",
-
-                "& + .MuiSwitch-track": {
-                    backgroundColor: isDark
-                        ? "var(--color-status-success, #426b57)"
-                        : "var(--color-status-success, #039855)",
-                    opacity: 1,
-                    border: 0,
-                },
-
-                "& .MuiSwitch-thumb": {
-                    backgroundColor: "#ffffff",
-                },
-            },
-
-            "&.Mui-disabled": {
-                opacity: 0.5,
-            },
-        },
-
-        "& .MuiSwitch-thumb": {
-            boxSizing: "border-box",
-            width: 18,
-            height: 18,
-            backgroundColor: "#ffffff",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.25)",
-        },
-
-        "& .MuiSwitch-track": {
-            borderRadius: "11px",
-            backgroundColor: isDark ? "#47484b" : "#D1D5DB",
-            opacity: 1,
-            transition: "background-color 200ms ease",
-        },
-
-        "& .MuiSwitch-switchBase.Mui-checked": {
-            color: "#ffffff",
-        },
-        "& .MuiSwitch-switchBase.Mui-disabled:not(.Mui-checked) + .MuiSwitch-track":
-            {
-                backgroundColor: isDark ? "#4B5563" : "#C4C9D1",
+            "& + .MuiSwitch-track": {
+                backgroundColor: "var(--color-switch-track-checked)",
                 opacity: 1,
+                border: "1px solid var(--color-switch-track-checked-border)",
             },
-    };
+        },
+
+        "&.Mui-disabled": {
+            opacity: 0.5,
+        },
+
+        "&.Mui-disabled.Mui-checked + .MuiSwitch-track": {
+            backgroundColor: "var(--color-switch-track-checked)",
+            opacity: 0.5,
+        },
+    },
+
+    "& .MuiSwitch-thumb": {
+        boxSizing: "border-box",
+        width: 18,
+        height: 18,
+        backgroundColor: "var(--color-switch-thumb)",
+        boxShadow: "var(--shadow-switch-thumb)",
+    },
+
+    "& .MuiSwitch-track": {
+        borderRadius: "11px",
+        backgroundColor: "var(--color-switch-track)",
+        border: "1px solid var(--color-switch-track-border)",
+        opacity: 1,
+        transition: "background-color 200ms ease, border-color 200ms ease",
+    },
+
+    "& .MuiSwitch-switchBase.Mui-disabled:not(.Mui-checked) + .MuiSwitch-track":
+        {
+            backgroundColor: "var(--color-switch-track-disabled)",
+            borderColor: "var(--color-switch-track-disabled-border)",
+            opacity: 1,
+        },
 };
 
 export const getTableStatusLabelSx = (isActive: boolean): SxProps<Theme> => ({

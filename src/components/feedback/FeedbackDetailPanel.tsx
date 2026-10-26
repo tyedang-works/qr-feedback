@@ -200,21 +200,28 @@ export default function FeedbackDetailPanel({
                                 px: 1.5,
                                 py: 1.25,
                                 minHeight: 52,
-                                border: "1px solid var(--color-border, #E5E7EB)",
+                                border: "1px solid var(--color-border)",
                                 borderRadius: 1.5,
-                                bgcolor: "var(--color-surface-hover, #F9FAFB)",
-                                '[data-theme="dark"] &': {
-                                    bgcolor: "#19212C",
-                                },
+                                bgcolor: "var(--color-surface-hover)",
+                                display: "flex",
+                                alignItems: data.feedback
+                                    ? "flex-start"
+                                    : "center",
                             }}
                         >
                             <Typography
                                 sx={{
+                                    width: "100%",
                                     fontSize: 13,
                                     lineHeight: 1.7,
-                                    color: "var(--color-text-primary, #111827)",
+                                    color: data.feedback
+                                        ? "var(--color-text-primary)"
+                                        : "var(--color-text-secondary)",
                                     whiteSpace: "pre-wrap",
                                     overflowWrap: "anywhere",
+                                    fontStyle: data.feedback
+                                        ? "normal"
+                                        : "italic",
                                 }}
                             >
                                 {data.feedback ||

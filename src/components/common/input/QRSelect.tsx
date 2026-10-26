@@ -82,7 +82,7 @@ export default function QRSelect<Value = string>({
                             minHeight: "0 !important",
                             boxSizing: "border-box",
                             padding: "0 36px 0 12px",
-                            fontSize: 14,
+                            fontSize: 13,
                             lineHeight: "20px",
                         },
 
@@ -140,7 +140,7 @@ export default function QRSelect<Value = string>({
                                     minHeight: 40,
                                     px: 1.5,
                                     py: 1,
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     lineHeight: 1.5,
                                     color: "var(--color-text-primary, #111827)",
                                 },

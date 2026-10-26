@@ -1,29 +1,36 @@
 import type { RecentFeedbackItem } from "@/lib/dashboard/types";
-import { FEEDBACK_ISSUE_LABEL_MAP } from "@/lib/feedback/constants";
+import {
+    FEEDBACK_ISSUE_LABEL_MAP,
+    isFeedbackIssueOption,
+    STATUS_CONFIG,
+} from "@/lib/feedback/constants";
 import { Box, Card, Chip, Stack, Typography } from "@mui/material";
 import Link from "next/link";
+import FeedbackIssueChip from "../feedback/FeedbackIssueChip";
 
 type RecentFeedbackProps = {
     data: RecentFeedbackItem[];
 };
 
-const STATUS_CONFIG = {
-    new: {
-        label: "Chưa xử lý",
-        color: "var(--color-feedback-status-new-text, #9A5B13)",
-        backgroundColor: "var(--color-feedback-status-new-bg, #F8F0E4)",
+const chipRemainSx = {
+    height: 25,
+    borderRadius: "6px",
+    bgcolor: "var(--color-remaining-count-bg)",
+    color: "var(--color-remaining-count-text)",
+    border: "1px solid var(--color-remaining-count-border)",
+    fontSize: 10.5,
+    fontWeight: 700,
+    transition: "background-color 150ms ease, border-color 150ms ease",
+
+    "& .MuiChip-label": {
+        px: 0.875,
     },
-    in_progress: {
-        label: "Đang xử lý",
-        color: "var(--color-feedback-status-progress-text, #526B83)",
-        backgroundColor: "var(--color-feedback-status-progress-bg, #EDF1F5)",
+
+    ".feedback-card:hover &": {
+        bgcolor: "var(--color-remaining-count-hover-bg)",
+        borderColor: "var(--color-remaining-count-hover-border)",
     },
-    resolved: {
-        label: "Đã giải quyết",
-        color: "var(--color-feedback-status-resolved-text, #39745C)",
-        backgroundColor: "var(--color-feedback-status-resolved-bg, #EAF2ED)",
-    },
-} as const;
+};
 
 function formatDateTime(dateString: string) {
     return new Intl.DateTimeFormat("vi-VN", {
@@ -35,46 +42,6 @@ function formatDateTime(dateString: string) {
         hourCycle: "h23",
     }).format(new Date(dateString));
 }
-
-function getIssueLabel(option: string) {
-    return FEEDBACK_ISSUE_LABEL_MAP[option] ?? option;
-}
-
-const ISSUE_CHIP_SX = {
-    maxWidth: "100%",
-    height: 25,
-    borderRadius: "6px",
-    border: "1px solid var(--color-border)",
-    bgcolor: "var(--color-surface-hover)",
-    color: "var(--color-text-secondary)",
-    fontSize: 10.5,
-    fontWeight: 500,
-    transition:
-        "background-color 150ms ease, color 150ms ease, border-color 150ms ease",
-
-    "& .MuiChip-label": {
-        px: 1,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-    },
-
-    "&:hover": {
-        bgcolor: "var(--color-surface-active)",
-    },
-
-    '[data-theme="light"] .feedback-item:hover &': {
-        bgcolor: "#FFFFFF",
-        color: "#344054",
-        borderColor: "#CBD5E1",
-    },
-
-    '[data-theme="dark"] .feedback-item:hover &': {
-        bgcolor: "#293548",
-        color: "#E5E7EB",
-        borderColor: "#64748B",
-    },
-} as const;
 
 export default function RecentFeedback({ data }: RecentFeedbackProps) {
     return (
@@ -286,34 +253,33 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                                 pl: { xs: 0, sm: "46px" },
                                             }}
                                         >
-                                            {visibleOptions.map((option) => (
-                                                <Chip
-                                                    key={option}
-                                                    label={getIssueLabel(
+                                            {visibleOptions.map((option) => {
+                                                if (
+                                                    !isFeedbackIssueOption(
                                                         option,
-                                                    )}
-                                                    size="small"
-                                                    sx={ISSUE_CHIP_SX}
-                                                />
-                                            ))}
+                                                    )
+                                                ) {
+                                                    return null;
+                                                }
+
+                                                return (
+                                                    <FeedbackIssueChip
+                                                        key={option}
+                                                        option={option}
+                                                        label={
+                                                            FEEDBACK_ISSUE_LABEL_MAP[
+                                                                option
+                                                            ]
+                                                        }
+                                                    />
+                                                );
+                                            })}
 
                                             {remainingCount > 0 && (
                                                 <Chip
                                                     label={`+${remainingCount}`}
                                                     size="small"
-                                                    sx={{
-                                                        height: 25,
-                                                        borderRadius: "6px",
-                                                        bgcolor:
-                                                            "var(--color-surface-active)",
-                                                        color: "var(--color-text-secondary)",
-                                                        border: "1px solid var(--color-border)",
-                                                        fontSize: 10.5,
-                                                        fontWeight: 700,
-                                                        "& .MuiChip-label": {
-                                                            px: 0.875,
-                                                        },
-                                                    }}
+                                                    sx={chipRemainSx}
                                                 />
                                             )}
                                         </Stack>

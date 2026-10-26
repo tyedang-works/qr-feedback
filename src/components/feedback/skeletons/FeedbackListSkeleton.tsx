@@ -9,7 +9,7 @@ const skeletonSx = {
     },
 };
 
-const dividerColor = "var(--color-border, #E5E7EB)";
+const dividerColor = "var(--color-border)";
 
 export default function FeedbackListSkeleton() {
     return (
@@ -61,17 +61,12 @@ export default function FeedbackListSkeleton() {
                             item < 4 ? `1px solid ${dividerColor}` : "none",
                         bgcolor:
                             item === 1
-                                ? "var(--color-surface-active, #F3F4F6)"
+                                ? "var(--color-surface-active)"
                                 : "transparent",
                         borderLeft:
                             item === 1
-                                ? "2px solid var(--color-text-secondary, #667085)"
+                                ? "2px solid var(--color-text-secondary)"
                                 : "2px solid transparent",
-                        '[data-theme="dark"] &': {
-                            bgcolor: item === 1 ? "#292F38" : "transparent",
-                            borderLeftColor:
-                                item === 1 ? "#8B949E" : "transparent",
-                        },
                     }}
                 >
                     <Stack sx={{ gap: 1 }}>

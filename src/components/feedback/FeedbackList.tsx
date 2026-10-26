@@ -52,25 +52,18 @@ function FeedbackRowContent({
                 gap: 1.25,
                 textAlign: "left",
                 bgcolor: isSelected
-                    ? "var(--color-surface-active, #F3F4F6)"
+                    ? "var(--color-surface-active)"
                     : "transparent",
                 borderLeft: isSelected
-                    ? "2px solid var(--color-text-secondary, #667085)"
+                    ? "2px solid var(--color-text-secondary)"
                     : "2px solid transparent",
                 transition:
                     "background-color 150ms ease, border-color 150ms ease",
 
                 "&:hover": {
-                    bgcolor: "var(--color-surface-hover, #F8F9FA)",
-                },
-
-                '[data-theme="dark"] &': {
-                    bgcolor: isSelected ? "#292F38" : "transparent",
-                    borderLeftColor: isSelected ? "#8B949E" : "transparent",
-                },
-
-                '[data-theme="dark"] &:hover': {
-                    bgcolor: isSelected ? "#303741" : "#252C35",
+                    bgcolor: isSelected
+                        ? "var(--color-surface-active)"
+                        : "var(--color-surface-hover)",
                 },
             }}
         >
@@ -165,6 +158,7 @@ function FeedbackRowContent({
                     WebkitLineClamp: 2,
                     overflow: "hidden",
                     overflowWrap: "anywhere",
+                    fontStyle: !item.feedback ? "italic" : "inherit",
                 }}
             >
                 {item.feedback || "Khách hàng không để lại nội dung bổ sung."}
@@ -209,12 +203,8 @@ function EmptyFeedbackState() {
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: "50%",
-                    backgroundColor: "var(--color-surface-active, #F2F4F7)",
-                    color: "var(--color-text-secondary, #667085)",
-                    '[data-theme="dark"] &': {
-                        bgcolor: "#374151",
-                        color: "#D1D5DB",
-                    },
+                    backgroundColor: "var(--color-surface-active)",
+                    color: "var(--color-text-secondary)",
                     fontSize: 23,
                 }}
             >

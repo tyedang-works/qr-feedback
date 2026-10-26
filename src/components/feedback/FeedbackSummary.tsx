@@ -1,5 +1,6 @@
 "use client";
 
+import { FEEDBACK_STATUS, STATUS_CONFIG } from "@/lib/feedback/constants";
 import type { FeedbackSummary as FeedbackSummaryData } from "@/lib/feedback/types";
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Stack, Typography } from "@mui/material";
@@ -29,17 +30,17 @@ const SUMMARY_ITEMS: SummaryItem[] = [
     },
     {
         key: "new",
-        label: "Chưa xử lý",
+        label: STATUS_CONFIG[FEEDBACK_STATUS.NEW].label,
         color: "#EF4444",
     },
     {
         key: "inProgress",
-        label: "Đang xử lý",
+        label: STATUS_CONFIG[FEEDBACK_STATUS.IN_PROGRESS].label,
         color: "#3B82F6",
     },
     {
         key: "resolved",
-        label: "Đã xử lý",
+        label: STATUS_CONFIG[FEEDBACK_STATUS.RESOLVED].label,
         color: "#10B981",
     },
 ];
@@ -65,17 +66,17 @@ function getPercentage(value: number, total: number): number {
 function getTotalSegments(data: FeedbackSummaryData): DonutSegment[] {
     return [
         {
-            name: "Chưa xử lý",
+            name: STATUS_CONFIG[FEEDBACK_STATUS.NEW].label,
             value: data.new,
             color: STATUS_COLORS.new,
         },
         {
-            name: "Đang xử lý",
+            name: STATUS_CONFIG[FEEDBACK_STATUS.IN_PROGRESS].label,
             value: data.inProgress,
             color: STATUS_COLORS.inProgress,
         },
         {
-            name: "Đã xử lý",
+            name: STATUS_CONFIG[FEEDBACK_STATUS.RESOLVED].label,
             value: data.resolved,
             color: STATUS_COLORS.resolved,
         },
@@ -139,7 +140,7 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
                             fontSize: { xs: 13, sm: 15 },
                             lineHeight: 1.45,
                             fontWeight: 600,
-                            color: "var(--color-text-primary, #111827)",
+                            color: "var(--color-text-primary)",
                         }}
                     >
                         {item.label}
@@ -159,7 +160,7 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
                         lineHeight: 1.15,
                         fontWeight: 700,
                         letterSpacing: "-0.7px",
-                        color: "var(--color-text-primary, #111827)",
+                        color: "var(--color-text-primary)",
                         fontVariantNumeric: "tabular-nums",
                     }}
                 >
@@ -170,7 +171,7 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
                     sx={{
                         fontSize: 12,
                         lineHeight: 1.5,
-                        color: "var(--color-text-secondary, #6B7280)",
+                        color: "var(--color-text-secondary)",
                     }}
                 >
                     {isTotal

@@ -100,7 +100,7 @@ export default function QRTextField({
                             boxSizing: "border-box",
                             height: "42px",
                             padding: "10px 12px",
-                            fontSize: 13,
+                            fontSize: { xs: "16px", sm: "13px" },
                             lineHeight: 1.4,
                             color: "var(--color-text-primary, #111827)",
                             WebkitTextFillColor:

@@ -1,5 +1,5 @@
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 
 import MuiThemeProvider from "@/components/common/providers/MuiThemeProvider";
@@ -10,6 +10,11 @@ import "./globals.css";
 export const metadata: Metadata = {
     title: "QR Feedback",
     description: "Customer feedback system for restaurants",
+};
+
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
 };
 
 const themeInitScript = `

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { getUserContext } from "@/lib/auth/queries";
 import { getRestaurantSettings } from "@/lib/restaurant/queries";
+import SessionRefreshReminder from "@/components/auth/SessionRefreshReminder";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +55,7 @@ export default async function DashboardRouteLayout({
             feedbackEmail={feedbackEmail}
         >
             {children}
+            <SessionRefreshReminder />
         </DashboardLayout>
     );
 }

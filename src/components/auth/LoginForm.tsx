@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/browser";
 import { loginButtonSx, loginTextFieldSx } from "@/styles/login.styles";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { startSessionCycle } from "@/lib/auth/session-refresh";
 
 type LoginFormValues = {
     email: string;
@@ -80,7 +81,7 @@ export default function LoginForm() {
                 setStatus("Email hoặc mật khẩu không chính xác.");
                 return;
             }
-
+            startSessionCycle();
             router.push("/dashboard");
             router.refresh();
         } catch {

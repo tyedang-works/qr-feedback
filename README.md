@@ -36,25 +36,31 @@ By organizing customer feedback systematically, QR Feedback aims to enhance the 
 ---
 
 ## Technology Stack
+### Core
+- **Framework:** Next.js `16.3.6` (App Router)
+- **UI Runtime:** React / React DOM `19.2.8`
+- **Language:** TypeScript
 
-Area Technology
-Framework Next.js `16.3.6` (App Router)
-UI runtime React / React DOM `19.2.8`
-Language TypeScript
-UI components Material UI `^9.4.0`
-Styling engine Emotion
-Authentication, database, storage Supabase
-Form handling and validation Formik, Yup
-Email Resend
-Rate limiting Upstash Redis, `@upstash/ratelimit`
-QR rendering `qrcode.react`
-Charts Recharts
-Image cropping `react-easy-crop`
-Icons `lucide-react`
-Spreadsheet operations `xlsx`
-Linting and formatting ESLint, Prettier
-Deployment Vercel
+### UI & Styling
+- **UI Components:** Material UI `^9.4.0`
+- **Styling Engine:** Emotion
+- **Icons:** `lucide-react`
 
+### Backend & Data
+- **Authentication, Database & Storage:** Supabase
+- **Email Service:** Resend
+- **Rate Limiting:** Upstash Redis, `@upstash/ratelimit`
+
+### Forms & Visualization
+- **Form Handling & Validation:** Formik, Yup
+- **Charts:** Recharts
+- **QR Code Rendering:** `qrcode.react`
+- **Image Cropping:** `react-easy-crop`
+- **Spreadsheet Operations:** `xlsx`
+
+### Development & Deployment
+- **Linting & Formatting:** ESLint, Prettier
+- **Deployment:** Vercel
 ---
 
 ## Requirements

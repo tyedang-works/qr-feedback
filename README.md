@@ -106,13 +106,14 @@ source code or deployment configuration
 
 ## Available Scripts
 
-Command Description
-`npm run dev` Start the Next.js development server
-`npm run build` Create a production build
-`npm run start` Start the production server after building
-`npm run lint` Run ESLint
-`npm run format` Format files with Prettier
-`npm run format:check` Check formatting with Prettier
+Run the following commands from the project root directory.
+
+- `npm run dev` — Start the Next.js development server.
+- `npm run build` — Create a production build.
+- `npm run start` — Start the production server after building.
+- `npm run lint` — Run ESLint to check for code issues.
+- `npm run format` — Format files with Prettier.
+- `npm run format:check` — Check code formatting with Prettier.
 
 ---
 
@@ -146,42 +147,34 @@ server. Do not trust a client-supplied role, user ID, or restaurant ID.
 
 ---
 
-## Multi-Tenant Rules
+## Multi-Tenant Architecture & Data Isolation
 
-- Each email address belongs to only one restaurant.
-- Each Owner manages exactly one restaurant.
-- Reuse the existing `profiles.restaurant_id` relationship for
-  restaurant context.
-- Do not introduce restaurant slugs or multi-restaurant membership
-  unless the product requirements explicitly change.
-- Login is shared across restaurants and uses QR Feedback branding.
-- After authentication, resolve the user's restaurant context through
-  the existing `getUserContext()` flow.
+QR Feedback follows a multi-tenant architecture with the following rules:
 
-These rules are important for authorization and data isolation. Verify
-current database constraints and Row Level Security (RLS) policies
-before changing tenant-related behavior.
+- **One email, one restaurant:** Each email address can belong to only one restaurant.
+- **One Owner, one restaurant:** Each Owner manages exactly one restaurant.
+- **Restaurant context:** Reuse the existing `profiles.restaurant_id` relationship to determine the user's restaurant context.
+- **No additional tenant mapping:** Do not introduce restaurant slugs or multi-restaurant membership.
+- **Shared authentication:** All restaurants use the same login system and QR Feedback branding.
+- **Context resolution:** After authentication, resolve the user's restaurant context through the existing `getUserContext()` flow.
+
+### Security Considerations
+
+These rules are essential for authorization and tenant data isolation. Before changing tenant-related behavior, verify the existing database constraints and Row Level Security (RLS) policies to ensure users can access only the data they are authorized to access.
 
 ---
 
 ## Styling and UI Conventions
 
-- Global styles and theme tokens are defined in `src/app/globals.css`
-- Light and dark themes use `:root`, `:root[data-theme="light"]`, and
-  `:root[data-theme="dark"]`.
-- Prefer existing CSS variables for colors rather than introducing
-  hardcoded colors or substituting MUI palette values where project
-  conventions call for CSS variables.
-- Reuse existing shared components and styles, including
-  `QRTextField`, `QRSelect`, `QRDialog`, `QRSnackbar`, `TabBar`,
-  `cardSx`, `buttonBaseSx`, `buttonBaseCancelSx`, and `chipBaseSx`,
-  when their current exports and props match the use case.
-- Use `lucide-react` for icons, consistent with the established UI
-  convention.
-- Follow the existing MUI convention: place System/layout properties
-  in `sx`
-- Keep responsive behavior, existing layouts, and working interactions
-  intact unless a change explicitly requires otherwise.
+- **Global styles:** Global styles and theme tokens are defined in `src/app/globals.css`.
+- **Theme support:** Support both light and dark themes using `:root`, `:root[data-theme="light"]`, and `:root[data-theme="dark"]`.
+- **CSS variables:** Prefer existing CSS variables for colors instead of introducing hardcoded colors or replacing project-defined CSS variables with MUI palette values.
+- **Shared components and styles:** Reuse existing components and style utilities when their current exports and props match the use case:
+  - Components: `QRTextField`, `QRSelect`, `QRDialog`, `QRSnackbar`, `TabBar`
+  - Style utilities: `cardSx`, `buttonBaseSx`, `buttonBaseCancelSx`, `chipBaseSx`
+- **Icons:** Use `lucide-react` to stay consistent with the existing UI convention.
+- **MUI styling:** Place MUI System and layout properties inside the `sx` prop.
+- **Responsive design:** Preserve existing responsive behavior, layouts, and working interactions unless a change explicitly requires otherwise.
 
 ---
 

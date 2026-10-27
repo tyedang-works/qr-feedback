@@ -137,14 +137,6 @@ The project defines these roles:
   accounts.
 - **Manager (`MANAGER`)** --- can manage tables.
 - **Staff (`STAFF`)** --- can access and manage feedback.
-
-Always inspect `src/lib/auth/permissions.ts` for the current source of truth
-before changing authorization.
-
-All authorization-sensitive server actions must verify the authenticated
-user, permissions, submitted input, and restaurant ownership on the
-server. Do not trust a client-supplied role, user ID, or restaurant ID.
-
 ---
 
 ## Multi-Tenant Architecture & Data Isolation

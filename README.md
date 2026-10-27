@@ -1,8 +1,11 @@
 # QR Feedback
 
-QR Feedback is a restaurant customer feedback management system.
-Customers scan a QR code assigned to their table, submit feedback, and
-restaurant staff review and manage submissions from a dashboard.
+## Project Introduction
+**QR Feedback** is a customer feedback management system designed for restaurants. It streamlines the process of collecting, monitoring, and evaluating customer experiences through QR codes placed at individual dining tables.
+
+Customers can scan a QR code to submit feedback on various aspects of their dining experience, including food quality, food presentation, service quality, dining area cleanliness, and service time. All feedback is stored centrally and displayed on a management dashboard, allowing restaurant staff to conveniently review, search, filter, and manage customer feedback.
+The goal of QR Feedback goes beyond simply collecting customer opinions. It helps restaurants turn customer feedback into actionable insights to continuously improve service quality. Positive aspects identified through customer feedback can be maintained and further developed, while issues that fall short of customer expectations can be identified, prioritized, and addressed promptly.
+By organizing customer feedback systematically, QR Feedback aims to enhance the overall customer experience, support data-informed decisions, and help restaurants continuously improve their service quality and achieve sustainable growth.
 
 ---
 

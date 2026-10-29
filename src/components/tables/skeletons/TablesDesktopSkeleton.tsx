@@ -70,6 +70,8 @@ export default function TablesDesktopSkeleton() {
                                     width: 76,
                                     maxWidth: "100%",
                                     height: 22,
+                                    bgcolor:
+                                        "var(--color-table-skeleton, var(--color-donut-skeleton))",
                                 }}
                             />
 
@@ -79,6 +81,8 @@ export default function TablesDesktopSkeleton() {
                                     width: "85%",
                                     maxWidth: 240,
                                     height: 22,
+                                    bgcolor:
+                                        "var(--color-table-skeleton, var(--color-donut-skeleton))",
                                 }}
                             />
 
@@ -95,6 +99,8 @@ export default function TablesDesktopSkeleton() {
                                         width: 36,
                                         height: 20,
                                         borderRadius: 999,
+                                        bgcolor:
+                                            "var(--color-table-skeleton, var(--color-donut-skeleton))",
                                     }}
                                 />
 
@@ -104,6 +110,8 @@ export default function TablesDesktopSkeleton() {
                                         width: 80,
                                         maxWidth: "100%",
                                         height: 20,
+                                        bgcolor:
+                                            "var(--color-table-skeleton, var(--color-donut-skeleton))",
                                     }}
                                 />
                             </Stack>
@@ -118,12 +126,22 @@ export default function TablesDesktopSkeleton() {
                             >
                                 <Skeleton
                                     variant="text"
-                                    sx={{ width: 48, height: 22 }}
+                                    sx={{
+                                        width: 48,
+                                        height: 22,
+                                        bgcolor:
+                                            "var(--color-table-skeleton, var(--color-donut-skeleton))",
+                                    }}
                                 />
 
                                 <Skeleton
                                     variant="text"
-                                    sx={{ width: 28, height: 22 }}
+                                    sx={{
+                                        width: 28,
+                                        height: 22,
+                                        bgcolor:
+                                            "var(--color-table-skeleton, var(--color-donut-skeleton))",
+                                    }}
                                 />
                             </Stack>
                         </Box>
@@ -131,8 +149,7 @@ export default function TablesDesktopSkeleton() {
                         {index < 5 && (
                             <Box
                                 sx={{
-                                    borderTop:
-                                        "1px solid var(--color-donut-skeleton, #eaecf0)",
+                                    borderTop: "1px solid var(--color-border)",
                                 }}
                             />
                         )}

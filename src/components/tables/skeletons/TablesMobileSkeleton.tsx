@@ -1,14 +1,17 @@
 import { Box, Skeleton, Stack } from "@mui/material";
 
 export default function TablesMobileSkeleton() {
+    const skeletonColor =
+        "var(--color-table-skeleton, var(--color-donut-skeleton))";
+
     return (
         <Stack
             sx={{
                 display: { xs: "flex", sm: "none" },
-                border: "1px solid #eaecf0",
+                border: "1px solid var(--color-border)",
                 borderRadius: 2,
                 overflow: "hidden",
-                backgroundColor: "#ffffff",
+                backgroundColor: "var(--color-surface)",
             }}
         >
             {Array.from({ length: 5 }).map((_, index) => (
@@ -35,6 +38,7 @@ export default function TablesMobileSkeleton() {
                                         width: 100,
                                         maxWidth: "100%",
                                         height: 23,
+                                        bgcolor: skeletonColor,
                                     }}
                                 />
 
@@ -44,6 +48,7 @@ export default function TablesMobileSkeleton() {
                                         width: "85%",
                                         maxWidth: 230,
                                         height: 20,
+                                        bgcolor: skeletonColor,
                                     }}
                                 />
                             </Stack>
@@ -57,12 +62,20 @@ export default function TablesMobileSkeleton() {
                             >
                                 <Skeleton
                                     variant="text"
-                                    sx={{ width: 42, height: 22 }}
+                                    sx={{
+                                        width: 42,
+                                        height: 22,
+                                        bgcolor: skeletonColor,
+                                    }}
                                 />
 
                                 <Skeleton
                                     variant="text"
-                                    sx={{ width: 32, height: 22 }}
+                                    sx={{
+                                        width: 32,
+                                        height: 22,
+                                        bgcolor: skeletonColor,
+                                    }}
                                 />
                             </Stack>
                         </Stack>
@@ -74,12 +87,17 @@ export default function TablesMobileSkeleton() {
                                 width: 112,
                                 height: 24,
                                 borderRadius: 1,
+                                bgcolor: skeletonColor,
                             }}
                         />
                     </Box>
 
                     {index < 4 && (
-                        <Box sx={{ borderTop: "1px solid #eaecf0" }} />
+                        <Box
+                            sx={{
+                                borderTop: "1px solid var(--color-border)",
+                            }}
+                        />
                     )}
                 </Box>
             ))}

@@ -12,6 +12,7 @@ import { Box, Stack } from "@mui/material";
 import { Table2 } from "lucide-react";
 
 export default async function TablesPage() {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     const userContext = await getUserContext();
 
     if (!userContext) {

@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
     Box,
     Button,
@@ -11,8 +9,10 @@ import {
     Typography,
 } from "@mui/material";
 import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { createClient } from "@/lib/supabase/browser";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import {
     clearSessionCycle,
     getSessionStartedAt,
@@ -20,10 +20,12 @@ import {
     SESSION_REMINDER_BEFORE_MS,
     startSessionCycle,
 } from "@/lib/auth/session-refresh";
+import { createClient } from "@/lib/supabase/browser";
 import { buttonBaseSx } from "@/styles/button.styles";
 
 export default function SessionRefreshReminder() {
     const router = useRouter();
+    const { t } = useTranslation();
 
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -207,7 +209,7 @@ export default function SessionRefreshReminder() {
                             mb: 0.5,
                         }}
                     >
-                        Phiên đăng nhập sắp hết hạn
+                        {t("common", "sessionExpiringTitle")}
                     </Typography>
 
                     <Typography
@@ -218,8 +220,7 @@ export default function SessionRefreshReminder() {
                             color: "var(--color-text-secondary)",
                         }}
                     >
-                        Làm mới phiên để tiếp tục sử dụng. Bạn sẽ tự động đăng
-                        xuất sau 5 phút.
+                        {t("common", "sessionExpiringDescription")}
                     </Typography>
                 </Box>
 
@@ -256,10 +257,12 @@ export default function SessionRefreshReminder() {
                                     color: "var(--color-button-primary-text)",
                                 }}
                             />
-                            <Box component="span">Đang làm mới...</Box>
+                            <Box component="span">
+                                {t("common", "refreshingSession")}
+                            </Box>
                         </Box>
                     ) : (
-                        "Làm mới phiên"
+                        t("common", "refreshSession")
                     )}
                 </Button>
 
@@ -275,7 +278,7 @@ export default function SessionRefreshReminder() {
                     }}
                 >
                     <IconButton
-                        aria-label="Đóng thông báo"
+                        aria-label={t("common", "closeNotification")}
                         onClick={handleClose}
                         size="small"
                         sx={{

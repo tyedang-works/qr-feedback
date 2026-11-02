@@ -21,6 +21,12 @@ export const translations = {
             allRightsReserved: "All rights reserved.",
             helpEmailSubject: "QR Feedback Support Request",
             contactEmailSubject: "Contact QR Feedback",
+            sessionExpiringTitle: "Your session is about to expire",
+            sessionExpiringDescription:
+                "Refresh your session to continue. You will be automatically logged out when your session expires.",
+            refreshSession: "Refresh session",
+            refreshingSession: "Refreshing...",
+            closeNotification: "Close notification",
         },
         navigation: {
             overview: "Overview",
@@ -161,6 +167,12 @@ export const translations = {
             exportingFeedback: "Exporting feedback",
             exportFeedbackFailed: "Unable to export Excel file.",
             exportFeedbackError: "Excel export failed. Please try again.",
+            welcomeBack: "Welcome back",
+            welcomeDescription:
+                "Keep track of your restaurant's feedback and discover what matters most to your customers.",
+            goNow: "Go now",
+            productName: "QR Feedback",
+            comingSoon: "A new experience is coming soon",
         },
         table: {
             tablesManagement: "Table Management",
@@ -707,6 +719,12 @@ export const translations = {
             allRightsReserved: "All rights reserved.",
             helpEmailSubject: "Yêu cầu hỗ trợ QR Feedback",
             contactEmailSubject: "Liên hệ QR Feedback",
+            sessionExpiringTitle: "Phiên đăng nhập sắp hết hạn",
+            sessionExpiringDescription:
+                "Làm mới phiên để tiếp tục sử dụng. Bạn sẽ tự động đăng xuất khi phiên hết hạn.",
+            refreshSession: "Làm mới phiên",
+            refreshingSession: "Đang làm mới...",
+            closeNotification: "Đóng thông báo",
         },
         navigation: {
             overview: "Tổng quan",
@@ -847,6 +865,12 @@ export const translations = {
             exportingFeedback: "Đang xuất phản hồi",
             exportFeedbackFailed: "Không thể xuất file Excel.",
             exportFeedbackError: "Xuất Excel thất bại. Vui lòng thử lại.",
+            welcomeBack: "Chào mừng trở lại",
+            welcomeDescription:
+                "Theo dõi phản hồi của khách hàng, nắm bắt chất lượng dịch vụ và không ngừng cải thiện trải nghiệm tại nhà hàng.",
+            goNow: "Theo dõi phản hồi",
+            productName: "QR Feedback",
+            comingSoon: "Trải nghiệm mới đang được hoàn thiện",
         },
         table: {
             tablesManagement: "Quản lý bàn",

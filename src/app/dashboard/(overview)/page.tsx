@@ -1,3 +1,5 @@
+import FluidLoader from "@/components/common/loader/FluidLoader";
+import DashboardWelcomeCard from "@/components/dashboard/DashboardWelcomeCard";
 import FeedbackStatusChart from "@/components/dashboard/FeedbackStatusChart";
 import FeedbackTrend from "@/components/dashboard/FeedbackTrend";
 import IssueDistribution from "@/components/dashboard/IssueDistribution";
@@ -70,7 +72,70 @@ export default async function DashboardPage() {
           ];
 
     return (
-        <Stack sx={{ gap: 2, minWidth: 0 }}>
+        <Stack
+            sx={{
+                width: "100%",
+                maxWidth: 1440,
+                mx: "auto",
+                gap: { xs: 2, md: 2.5 },
+                minWidth: 0,
+            }}
+        >
+            <Box
+                sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "minmax(0, 1fr)",
+                        md: "repeat(3, minmax(0, 1fr))",
+                    },
+                    gap: 2,
+                    alignItems: "stretch",
+                    minWidth: 0,
+                }}
+            >
+                <Box
+                    sx={{
+                        gridColumn: {
+                            xs: "auto",
+                            md: "span 2",
+                        },
+                        minWidth: 0,
+                        minHeight: { xs: 300, md: 340 },
+                        height: "100%",
+                        "& > *": {
+                            height: "100%",
+                        },
+                    }}
+                >
+                    <DashboardWelcomeCard
+                        fullName={userContext?.fullName ?? ""}
+                    />
+                </Box>
+
+                <Box
+                    sx={{
+                        gridColumn: {
+                            xs: "auto",
+                            md: "span 1",
+                        },
+                        minWidth: 0,
+                        minHeight: { xs: 260, md: 340 },
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 2,
+                        p: { xs: 2, sm: 3 },
+                        border: "1px solid var(--color-border)",
+                        borderRadius: "16px",
+                        bgcolor: "var(--color-surface)",
+                        boxShadow: "var(--shadow-card)",
+                    }}
+                >
+                    <FluidLoader />
+                </Box>
+            </Box>
+
             <SummaryCards
                 totalFeedback={summary.totalFeedback}
                 todayFeedback={summary.todayFeedback}
@@ -87,15 +152,20 @@ export default async function DashboardPage() {
                     display: "grid",
                     gridTemplateColumns: {
                         xs: "minmax(0, 1fr)",
-                        lg: "minmax(0, 1fr) minmax(0, 1.5fr)",
+                        md: "repeat(2, minmax(0, 1fr))",
                     },
                     gap: 2,
                     alignItems: "stretch",
                     minWidth: 0,
                 }}
             >
-                <FeedbackStatusChart data={feedbackStatusDistribution} />
-                <FeedbackTrend data={feedbackTrend} />
+                <Box sx={{ minWidth: 0 }}>
+                    <FeedbackTrend data={feedbackTrend} />
+                </Box>
+
+                <Box sx={{ minWidth: 0 }}>
+                    <FeedbackStatusChart data={feedbackStatusDistribution} />
+                </Box>
             </Box>
 
             <Box
@@ -103,19 +173,20 @@ export default async function DashboardPage() {
                     display: "grid",
                     gridTemplateColumns: {
                         xs: "minmax(0, 1fr)",
-                        lg: "minmax(0, 1.5fr) minmax(0, 1fr)",
+                        md: "minmax(0, 7fr) minmax(0, 5fr)",
                     },
                     gap: 2,
-                    alignItems: "start",
+                    alignItems: "stretch",
                     minWidth: 0,
                 }}
             >
                 <Box sx={{ minWidth: 0 }}>
                     <RecentFeedback data={recentFeedback} />
                 </Box>
-                <Stack sx={{ gap: 2, minWidth: 0 }}>
+
+                <Box sx={{ minWidth: 0 }}>
                     <IssueDistribution data={issueComparison} />
-                </Stack>
+                </Box>
             </Box>
         </Stack>
     );

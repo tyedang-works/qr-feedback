@@ -333,7 +333,6 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                         minWidth: 0,
                                     }}
                                 >
-                                    {/* Avatar */}
                                     <Card
                                         sx={{
                                             ...cardSx,
@@ -556,7 +555,6 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                         </Stack>
                                     </Card>
 
-                                    {/* Personal information */}
                                     <Card
                                         sx={{
                                             ...cardSx,
@@ -673,7 +671,6 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                 </Formik>
             </Stack>
 
-            {/* Avatar crop dialog */}
             <QRDialog
                 open={cropOpen}
                 onClose={handleCancelCrop}

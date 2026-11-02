@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
     createContext,
@@ -11,6 +11,7 @@ import {
     useState,
     type ReactNode,
 } from "react";
+import QRLoading from "../common/layout/QRLoading";
 
 type DashboardLoadingContextValue = {
     startNavigation: () => void;
@@ -95,11 +96,7 @@ export function DashboardLoadingProvider({
                         },
                     }}
                 >
-                    <CircularProgress
-                        size={38}
-                        thickness={3.5}
-                        sx={{ color: "#FFFFFF" }}
-                    />
+                    <QRLoading size={72} />
                 </Box>
             )}
         </DashboardLoadingContext.Provider>

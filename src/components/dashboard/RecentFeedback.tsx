@@ -2,14 +2,9 @@
 
 import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { RecentFeedbackItem } from "@/lib/dashboard/types";
-import {
-    FEEDBACK_ISSUE_LABEL_MAP,
-    isFeedbackIssueOption,
-    STATUS_CONFIG,
-} from "@/lib/feedback/constants";
+import { STATUS_CONFIG } from "@/lib/feedback/constants";
 import { Box, Card, Chip, Stack, Typography } from "@mui/material";
 import Link from "next/link";
-import FeedbackIssueChip from "../feedback/FeedbackIssueChip";
 
 type RecentFeedbackProps = {
     data: RecentFeedbackItem[];
@@ -17,35 +12,46 @@ type RecentFeedbackProps = {
 
 type FeedbackStatusTranslationKey = "new" | "inProgress" | "resolved";
 
-const chipRemainSx = {
-    height: 25,
-    borderRadius: "6px",
-    bgcolor: "var(--color-remaining-count-bg)",
-    color: "var(--color-remaining-count-text)",
-    border: "1px solid var(--color-remaining-count-border)",
-    fontSize: 10.5,
-    fontWeight: 700,
-    transition: "background-color 150ms ease, border-color 150ms ease",
+function formatRelativeTime(dateString: string, locale: string) {
+    const date = new Date(dateString);
 
-    "& .MuiChip-label": {
-        px: 0.875,
-    },
+    if (Number.isNaN(date.getTime())) {
+        return "—";
+    }
 
-    ".feedback-card:hover &": {
-        bgcolor: "var(--color-remaining-count-hover-bg)",
-        borderColor: "var(--color-remaining-count-hover-border)",
-    },
-};
+    const diff = date.getTime() - Date.now();
+    const absDiff = Math.abs(diff);
 
-function formatDateTime(dateString: string, locale: string) {
-    return new Intl.DateTimeFormat(locale, {
-        timeZone: "Asia/Ho_Chi_Minh",
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23",
-    }).format(new Date(dateString));
+    const units: {
+        unit: Intl.RelativeTimeFormatUnit;
+        milliseconds: number;
+    }[] = [
+        { unit: "second", milliseconds: 1000 },
+        { unit: "minute", milliseconds: 60 * 1000 },
+        { unit: "hour", milliseconds: 60 * 60 * 1000 },
+        { unit: "day", milliseconds: 24 * 60 * 60 * 1000 },
+        { unit: "week", milliseconds: 7 * 24 * 60 * 60 * 1000 },
+        { unit: "month", milliseconds: 30 * 24 * 60 * 60 * 1000 },
+        { unit: "year", milliseconds: 365 * 24 * 60 * 60 * 1000 },
+    ];
+
+    let selectedUnit = units[0];
+
+    for (let i = 1; i < units.length; i++) {
+        if (absDiff >= units[i].milliseconds) {
+            selectedUnit = units[i];
+        } else {
+            break;
+        }
+    }
+
+    const value =
+        Math.sign(diff) * Math.floor(absDiff / selectedUnit.milliseconds);
+
+    return new Intl.RelativeTimeFormat(locale, {
+        numeric: "auto",
+        style: "long",
+    }).format(value, selectedUnit.unit);
 }
 
 function getStatusTranslationKey(
@@ -95,6 +101,8 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                             fontSize: 16,
                             lineHeight: 1.5,
                             fontWeight: 700,
+                            marginTop: "6px",
+                            marginBottom: "2px",
                             color: "var(--color-text-primary)",
                         }}
                     >
@@ -139,7 +147,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                     sx={{
                         px: 2.5,
                         py: 5,
-                        borderTop: "1px solid var(--color-border)",
+                        borderTop: "1px dashed var(--color-border)",
                         textAlign: "center",
                     }}
                 >
@@ -156,13 +164,20 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                 <Stack>
                     {data.map((item) => {
                         const status = STATUS_CONFIG[item.status];
+
                         const statusTranslationKey = getStatusTranslationKey(
                             item.status,
                         );
-                        const visibleOptions = item.selectedOptions.slice(0, 2);
-                        const remainingCount = Math.max(
-                            0,
-                            item.selectedOptions.length - visibleOptions.length,
+
+                        const hasComment = Boolean(item.feedback?.trim());
+
+                        const comment = hasComment
+                            ? item.feedback.trim()
+                            : t("dashboard", "noAdditionalComment");
+
+                        const relativeTime = formatRelativeTime(
+                            item.createdAt,
+                            dateLocale,
                         );
 
                         return (
@@ -170,181 +185,182 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                 key={item.id}
                                 className="feedback-item"
                                 sx={{
-                                    px: { xs: 2, sm: 2.5 },
-                                    py: 1.5,
-                                    borderTop: "1px solid var(--color-border)",
-                                    transition:
-                                        "background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease",
-
-                                    "&:hover": {
-                                        bgcolor:
-                                            "var(--color-feedback-item-hover-bg)",
-                                        borderTopColor:
-                                            "var(--color-feedback-item-hover-border)",
-                                        boxShadow:
-                                            "var(--shadow-feedback-item-hover)",
+                                    display: "grid",
+                                    gridTemplateColumns: {
+                                        xs: "34px minmax(0, 1fr) auto",
+                                        sm: "34px minmax(180px, 1.15fr) minmax(0, 2fr) minmax(85px, auto)",
                                     },
+                                    gridTemplateAreas: {
+                                        xs: `
+                                            "icon details time"
+                                            "icon comment comment"
+                                        `,
+                                        sm: `
+                                            "icon details comment time"
+                                        `,
+                                    },
+                                    alignItems: "center",
+                                    columnGap: {
+                                        xs: 1.25,
+                                        sm: 2,
+                                        md: 2.5,
+                                    },
+                                    rowGap: {
+                                        xs: 0.75,
+                                        sm: 0,
+                                    },
+                                    px: { xs: 2, sm: 2.5 },
+                                    py: { xs: 1.75, sm: 2 },
+                                    borderTop: "1px dashed var(--color-border)",
+                                    transition: "background-color 160ms ease",
                                 }}
                             >
-                                <Stack sx={{ gap: 0.75 }}>
-                                    <Stack
+                                <Box
+                                    aria-hidden="true"
+                                    sx={{
+                                        gridArea: "icon",
+                                        width: 36,
+                                        height: 36,
+                                        flexShrink: 0,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        borderRadius: "10px",
+                                        bgcolor: "var(--color-surface-hover)",
+                                        border: "1px solid var(--color-border)",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    <Box
+                                        component="img"
+                                        src="/assets/table-icon.svg"
+                                        alt=""
+                                        draggable={false}
                                         sx={{
-                                            flexDirection: "row",
-                                            alignItems: "flex-start",
-                                            justifyContent: "space-between",
-                                            gap: 1.5,
+                                            display: "block",
+                                            width: 23,
+                                            height: 23,
+                                            objectFit: "contain",
+                                            opacity: 0.85,
+                                            pointerEvents: "none",
+                                            userSelect: "none",
+                                            transition:
+                                                "filter 200ms ease, opacity 200ms ease",
+
+                                            // Dark mode
+                                            '[data-theme="dark"] &': {
+                                                filter: "brightness(0) invert(1)",
+                                                opacity: 0.95,
+                                            },
+                                        }}
+                                    />
+                                </Box>
+                                <Stack
+                                    sx={{
+                                        gridArea: "details",
+                                        minWidth: 0,
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        flexWrap: "wrap",
+                                        gap: 0.75,
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            fontSize: 12.5,
+                                            lineHeight: 1.5,
+                                            fontWeight: 650,
+                                            color: "var(--color-text-primary)",
+                                            whiteSpace: "nowrap",
                                         }}
                                     >
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 1.25,
-                                                minWidth: 0,
-                                            }}
-                                        >
-                                            <Box
-                                                aria-hidden="true"
-                                                sx={{
-                                                    width: 34,
-                                                    height: 34,
-                                                    flexShrink: 0,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                    borderRadius: "9px",
-                                                    bgcolor:
-                                                        "var(--color-surface-hover)",
-                                                    color: "var(--color-text-secondary)",
-                                                    fontSize: 17,
-                                                }}
-                                            >
-                                                ▦
-                                            </Box>
+                                        {item.tableName}
+                                    </Typography>
 
-                                            <Box sx={{ minWidth: 0 }}>
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: 13,
-                                                        lineHeight: 1.5,
-                                                        fontWeight: 600,
-                                                        color: "var(--color-text-primary)",
-                                                        overflow: "hidden",
-                                                        textOverflow:
-                                                            "ellipsis",
-                                                        whiteSpace: "nowrap",
-                                                    }}
-                                                >
-                                                    {item.tableName}
-                                                </Typography>
-
-                                                <Typography
-                                                    sx={{
-                                                        mt: 0.125,
-                                                        fontSize: 11,
-                                                        lineHeight: 1.5,
-                                                        color: "var(--color-text-secondary)",
-                                                    }}
-                                                >
-                                                    {formatDateTime(
-                                                        item.createdAt,
-                                                        dateLocale,
-                                                    )}
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-
-                                        <Chip
-                                            label={
-                                                statusTranslationKey
-                                                    ? t(
-                                                          "dashboard",
-                                                          statusTranslationKey,
-                                                      )
-                                                    : status.label
-                                            }
-                                            size="small"
-                                            sx={{
-                                                height: 23,
-                                                flexShrink: 0,
-                                                borderRadius: "6px",
-                                                color: status.color,
-                                                bgcolor: status.backgroundColor,
-                                                border: "1px solid transparent",
-                                                fontSize: 10,
-                                                fontWeight: 600,
-                                                "& .MuiChip-label": {
-                                                    px: 1,
-                                                },
-                                            }}
-                                        />
-                                    </Stack>
-
-                                    {visibleOptions.length > 0 && (
-                                        <Stack
-                                            sx={{
-                                                flexDirection: "row",
-                                                flexWrap: "wrap",
-                                                alignItems: "center",
-                                                gap: 0.5,
-                                                pl: { xs: 0, sm: "46px" },
-                                            }}
-                                        >
-                                            {visibleOptions.map((option) => {
-                                                if (
-                                                    !isFeedbackIssueOption(
-                                                        option,
-                                                    )
-                                                ) {
-                                                    return null;
-                                                }
-
-                                                return (
-                                                    <FeedbackIssueChip
-                                                        key={option}
-                                                        option={option}
-                                                        label={
-                                                            FEEDBACK_ISSUE_LABEL_MAP[
-                                                                option
-                                                            ]
-                                                        }
-                                                    />
-                                                );
-                                            })}
-
-                                            {remainingCount > 0 && (
-                                                <Chip
-                                                    label={`+${remainingCount}`}
-                                                    size="small"
-                                                    sx={chipRemainSx}
-                                                />
-                                            )}
-                                        </Stack>
-                                    )}
-
-                                    <Typography
-                                        title={item.feedback || undefined}
+                                    <Chip
+                                        label={
+                                            statusTranslationKey
+                                                ? t(
+                                                      "dashboard",
+                                                      statusTranslationKey,
+                                                  )
+                                                : status.label
+                                        }
+                                        size="small"
                                         sx={{
-                                            pl: { xs: 0, sm: "46px" },
+                                            height: 21,
+                                            borderRadius: "6px",
+                                            flexShrink: 0,
+                                            color: status.color,
+                                            bgcolor: status.backgroundColor,
+                                            border: "1px solid transparent",
+                                            fontSize: 9.5,
+                                            fontWeight: 600,
+
+                                            "& .MuiChip-label": {
+                                                px: 0.875,
+                                            },
+                                        }}
+                                    />
+                                </Stack>
+
+                                <Box
+                                    sx={{
+                                        gridArea: "comment",
+                                        minWidth: 0,
+                                    }}
+                                >
+                                    <Typography
+                                        title={comment}
+                                        sx={{
+                                            display: "block",
+                                            minWidth: 0,
                                             fontSize: 12,
                                             lineHeight: 1.6,
-                                            color: item.feedback
-                                                ? "var(--color-text-secondary)"
-                                                : "var(--color-text-muted)",
-                                            display: "-webkit-box",
-                                            WebkitBoxOrient: "vertical",
-                                            WebkitLineClamp: 2,
+                                            color: hasComment
+                                                ? "var(--color-text-primary)"
+                                                : "var(--color-text-secondary)",
+                                            fontStyle: hasComment
+                                                ? "normal"
+                                                : "italic",
                                             overflow: "hidden",
-                                            overflowWrap: "anywhere",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
                                         }}
                                     >
-                                        {item.feedback ||
-                                            t(
-                                                "dashboard",
-                                                "noAdditionalComment",
-                                            )}
+                                        {comment}
                                     </Typography>
-                                </Stack>
+                                </Box>
+
+                                <Box
+                                    sx={{
+                                        gridArea: "time",
+                                        minWidth: 0,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "flex-end",
+                                    }}
+                                >
+                                    <Typography
+                                        title={new Intl.DateTimeFormat(
+                                            dateLocale,
+                                            {
+                                                timeZone: "Asia/Ho_Chi_Minh",
+                                                dateStyle: "medium",
+                                                timeStyle: "short",
+                                            },
+                                        ).format(new Date(item.createdAt))}
+                                        sx={{
+                                            fontSize: 10.5,
+                                            lineHeight: 1.5,
+                                            whiteSpace: "nowrap",
+                                            color: "var(--color-text-muted)",
+                                            fontVariantNumeric: "tabular-nums",
+                                        }}
+                                    >
+                                        {relativeTime}
+                                    </Typography>
+                                </Box>
                             </Box>
                         );
                     })}

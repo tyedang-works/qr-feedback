@@ -22,11 +22,32 @@ type MiniBarChartProps = {
     color: string;
 };
 
+type SummaryCardTheme = {
+    background: string;
+    darkBackground: string;
+};
+
+const SUMMARY_THEMES: SummaryCardTheme[] = [
+    {
+        background: "linear-gradient(135deg, #DDF9EB 0%, #B9F0D5 100%)",
+        darkBackground: "linear-gradient(135deg, #183B32 0%, #1D493C 100%)",
+    },
+    {
+        background: "linear-gradient(135deg, #F0E4FF 0%, #E1C9FF 100%)",
+        darkBackground: "linear-gradient(135deg, #302346 0%, #3C2A57 100%)",
+    },
+    {
+        background: "linear-gradient(135deg, #FFF4D1 0%, #FFE9AD 100%)",
+        darkBackground: "linear-gradient(135deg, #44371F 0%, #574326 100%)",
+    },
+];
+
 function MiniBarChart({ data, color }: MiniBarChartProps) {
     const maxValue = Math.max(...data, 1);
 
     return (
         <Stack
+            aria-hidden="true"
             sx={{
                 flexDirection: "row",
                 alignItems: "flex-end",
@@ -36,7 +57,6 @@ function MiniBarChart({ data, color }: MiniBarChartProps) {
                 height: 36,
                 flexShrink: 0,
             }}
-            aria-hidden="true"
         >
             {data.map((value, index) => (
                 <Box
@@ -163,6 +183,7 @@ type SummaryCardItemProps = {
     comparison: ReactNode;
     chartData: number[];
     chartColor: string;
+    theme: SummaryCardTheme;
 };
 
 function SummaryCardItem({
@@ -171,6 +192,7 @@ function SummaryCardItem({
     comparison,
     chartData,
     chartColor,
+    theme,
 }: SummaryCardItemProps) {
     return (
         <Card
@@ -180,10 +202,17 @@ function SummaryCardItem({
                 minWidth: 0,
                 boxSizing: "border-box",
                 p: { xs: 2, sm: 2.5 },
-                border: "1px solid var(--color-border, #F0F2F5)",
+                border: "1px solid transparent",
                 borderRadius: "16px",
-                bgcolor: "var(--color-surface, #FFFFFF)",
-                boxShadow: "var(--shadow-card)",
+                background: theme.background,
+                boxShadow: "none",
+                transition: "background 200ms ease",
+
+                '[data-theme="dark"] &': {
+                    background: theme.darkBackground,
+                    borderColor: "var(--color-border)",
+                    boxShadow: "var(--shadow-card)",
+                },
             }}
         >
             <Stack
@@ -199,7 +228,11 @@ function SummaryCardItem({
                         fontSize: 13,
                         lineHeight: 1.5,
                         fontWeight: 400,
-                        color: "var(--color-text-primary, #111827)",
+                        color: "#1F2937",
+
+                        '[data-theme="dark"] &': {
+                            color: "#F9FAFB",
+                        },
                     }}
                 >
                     {label}
@@ -221,8 +254,12 @@ function SummaryCardItem({
                             lineHeight: 1.2,
                             fontWeight: 700,
                             letterSpacing: "-0.7px",
-                            color: "var(--color-text-primary, #111827)",
+                            color: "#111827",
                             fontVariantNumeric: "tabular-nums",
+
+                            '[data-theme="dark"] &': {
+                                color: "#F9FAFB",
+                            },
                         }}
                     >
                         {value}
@@ -270,6 +307,7 @@ export default function SummaryCards({
                 value={formatNumber(totalFeedback)}
                 chartData={trendData}
                 chartColor="#10B981"
+                theme={SUMMARY_THEMES[0]}
                 comparison={
                     <ComparisonText
                         current={last7DaysFeedback}
@@ -284,6 +322,7 @@ export default function SummaryCards({
                 value={formatNumber(todayFeedback)}
                 chartData={trendData}
                 chartColor="#06B6D4"
+                theme={SUMMARY_THEMES[1]}
                 comparison={
                     <ComparisonText
                         current={todayFeedback}
@@ -300,6 +339,7 @@ export default function SummaryCards({
                 )}`}
                 chartData={[activeTables, inactiveTables]}
                 chartColor="#F97316"
+                theme={SUMMARY_THEMES[2]}
                 comparison={
                     <Typography
                         component="p"

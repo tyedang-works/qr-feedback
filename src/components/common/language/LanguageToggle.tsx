@@ -1,9 +1,12 @@
 "use client";
 
-import { IconButton, Tooltip } from "@mui/material";
-import { Languages } from "lucide-react";
-
+import { Box, IconButton, Tooltip } from "@mui/material";
 import { useLanguage } from "@/components/common/providers/LanguageProvider";
+
+const FLAG_URLS = {
+    vi: "/assets/flags/VN.svg",
+    en: "/assets/flags/GB.svg",
+} as const;
 
 export default function LanguageToggle() {
     const { locale, setLocale } = useLanguage();
@@ -13,8 +16,11 @@ export default function LanguageToggle() {
     return (
         <Tooltip
             title={
-                locale === "en" ? "Chuyển sang tiếng Việt" : "Switch to English"
+                locale === "en"
+                    ? "Switch to Vietnamese"
+                    : "Chuyển sang tiếng Anh"
             }
+            arrow
         >
             <IconButton
                 onClick={() => setLocale(nextLocale)}
@@ -26,18 +32,37 @@ export default function LanguageToggle() {
                 sx={{
                     width: 38,
                     height: 38,
-                    color: "var(--color-text-secondary)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 2,
-                    bgcolor: "var(--color-surface)",
-                    transition: "background-color 150ms ease, color 150ms ease",
+                    p: 0,
+                    border: "none",
+                    borderRadius: "50%",
+                    bgcolor: "transparent",
+                    transition: "background-color 150ms ease",
+
                     "&:hover": {
                         bgcolor: "var(--color-surface-hover)",
-                        color: "var(--color-text-primary)",
+                    },
+
+                    "&:active": {
+                        bgcolor: "var(--color-surface-active)",
                     },
                 }}
             >
-                <Languages size={18} strokeWidth={1.8} />
+                <Box
+                    component="img"
+                    src={FLAG_URLS[locale]}
+                    alt={locale === "vi" ? "Vietnamese" : "English"}
+                    draggable={false}
+                    sx={{
+                        display: "block",
+                        width: 26,
+                        height: 18,
+                        objectFit: "cover",
+                        borderRadius: "3px",
+                        flexShrink: 0,
+                        userSelect: "none",
+                        pointerEvents: "none",
+                    }}
+                />
             </IconButton>
         </Tooltip>
     );

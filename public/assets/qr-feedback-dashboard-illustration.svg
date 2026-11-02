@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="25 90 300 205" width="900" height="615" fill="none">
+  <defs>
+    <clipPath id="paper-clip">
+      <path d="M 47.943 122.571 L 96.231 273.55 a 11.4 11.4 0 0 0 11.786 7.805 l 63.326 -5.36 l 148.013 -12.644 a 11.316 11.316 0 0 0 9.904 -7.823 c 0.456 -1.421 0.627 -2.918 0.503 -4.405 a 12.314 12.314 0 0 0 -0.729 -3.122 l -11.838 -31.221 l -21.412 -57.238 l -16.599 -44.23 a 11.37 11.37 0 0 0 -10.641 -7.362 H 58.741 a 11.345 11.345 0 0 0 -11.344 11.343 c 0.016 1.114 0.2 2.219 0.546 3.278 Z"/>
+    </clipPath>
+    <linearGradient id="green-panel" x1="47" y1="120" x2="110" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#42D7A0"/><stop offset="1" stop-color="#159B78"/>
+    </linearGradient>
+    <linearGradient id="plane" x1="73" y1="103" x2="111" y2="122" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#39E4A5"/><stop offset="1" stop-color="#12A982"/>
+    </linearGradient>
+  </defs>
+  <path d="M 47.943 122.571 L 96.231 273.55 a 11.4 11.4 0 0 0 11.786 7.805 l 63.326 -5.36 l 148.013 -12.644 a 11.316 11.316 0 0 0 9.904 -7.823 c 0.456 -1.421 0.627 -2.918 0.503 -4.405 a 12.314 12.314 0 0 0 -0.729 -3.122 l -11.838 -31.221 l -21.412 -57.238 l -16.599 -44.23 a 11.37 11.37 0 0 0 -10.641 -7.362 H 58.741 a 11.345 11.345 0 0 0 -11.344 11.343 c 0.016 1.114 0.2 2.219 0.546 3.278 Z" fill="#FFFFFF"/>
+  <g clip-path="url(#paper-clip)">
+    <path d="M27 101 L78 96 L133 284 L87 291 Z" fill="url(#green-panel)"/>
+    <circle cx="68" cy="151" r="10.5" stroke="#A9F2D8" stroke-width="2.4"/>
+    <path d="M63 151.5 L67 155.5 L73.5 147.5" stroke="#B8F7E1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="79" cy="197" r="10.5" stroke="#A9F2D8" stroke-width="2.4"/>
+    <path d="M74 197.5 L78 201.5 L84.5 193.5" stroke="#B8F7E1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="90" cy="244" r="10.5" stroke="#A9F2D8" stroke-width="2.4"/>
+    <path d="M85 244.5 L89 248.5 L95.5 240.5" stroke="#B8F7D8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="111" y="151" width="63" height="17" rx="4" fill="#E9EDF1"/>
+    <rect x="117" y="183" width="68" height="17" rx="4" fill="#E9EDF1"/>
+    <rect x="127" y="226" width="74" height="37" rx="5" fill="#DDE2E8"/>
+    <g transform="rotate(-7 205 174)">
+      <rect x="181" y="143" width="111" height="65" rx="7" fill="#F9FBFC" stroke="#E7EBEF" stroke-width="1.2"/>
+      <rect x="196" y="177" width="8" height="21" rx="2" fill="#B6EBDD"/>
+      <rect x="210" y="166" width="8" height="32" rx="2" fill="#54D6AD"/>
+      <rect x="224" y="158" width="8" height="40" rx="2" fill="#20B98D"/>
+      <rect x="238" y="171" width="8" height="27" rx="2" fill="#7CE2C3"/>
+      <path d="M194 200 H276" stroke="#E8EEF0"/>
+    </g>
+  </g>
+  <path d="M70 119 C49 132 38 148 35 169 C32 193 45 211 69 219" stroke="#25D8A0" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="5 8"/>
+  <path d="M73 104 L113 100 L87 124 L82 113 Z" fill="url(#plane)"/>
+  <path d="M73 104 L87 113 L113 100" fill="#69F0BF"/>
+  <path d="M87 113 L82 124 L82 113" fill="#119B7C"/>
+</svg>

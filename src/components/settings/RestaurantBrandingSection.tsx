@@ -16,6 +16,7 @@ import {
     Trash2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 
 import {
     deleteRestaurantBranding,
@@ -115,6 +116,8 @@ const isAllowedFile = (file: File) =>
     ) || isIcoFile(file);
 
 export default function RestaurantBrandingSection({ initialSettings }: Props) {
+    const { t } = useTranslation();
+
     const [images, setImages] = useState<BrandingImages>({
         logo: initialSettings.logo_url,
         favicon: initialSettings.favicon_url,
@@ -159,6 +162,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
 
     const createManagedObjectUrl = (file: File) => {
         const url = URL.createObjectURL(file);
+
         objectUrlsRef.current.add(url);
 
         return url;
@@ -195,15 +199,16 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
         if (!isAllowedFile(file) || (type === "logo" && isIcoFile(file))) {
             showSnackbar(
                 type === "favicon"
-                    ? "Chỉ chấp nhận ảnh PNG, JPEG, WebP hoặc ICO."
-                    : "Logo chỉ hỗ trợ PNG, JPEG hoặc WebP.",
+                    ? t("settings", "faviconFormatError")
+                    : t("settings", "logoFormatError"),
                 "error",
             );
+
             return;
         }
 
         if (file.size > MAX_FILE_SIZE) {
-            showSnackbar("Dung lượng ảnh không được vượt quá 1 MB.", "error");
+            showSnackbar(t("settings", "imageSizeError"), "error");
             return;
         }
 
@@ -290,7 +295,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
         setPreview(null);
         setDeleteType(null);
 
-        showSnackbar("Đã hủy các thay đổi chưa lưu.", "success");
+        showSnackbar(t("settings", "discardChangesSuccess"), "success");
     };
 
     const saveBrandingType = async (
@@ -328,7 +333,10 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
 
                 if (!file && !shouldDelete) continue;
 
-                const label = type === "logo" ? "Logo" : "Favicon";
+                const label = t(
+                    "settings",
+                    type === "logo" ? "logoTitle" : "faviconTitle",
+                );
 
                 try {
                     const result = await saveBrandingType(
@@ -352,7 +360,9 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                     successfulTypes.push(type);
                 } catch (error) {
                     console.error(`Failed to save ${type}:`, error);
-                    errors.push(`${label}: Không thể lưu thay đổi.`);
+                    errors.push(
+                        `${label}: ${t("settings", "saveChangesFailed")}`,
+                    );
                 }
             }
 
@@ -395,10 +405,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
             if (errors.length > 0) {
                 showSnackbar(errors.join(" "), "error");
             } else if (successfulTypes.length > 0) {
-                showSnackbar(
-                    "Đã lưu nhận diện thương hiệu thành công.",
-                    "success",
-                );
+                showSnackbar(t("settings", "brandingSaveSuccess"), "success");
             }
         } finally {
             setLoading(false);
@@ -460,11 +467,11 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
 
                     <Box sx={{ minWidth: 0 }}>
                         <Typography sx={sectionTitleSx}>
-                            Nhận diện thương hiệu
+                            {t("settings", "brandingTitle")}
                         </Typography>
 
                         <Typography sx={sectionDescriptionSx}>
-                            Quản lý logo và favicon của nhà hàng.
+                            {t("settings", "brandingDescription")}
                         </Typography>
                     </Box>
                 </Stack>
@@ -481,6 +488,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                 >
                     {BRANDING_ITEMS.map((item) => {
                         const { type } = item;
+
                         const imageUrl = getDisplayUrl(type);
                         const isDeleted = pendingDeletes[type];
                         const pendingFile = pendingFiles[type];
@@ -501,11 +509,21 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                                 <Stack sx={{ gap: 1.5 }}>
                                     <Box>
                                         <Typography sx={sectionTitleSx}>
-                                            {item.title}
+                                            {t(
+                                                "settings",
+                                                type === "logo"
+                                                    ? "logoTitle"
+                                                    : "faviconTitle",
+                                            )}
                                         </Typography>
 
                                         <Typography sx={sectionDescriptionSx}>
-                                            {item.description}
+                                            {t(
+                                                "settings",
+                                                type === "logo"
+                                                    ? "logoDescription"
+                                                    : "faviconDescription",
+                                            )}
                                         </Typography>
                                     </Box>
 
@@ -526,7 +544,12 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                                             <Box
                                                 component="img"
                                                 src={imageUrl}
-                                                alt={item.title}
+                                                alt={t(
+                                                    "settings",
+                                                    type === "logo"
+                                                        ? "logoTitle"
+                                                        : "faviconTitle",
+                                                )}
                                                 sx={{
                                                     maxWidth: "100%",
                                                     maxHeight: 110,
@@ -550,19 +573,36 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                                                     sx={{ fontSize: 12 }}
                                                 >
                                                     {isDeleted
-                                                        ? "Ảnh sẽ bị xóa khi lưu"
-                                                        : "Chưa có hình ảnh"}
+                                                        ? t(
+                                                              "settings",
+                                                              "imageWillBeDeleted",
+                                                          )
+                                                        : t(
+                                                              "settings",
+                                                              "noImage",
+                                                          )}
                                                 </Typography>
                                             </Stack>
                                         )}
                                     </Box>
 
                                     <Typography sx={sectionDescriptionSx}>
-                                        {item.recommendation} Tối đa 1 MB. Hỗ
-                                        trợ{" "}
+                                        {t(
+                                            "settings",
+                                            type === "logo"
+                                                ? "logoRecommendation"
+                                                : "faviconRecommendation",
+                                        )}{" "}
+                                        {t("settings", "imageRequirements")}{" "}
                                         {type === "favicon"
-                                            ? "PNG, JPEG, WebP và ICO."
-                                            : "PNG, JPEG và WebP."}
+                                            ? t(
+                                                  "settings",
+                                                  "faviconImageRequirements",
+                                              )
+                                            : t(
+                                                  "settings",
+                                                  "logoImageRequirements",
+                                              )}
                                     </Typography>
 
                                     {isPending && (
@@ -573,7 +613,8 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                                                 overflowWrap: "anywhere",
                                             }}
                                         >
-                                            Ảnh mới: {pendingFile?.name}
+                                            {t("settings", "newImage")}:{" "}
+                                            {pendingFile?.name}
                                         </Typography>
                                     )}
 
@@ -584,7 +625,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                                                 color: "error.main",
                                             }}
                                         >
-                                            Đã đánh dấu xóa — chưa áp dụng.
+                                            {t("settings", "markedForDeletion")}
                                         </Typography>
                                     )}
 
@@ -630,7 +671,9 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                                                 fontSize: 12,
                                             }}
                                         >
-                                            {imageUrl ? "Thay ảnh" : "Chọn ảnh"}
+                                            {imageUrl
+                                                ? t("settings", "replaceImage")
+                                                : t("settings", "selectImage")}
                                         </Button>
 
                                         {(images[type] || isPending) &&
@@ -651,7 +694,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                                                         fontSize: 12,
                                                     }}
                                                 >
-                                                    Xóa
+                                                    {t("settings", "delete")}
                                                 </Button>
                                             )}
 
@@ -669,7 +712,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                                                 }
                                                 sx={buttonBaseCancelSx}
                                             >
-                                                Hoàn tác xóa
+                                                {t("settings", "undoDelete")}
                                             </Button>
                                         )}
                                     </Stack>
@@ -699,7 +742,7 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                         startIcon={<RotateCcw size={14} />}
                         sx={buttonBaseCancelSx}
                     >
-                        Hủy thay đổi
+                        {t("settings", "discardChanges")}
                     </Button>
 
                     <Button
@@ -715,7 +758,9 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                         }
                         sx={{ ...buttonBaseSx, minWidth: 150 }}
                     >
-                        {loading ? "Đang lưu..." : "Lưu thay đổi"}
+                        {loading
+                            ? t("settings", "saving")
+                            : t("settings", "saveChanges")}
                     </Button>
                 </Stack>
             </Stack>
@@ -724,7 +769,10 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
                 open={Boolean(preview)}
                 imageUrl={preview?.url ?? null}
                 file={preview?.file ?? null}
-                title={preview?.type === "favicon" ? "favicon" : "logo"}
+                title={t(
+                    "settings",
+                    preview?.type === "favicon" ? "faviconTitle" : "logoTitle",
+                )}
                 brandingType={preview?.type ?? "logo"}
                 loading={loading}
                 onClose={handleClosePreview}
@@ -733,7 +781,10 @@ export default function RestaurantBrandingSection({ initialSettings }: Props) {
 
             <BrandingDeleteDialog
                 open={deleteType !== null}
-                title={deleteType === "logo" ? "logo nhà hàng" : "favicon"}
+                title={t(
+                    "settings",
+                    deleteType === "logo" ? "logoTitle" : "faviconTitle",
+                )}
                 loading={loading}
                 onClose={() => setDeleteType(null)}
                 onConfirm={handleConfirmDelete}

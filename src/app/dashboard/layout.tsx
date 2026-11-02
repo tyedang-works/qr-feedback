@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 
+import SessionRefreshReminder from "@/components/auth/SessionRefreshReminder";
+import LanguageProvider from "@/components/common/providers/LanguageProvider";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { DashboardLoadingProvider } from "@/components/dashboard/DashboardLoadingProvider";
+import { Locale } from "@/i18n/translations";
 import { getUserContext } from "@/lib/auth/queries";
 import { getRestaurantSettings } from "@/lib/restaurant/queries";
-import SessionRefreshReminder from "@/components/auth/SessionRefreshReminder";
-import { DashboardLoadingProvider } from "@/components/dashboard/DashboardLoadingProvider";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
@@ -50,15 +53,22 @@ export default async function DashboardRouteLayout({
     const userContext = await getUserContext();
     const feedbackEmail = process.env.FEEDBACK_EMAIL ?? "";
 
+    const cookieStore = await cookies();
+    const savedLocale = cookieStore.get("qr-locale")?.value;
+
+    const locale: Locale = savedLocale === "en" ? "en" : "vi";
+
     return (
         <DashboardLoadingProvider>
-            <DashboardLayout
-                userContext={userContext}
-                feedbackEmail={feedbackEmail}
-            >
-                {children}
-                <SessionRefreshReminder />
-            </DashboardLayout>
+            <LanguageProvider initialLocale={locale}>
+                <DashboardLayout
+                    userContext={userContext}
+                    feedbackEmail={feedbackEmail}
+                >
+                    {children}
+                    <SessionRefreshReminder />
+                </DashboardLayout>
+            </LanguageProvider>
         </DashboardLoadingProvider>
     );
 }

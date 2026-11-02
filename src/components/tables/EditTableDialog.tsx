@@ -4,6 +4,7 @@ import { Button, CircularProgress } from "@mui/material";
 import { useMemo, useState } from "react";
 
 import { updateTableAction } from "@/app/dashboard/tables/actions";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
@@ -31,7 +32,11 @@ type SnackbarState = {
     severity: "success" | "error";
 };
 
-function createValidationSchema(tableName: string, tableNames: string[]) {
+function createValidationSchema(
+    tableName: string,
+    tableNames: string[],
+    t: (section: "table", key: string) => string,
+) {
     const normalizedCurrentName = tableName.trim().toLowerCase();
 
     const normalizedTableNames = tableNames
@@ -43,15 +48,19 @@ function createValidationSchema(tableName: string, tableNames: string[]) {
             .string()
             .trim()
             .required(" ")
-            .test("unique-table-name", "Tên bàn này đã tồn tại.", (value) => {
-                if (!value) {
-                    return true;
-                }
+            .test(
+                "unique-table-name",
+                t("table", "duplicateTableName"),
+                (value) => {
+                    if (!value) {
+                        return true;
+                    }
 
-                const normalizedName = value.trim().toLowerCase();
+                    const normalizedName = value.trim().toLowerCase();
 
-                return !normalizedTableNames.includes(normalizedName);
-            }),
+                    return !normalizedTableNames.includes(normalizedName);
+                },
+            ),
     });
 }
 
@@ -60,6 +69,8 @@ export default function EditTableDialog({
     tableName,
     tableNames,
 }: EditTableDialogProps) {
+    const { t } = useTranslation();
+
     const [open, setOpen] = useState(false);
 
     const [snackbar, setSnackbar] = useState<SnackbarState>({
@@ -73,8 +84,8 @@ export default function EditTableDialog({
     };
 
     const validationSchema = useMemo(
-        () => createValidationSchema(tableName, tableNames),
-        [tableName, tableNames],
+        () => createValidationSchema(tableName, tableNames, t),
+        [tableName, tableNames, t],
     );
 
     const handleSnackbarClose = () => {
@@ -96,7 +107,6 @@ export default function EditTableDialog({
             const formData = new FormData();
 
             formData.append("tableId", tableId);
-
             formData.append("name", values.name.trim());
 
             const result = await updateTableAction(
@@ -110,16 +120,19 @@ export default function EditTableDialog({
 
             if (!result.success) {
                 if (result.fieldErrors?.name) {
-                    setFieldError("name", result.fieldErrors.name);
+                    setFieldError(
+                        "name",
+                        result.fieldErrors.name === "duplicateTableName"
+                            ? t("table", "duplicateTableName")
+                            : result.fieldErrors.name,
+                    );
 
                     return;
                 }
 
                 setSnackbar({
                     open: true,
-                    message:
-                        result.message ||
-                        "Không thể cập nhật bàn. Vui lòng thử lại.",
+                    message: result.message || t("table", "updateTableFailed"),
                     severity: "error",
                 });
 
@@ -127,12 +140,11 @@ export default function EditTableDialog({
             }
 
             resetForm();
-
             setOpen(false);
 
             setSnackbar({
                 open: true,
-                message: result.message || "Đã cập nhật bàn thành công.",
+                message: t("table", "updateTableSuccess"),
                 severity: "success",
             });
         } catch (error) {
@@ -140,7 +152,7 @@ export default function EditTableDialog({
 
             setSnackbar({
                 open: true,
-                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: t("table", "updateTableError"),
                 severity: "error",
             });
         } finally {
@@ -155,7 +167,7 @@ export default function EditTableDialog({
                 onClick={() => setOpen(true)}
                 sx={tableEditButtonSx}
             >
-                Chỉnh sửa
+                {t("table", "editTable")}
             </Button>
 
             <Formik
@@ -190,7 +202,7 @@ export default function EditTableDialog({
                         <QRDialog
                             open={open}
                             onClose={handleClose}
-                            title="Chỉnh sửa bàn"
+                            title={t("table", "editTableTitle")}
                             actions={
                                 <>
                                     <Button
@@ -200,7 +212,7 @@ export default function EditTableDialog({
                                         disabled={isSubmitting}
                                         sx={buttonBaseCancelSx}
                                     >
-                                        Hủy
+                                        {t("table", "cancel")}
                                     </Button>
 
                                     <Button
@@ -220,10 +232,10 @@ export default function EditTableDialog({
                                                         mr: 1,
                                                     }}
                                                 />
-                                                Đang lưu...
+                                                {t("table", "saving")}
                                             </>
                                         ) : (
-                                            "Lưu thay đổi"
+                                            t("table", "saveChanges")
                                         )}
                                     </Button>
                                 </>
@@ -232,8 +244,11 @@ export default function EditTableDialog({
                             <Form id="edit-table-form" noValidate>
                                 <QRTextField
                                     name="name"
-                                    label="Tên bàn"
-                                    placeholder="Ví dụ: Bàn 03"
+                                    label={t("table", "tableName")}
+                                    placeholder={t(
+                                        "table",
+                                        "tableNamePlaceholder",
+                                    )}
                                     required
                                     value={values.name}
                                     onChange={(event) => {

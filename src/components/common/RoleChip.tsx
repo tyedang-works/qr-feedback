@@ -1,24 +1,29 @@
 "use client";
 
-import { Chip } from "@mui/material";
-
-import { UserRole } from "@/lib/auth/constants";
+import { useTranslation } from "@/components/common/providers/useTranslation";
+import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
 import type { UserRoleMember } from "@/lib/auth/user-roles.types";
+import { Chip } from "@mui/material";
 
 type RoleChipProps = {
     role: UserRoleMember["role"];
 };
 
-const ROLE_LABELS: Record<UserRole, string> = {
-    owner: "Chủ nhà hàng",
-    manager: "Quản lý",
-    staff: "Nhân viên",
+const ROLE_TRANSLATION_KEYS: Record<
+    UserRole,
+    "ownerRole" | "managerRole" | "staffRole"
+> = {
+    [USER_ROLES.OWNER]: "ownerRole",
+    [USER_ROLES.MANAGER]: "managerRole",
+    [USER_ROLES.STAFF]: "staffRole",
 };
 
 export default function RoleChip({ role }: RoleChipProps) {
+    const { t } = useTranslation();
+
     return (
         <Chip
-            label={ROLE_LABELS[role]}
+            label={t("account", ROLE_TRANSLATION_KEYS[role])}
             size="small"
             sx={{
                 display: "inline-flex",

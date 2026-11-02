@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { RecentFeedbackItem } from "@/lib/dashboard/types";
 import {
     FEEDBACK_ISSUE_LABEL_MAP,
@@ -11,6 +14,8 @@ import FeedbackIssueChip from "../feedback/FeedbackIssueChip";
 type RecentFeedbackProps = {
     data: RecentFeedbackItem[];
 };
+
+type FeedbackStatusTranslationKey = "new" | "inProgress" | "resolved";
 
 const chipRemainSx = {
     height: 25,
@@ -32,8 +37,8 @@ const chipRemainSx = {
     },
 };
 
-function formatDateTime(dateString: string) {
-    return new Intl.DateTimeFormat("vi-VN", {
+function formatDateTime(dateString: string, locale: string) {
+    return new Intl.DateTimeFormat(locale, {
         timeZone: "Asia/Ho_Chi_Minh",
         day: "2-digit",
         month: "2-digit",
@@ -43,7 +48,25 @@ function formatDateTime(dateString: string) {
     }).format(new Date(dateString));
 }
 
+function getStatusTranslationKey(
+    status: string,
+): FeedbackStatusTranslationKey | null {
+    switch (status) {
+        case "new":
+            return "new";
+        case "in_progress":
+            return "inProgress";
+        case "resolved":
+            return "resolved";
+        default:
+            return null;
+    }
+}
+
 export default function RecentFeedback({ data }: RecentFeedbackProps) {
+    const { t } = useTranslation();
+    const dateLocale = t("dashboard", "dateLocale");
+
     return (
         <Card
             elevation={0}
@@ -75,7 +98,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                             color: "var(--color-text-primary)",
                         }}
                     >
-                        Phản hồi gần đây
+                        {t("dashboard", "recentFeedbackTitle")}
                     </Typography>
 
                     <Typography
@@ -85,7 +108,10 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                             color: "var(--color-text-secondary)",
                         }}
                     >
-                        {data.length} phản hồi mới nhất
+                        {t("dashboard", "latestFeedbackCount").replace(
+                            "{count}",
+                            String(data.length),
+                        )}
                     </Typography>
                 </Box>
 
@@ -103,7 +129,7 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                         fontFamily: "var(--font-momo-trust-sans)",
                     }}
                 >
-                    Xem tất cả
+                    {t("dashboard", "viewAll")}
                     <span aria-hidden="true">→</span>
                 </Link>
             </Stack>
@@ -123,13 +149,16 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                             color: "var(--color-text-secondary)",
                         }}
                     >
-                        Chưa có phản hồi nào.
+                        {t("dashboard", "noRecentFeedback")}
                     </Typography>
                 </Box>
             ) : (
                 <Stack>
                     {data.map((item) => {
                         const status = STATUS_CONFIG[item.status];
+                        const statusTranslationKey = getStatusTranslationKey(
+                            item.status,
+                        );
                         const visibleOptions = item.selectedOptions.slice(0, 2);
                         const remainingCount = Math.max(
                             0,
@@ -219,13 +248,21 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                                 >
                                                     {formatDateTime(
                                                         item.createdAt,
+                                                        dateLocale,
                                                     )}
                                                 </Typography>
                                             </Box>
                                         </Box>
 
                                         <Chip
-                                            label={status.label}
+                                            label={
+                                                statusTranslationKey
+                                                    ? t(
+                                                          "dashboard",
+                                                          statusTranslationKey,
+                                                      )
+                                                    : status.label
+                                            }
                                             size="small"
                                             sx={{
                                                 height: 23,
@@ -302,7 +339,10 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                         }}
                                     >
                                         {item.feedback ||
-                                            "Không có góp ý bổ sung"}
+                                            t(
+                                                "dashboard",
+                                                "noAdditionalComment",
+                                            )}
                                     </Typography>
                                 </Stack>
                             </Box>

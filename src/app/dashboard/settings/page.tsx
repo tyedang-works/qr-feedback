@@ -1,12 +1,14 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { Box, Card, Stack, Typography } from "@mui/material";
+import { Bell, Settings } from "lucide-react";
 import PageHeader from "@/components/common/layout/PageHeader";
 import RestaurantSettingsContent from "@/components/settings/RestaurantSettingsContent";
+import { translations, type Locale } from "@/i18n/translations";
 import { canManageSettings } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import { getRestaurantSettings } from "@/lib/restaurant/queries";
 import { cardSx } from "@/styles/card.styles";
-import { Box, Card, Stack, Typography } from "@mui/material";
-import { Bell, Settings } from "lucide-react";
-import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {
     const userContext = await getUserContext();
@@ -21,6 +23,12 @@ export default async function SettingsPage() {
 
     const restaurant = await getRestaurantSettings(userContext.restaurantId);
 
+    const cookieStore = await cookies();
+    const locale: Locale =
+        cookieStore.get("qr-locale")?.value === "en" ? "en" : "vi";
+
+    const t = translations[locale].settings;
+
     return (
         <Stack
             component="main"
@@ -30,11 +38,7 @@ export default async function SettingsPage() {
                 gap: { xs: 2.5, md: 3 },
             }}
         >
-            <PageHeader
-                title="Cài đặt nhà hàng"
-                subtitle="Quản lý thông tin và nhận diện thương hiệu của nhà hàng."
-                icon={Settings}
-            />
+            <PageHeader title={t.title} subtitle={t.subtitle} icon={Settings} />
 
             <Card sx={cardSx}>
                 <Box sx={{ minWidth: 0 }}>
@@ -55,27 +59,22 @@ export default async function SettingsPage() {
                     }}
                 >
                     <Bell
-                        size={15}
-                        strokeWidth={1.8}
-                        aria-hidden="true"
-                        color="var(--color-text-muted)"
+                        size={17}
                         style={{
                             flexShrink: 0,
                             marginTop: 2,
+                            color: "var(--color-text-secondary)",
                         }}
                     />
 
                     <Typography
                         sx={{
-                            minWidth: 0,
-                            fontSize: 12,
+                            fontSize: 13,
                             lineHeight: 1.6,
                             color: "var(--color-text-secondary)",
-                            overflowWrap: "anywhere",
                         }}
                     >
-                        Thông tin nhà hàng được sử dụng để quản lý hoạt động và
-                        hỗ trợ khách hàng.
+                        {t.informationNote}
                     </Typography>
                 </Box>
             </Card>

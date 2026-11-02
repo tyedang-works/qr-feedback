@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@mui/material";
+import { useTranslation } from "../common/providers/useTranslation";
 
 type QRCodePreviewButtonProps = {
     onClick: () => void;
@@ -9,6 +10,7 @@ type QRCodePreviewButtonProps = {
 export default function QRCodePreviewButton({
     onClick,
 }: QRCodePreviewButtonProps) {
+    const { t } = useTranslation();
     return (
         <Button
             type="button"
@@ -29,7 +31,7 @@ export default function QRCodePreviewButton({
                 },
             }}
         >
-            Xem QR
+            {t("qrCode", "previewQR")}
         </Button>
     );
 }

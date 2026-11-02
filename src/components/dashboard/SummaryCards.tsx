@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { FeedbackTrendItem } from "@/lib/dashboard/types";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { Minus, TrendingDown, TrendingUp } from "lucide-react";
@@ -229,6 +230,7 @@ function SummaryCardItem({
 
                     <MiniBarChart data={chartData} color={chartColor} />
                 </Stack>
+
                 <Box sx={{ minWidth: 0, minHeight: 18 }}>{comparison}</Box>
             </Stack>
         </Card>
@@ -245,6 +247,8 @@ export default function SummaryCards({
     previous7DaysFeedback,
     yesterdayFeedback,
 }: SummaryCardsProps) {
+    const { t } = useTranslation();
+
     const trendData = feedbackTrend.map((item) => item.count);
 
     return (
@@ -262,7 +266,7 @@ export default function SummaryCards({
             }}
         >
             <SummaryCardItem
-                label="Tổng phản hồi"
+                label={t("dashboard", "totalFeedback")}
                 value={formatNumber(totalFeedback)}
                 chartData={trendData}
                 chartColor="#10B981"
@@ -270,13 +274,13 @@ export default function SummaryCards({
                     <ComparisonText
                         current={last7DaysFeedback}
                         previous={previous7DaysFeedback}
-                        suffix="so với 7 ngày trước"
+                        suffix={t("dashboard", "comparedWithPrevious7Days")}
                     />
                 }
             />
 
             <SummaryCardItem
-                label="Hôm nay"
+                label={t("dashboard", "today")}
                 value={formatNumber(todayFeedback)}
                 chartData={trendData}
                 chartColor="#06B6D4"
@@ -284,13 +288,13 @@ export default function SummaryCards({
                     <ComparisonText
                         current={todayFeedback}
                         previous={yesterdayFeedback}
-                        suffix="so với hôm qua"
+                        suffix={t("dashboard", "comparedWithYesterday")}
                     />
                 }
             />
 
             <SummaryCardItem
-                label="Bàn đang hoạt động"
+                label={t("dashboard", "activeTables")}
                 value={`${formatNumber(activeTables)}/${formatNumber(
                     activeTables + inactiveTables,
                 )}`}
@@ -313,10 +317,12 @@ export default function SummaryCards({
                                 fontWeight: 500,
                             }}
                         >
-                            {formatNumber(activeTables)} đang hoạt động
+                            {formatNumber(activeTables)}{" "}
+                            {t("dashboard", "activeTables").toLowerCase()}
                         </Box>
                         {" · "}
-                        {formatNumber(inactiveTables)} đã tắt
+                        {formatNumber(inactiveTables)}{" "}
+                        {t("dashboard", "inactive")}
                     </Typography>
                 }
             />

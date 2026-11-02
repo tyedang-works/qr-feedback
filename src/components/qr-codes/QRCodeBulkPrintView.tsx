@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { APP_URL } from "@/lib/config/app";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import { Box, Button, Stack, Typography } from "@mui/material";
@@ -20,6 +21,8 @@ export default function QRCodeBulkPrintView({
     tables,
     onClose,
 }: QRCodeBulkPrintViewProps) {
+    const { t } = useTranslation();
+
     const handlePrint = () => {
         window.print();
     };
@@ -70,7 +73,7 @@ export default function QRCodeBulkPrintView({
                             color: "var(--color-text-primary)",
                         }}
                     >
-                        In mã QR
+                        {t("qrCode", "printQRCodes")}
                     </Typography>
 
                     <Stack
@@ -86,7 +89,7 @@ export default function QRCodeBulkPrintView({
                             onClick={onClose}
                             sx={buttonBaseCancelSx}
                         >
-                            Quay lại
+                            {t("qrCode", "back")}
                         </Button>
 
                         <Button
@@ -95,7 +98,7 @@ export default function QRCodeBulkPrintView({
                             variant="contained"
                             sx={buttonBaseSx}
                         >
-                            In {tables.length} QR
+                            {t("qrCode", "printQR")} ({tables.length})
                         </Button>
                     </Stack>
                 </Stack>
@@ -225,7 +228,7 @@ export default function QRCodeBulkPrintView({
                                         },
                                     }}
                                 >
-                                    Quét mã để gửi phản hồi
+                                    {t("qrCode", "scanToSendFeedback")}
                                 </Typography>
 
                                 <Typography

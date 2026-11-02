@@ -3,6 +3,7 @@
 import { deleteUserAction } from "@/app/dashboard/users-roles/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import {
     buttonBaseCancelSx,
     buttonBaseSx,
@@ -28,6 +29,9 @@ export default function DeleteUserDialog({
     fullName,
 }: DeleteUserDialogProps) {
     const router = useRouter();
+    const { t } = useTranslation();
+
+    const deleteT = (key: string) => t("usersRoles", `deleteUser.${key}`);
 
     const [open, setOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -66,7 +70,7 @@ export default function DeleteUserDialog({
             if (!result.success) {
                 setSnackbar({
                     open: true,
-                    message: result.message || "Không thể xóa người dùng.",
+                    message: result.message || deleteT("deleteError"),
                     severity: "error",
                 });
 
@@ -77,7 +81,7 @@ export default function DeleteUserDialog({
 
             setSnackbar({
                 open: true,
-                message: result.message || "Đã xóa người dùng thành công.",
+                message: result.message || deleteT("deleteSuccess"),
                 severity: "success",
             });
 
@@ -87,7 +91,7 @@ export default function DeleteUserDialog({
 
             setSnackbar({
                 open: true,
-                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: deleteT("generalError"),
                 severity: "error",
             });
         } finally {
@@ -103,13 +107,13 @@ export default function DeleteUserDialog({
                 disabled={isDeleting}
                 sx={tableDeleteButtonSx}
             >
-                Xóa
+                {deleteT("delete")}
             </Button>
 
             <QRDialog
                 open={open}
                 onClose={handleClose}
-                title="Xóa người dùng"
+                title={deleteT("title")}
                 actions={
                     <>
                         <Button
@@ -119,7 +123,7 @@ export default function DeleteUserDialog({
                             disabled={isDeleting}
                             sx={buttonBaseCancelSx}
                         >
-                            Hủy
+                            {deleteT("cancel")}
                         </Button>
 
                         <Button
@@ -146,10 +150,10 @@ export default function DeleteUserDialog({
                                             mr: 1,
                                         }}
                                     />
-                                    Đang xóa...
+                                    {deleteT("deleting")}
                                 </>
                             ) : (
-                                "Xóa"
+                                deleteT("delete")
                             )}
                         </Button>
                     </>
@@ -162,7 +166,7 @@ export default function DeleteUserDialog({
                         color: "var(--color-text-primary)",
                     }}
                 >
-                    Bạn có chắc muốn xóa người dùng{" "}
+                    {deleteT("confirmPrefix")}{" "}
                     <Typography
                         component="span"
                         sx={{
@@ -171,9 +175,9 @@ export default function DeleteUserDialog({
                             color: "var(--color-text-primary)",
                         }}
                     >
-                        {fullName || "này"}
+                        {fullName || deleteT("thisUser")}
                     </Typography>
-                    ?
+                    {deleteT("confirmSuffix")}
                 </Typography>
 
                 <Typography
@@ -184,8 +188,7 @@ export default function DeleteUserDialog({
                         color: "var(--color-text-secondary)",
                     }}
                 >
-                    Tài khoản và quyền truy cập của người dùng này sẽ bị xóa.
-                    Email có thể được sử dụng lại cho người dùng khác.
+                    {deleteT("description")}
                 </Typography>
             </QRDialog>
 

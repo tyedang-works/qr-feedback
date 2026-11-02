@@ -24,6 +24,7 @@ import {
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { createCroppedImageFile } from "@/lib/images/crop-image";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import { cardSx } from "@/styles/card.styles";
@@ -32,14 +33,6 @@ import RoleChip from "../common/RoleChip";
 
 const MAX_AVATAR_SIZE = 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
-
-const validationSchema = yup.object({
-    fullName: yup
-        .string()
-        .trim()
-        .required(" ")
-        .max(100, "Họ và tên không được vượt quá 100 ký tự."),
-});
 
 type ProfileFormValues = {
     fullName: string;
@@ -57,6 +50,7 @@ type SnackbarState = {
 
 export default function ProfilePage({ profile }: ProfilePageProps) {
     const router = useRouter();
+    const { t } = useTranslation();
 
     const inputRef = useRef<HTMLInputElement>(null);
     const avatarUrlRef = useRef<string | null>(null);
@@ -79,6 +73,14 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
         open: false,
         message: "",
         severity: "success",
+    });
+
+    const validationSchema = yup.object({
+        fullName: yup
+            .string()
+            .trim()
+            .required(" ")
+            .max(100, t("profile", "fullNameMaxLength")),
     });
 
     const revokeBlobUrl = useCallback((url: string | null) => {
@@ -113,12 +115,12 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
         if (!file) return;
 
         if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-            showSnackbar("Chỉ chấp nhận ảnh PNG, JPEG hoặc WebP.", "error");
+            showSnackbar(t("profile", "invalidAvatarType"), "error");
             return;
         }
 
         if (file.size === 0 || file.size > MAX_AVATAR_SIZE) {
-            showSnackbar("Ảnh phải có dung lượng tối đa 1 MB.", "error");
+            showSnackbar(t("profile", "avatarMaxSize"), "error");
             return;
         }
 
@@ -160,10 +162,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
             );
 
             if (file.size === 0 || file.size > MAX_AVATAR_SIZE) {
-                showSnackbar(
-                    "Ảnh sau khi crop vượt quá 1 MB. Vui lòng chọn ảnh khác hoặc crop vùng nhỏ hơn.",
-                    "error",
-                );
+                showSnackbar(t("profile", "croppedAvatarMaxSize"), "error");
                 return;
             }
 
@@ -176,10 +175,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
             setAvatarPreview(nextPreview);
             handleCancelCrop();
         } catch {
-            showSnackbar(
-                "Không thể xử lý ảnh. Vui lòng chọn ảnh khác.",
-                "error",
-            );
+            showSnackbar(t("profile", "cropError"), "error");
         } finally {
             setIsCropping(false);
         }
@@ -203,23 +199,28 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                 avatar: avatarFile,
             });
 
+            // Handle validation and API errors
             if (!result.success) {
                 if (result.fieldErrors?.fullName) {
                     helpers.setFieldError(
                         "fullName",
-                        result.fieldErrors.fullName,
+                        t("profile", result.fieldErrors.fullName),
                     );
                 }
 
                 if (result.fieldErrors?.avatar) {
-                    showSnackbar(result.fieldErrors.avatar, "error");
+                    showSnackbar(
+                        t("profile", result.fieldErrors.avatar),
+                        "error",
+                    );
                 } else {
-                    showSnackbar(result.message, "error");
+                    showSnackbar(t("profile", result.messageKey), "error");
                 }
 
                 return;
             }
 
+            // Handle successful update
             if (result.profile) {
                 helpers.resetForm({
                     values: {
@@ -228,19 +229,28 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                 });
 
                 setAvatarPreview(result.profile.avatarUrl);
+            } else {
+                // Fallback when profile data is not returned
+                helpers.resetForm({
+                    values: {
+                        fullName: values.fullName.trim(),
+                    },
+                });
             }
 
+            // Cleanup temporary avatar URL
             revokeBlobUrl(avatarUrlRef.current);
             avatarUrlRef.current = null;
+
             setAvatarFile(null);
 
-            showSnackbar(result.message, "success");
+            showSnackbar(t("profile", result.messageKey), "success");
+
             router.refresh();
-        } catch {
-            showSnackbar(
-                "Đã xảy ra lỗi khi cập nhật hồ sơ. Vui lòng thử lại.",
-                "error",
-            );
+        } catch (error) {
+            console.error("Failed to update profile:", error);
+
+            showSnackbar(t("profile", "updateProfileError"), "error");
         } finally {
             helpers.setSubmitting(false);
         }
@@ -270,8 +280,8 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                     }}
                 >
                     <PageHeader
-                        title="Hồ sơ cá nhân"
-                        subtitle="Quản lý thông tin cá nhân và ảnh đại diện của bạn."
+                        title={t("profile", "pageTitle")}
+                        subtitle={t("profile", "pageSubtitle")}
                         icon={UserRound}
                     />
                 </Stack>
@@ -323,7 +333,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                         minWidth: 0,
                                     }}
                                 >
-                                    {/* avatar */}
+                                    {/* Avatar */}
                                     <Card
                                         sx={{
                                             ...cardSx,
@@ -344,7 +354,10 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                             <Box
                                                 role="button"
                                                 tabIndex={0}
-                                                aria-label="Cập nhật ảnh đại diện"
+                                                aria-label={t(
+                                                    "profile",
+                                                    "updateAvatar",
+                                                )}
                                                 aria-disabled={isBusy}
                                                 onClick={() => {
                                                     if (!isBusy) {
@@ -445,7 +458,10 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                             fontWeight: 600,
                                                         }}
                                                     >
-                                                        Cập nhật ảnh
+                                                        {t(
+                                                            "profile",
+                                                            "updateAvatar",
+                                                        )}
                                                     </Typography>
                                                 </Box>
 
@@ -480,7 +496,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                 }}
                                             >
                                                 {profile.fullName ||
-                                                    "Người dùng"}
+                                                    t("profile", "defaultUser")}
                                             </Typography>
 
                                             {profile.role && (
@@ -497,14 +513,12 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                     color: "text.secondary",
                                                 }}
                                             >
-                                                Nhấn vào ảnh đại diện để thay
-                                                đổi. Hỗ trợ PNG, JPEG hoặc WebP,
-                                                tối đa 1 MB.
+                                                {t("profile", "avatarHint")}
                                             </Typography>
 
                                             {avatarFile && (
                                                 <Box
-                                                    component={"div"}
+                                                    component="div"
                                                     sx={{
                                                         width: "100%",
                                                         display: "flex",
@@ -532,14 +546,17 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                             color: "#475467",
                                                         }}
                                                     >
-                                                        Hoàn tác ảnh
+                                                        {t(
+                                                            "profile",
+                                                            "undoAvatar",
+                                                        )}
                                                     </Button>
                                                 </Box>
                                             )}
                                         </Stack>
                                     </Card>
 
-                                    {/* form */}
+                                    {/* Personal information */}
                                     <Card
                                         sx={{
                                             ...cardSx,
@@ -557,7 +574,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                 color: "text.primary",
                                             }}
                                         >
-                                            Thông tin cá nhân
+                                            {t("profile", "personalInfo")}
                                         </Typography>
 
                                         <Typography
@@ -569,19 +586,20 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                 color: "text.secondary",
                                             }}
                                         >
-                                            Cập nhật thông tin cá nhân và thông
-                                            tin hiển thị của tài khoản.
+                                            {t(
+                                                "profile",
+                                                "personalInfoSubtitle",
+                                            )}
                                         </Typography>
 
-                                        <Stack
-                                            sx={{
-                                                gap: 2.5,
-                                            }}
-                                        >
+                                        <Stack sx={{ gap: 2.5 }}>
                                             <QRTextField
                                                 name="fullName"
-                                                label="Họ và tên"
-                                                placeholder="Nhập họ và tên"
+                                                label={t("profile", "fullName")}
+                                                placeholder={t(
+                                                    "profile",
+                                                    "fullNamePlaceholder",
+                                                )}
                                                 value={values.fullName}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
@@ -595,7 +613,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                             />
 
                                             <QRTextField
-                                                label="Email"
+                                                label={t("profile", "email")}
                                                 value={profile.email}
                                                 disabled
                                                 slotProps={{
@@ -622,7 +640,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                 disabled={isBusy || !hasChanges}
                                                 onClick={handleCancelChanges}
                                             >
-                                                Hủy thay đổi
+                                                {t("profile", "cancelChanges")}
                                             </Button>
 
                                             <Button
@@ -640,8 +658,11 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                                 }
                                             >
                                                 {isSubmitting
-                                                    ? "Đang lưu..."
-                                                    : "Lưu thay đổi"}
+                                                    ? t("profile", "saving")
+                                                    : t(
+                                                          "profile",
+                                                          "saveChanges",
+                                                      )}
                                             </Button>
                                         </Stack>
                                     </Card>
@@ -652,10 +673,11 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                 </Formik>
             </Stack>
 
+            {/* Avatar crop dialog */}
             <QRDialog
                 open={cropOpen}
                 onClose={handleCancelCrop}
-                title="Căn chỉnh ảnh đại diện"
+                title={t("profile", "cropAvatarTitle")}
                 maxWidth="sm"
                 actions={
                     <>
@@ -666,7 +688,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                             onClick={handleCancelCrop}
                             disabled={isCropping}
                         >
-                            Hủy
+                            {t("profile", "cancel")}
                         </Button>
 
                         <Button
@@ -684,7 +706,9 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                                 ) : undefined
                             }
                         >
-                            {isCropping ? "Đang xử lý..." : "Crop"}
+                            {isCropping
+                                ? t("profile", "processing")
+                                : t("profile", "crop")}
                         </Button>
                     </>
                 }
@@ -712,8 +736,13 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                 </Box>
 
                 <Stack sx={{ mt: 2, gap: 1 }}>
-                    <Typography sx={{ fontSize: 13, color: "text.secondary" }}>
-                        Thu phóng ảnh
+                    <Typography
+                        sx={{
+                            fontSize: 13,
+                            color: "text.secondary",
+                        }}
+                    >
+                        {t("profile", "zoomImage")}
                     </Typography>
 
                     <Slider
@@ -723,6 +752,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
                         value={zoom}
                         onChange={(_, value) => setZoom(value as number)}
                         disabled={isCropping}
+                        aria-label={t("profile", "zoomImage")}
                     />
                 </Stack>
             </QRDialog>

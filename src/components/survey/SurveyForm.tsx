@@ -13,6 +13,7 @@ import * as Yup from "yup";
 
 import QRTextField from "@/components/common/input/QRTextField";
 import { VIETNAM_PHONE_REGEX } from "@/constants/validation.constants";
+import { translations, type Locale } from "@/i18n/translations";
 import { FEEDBACK_ISSUES } from "@/lib/feedback/constants";
 import { animatedAvatarRingSx } from "@/styles/avatar.styles";
 import { formErrorSx } from "@/styles/form.styles";
@@ -24,6 +25,7 @@ type SurveyFormProps = {
     tableToken: string;
     restaurantName: string;
     restaurantLogoUrl: string | null;
+    locale: Locale;
 };
 
 type SurveyFormValues = {
@@ -42,33 +44,44 @@ const initialValues: SurveyFormValues = {
     phone: "",
 };
 
-const validationSchema = Yup.object({
-    selectedOptions: Yup.array().of(Yup.string().required()).defined(),
+type SurveyTranslations = (typeof translations)[Locale]["survey"];
 
-    feedback: Yup.string()
-        .max(1000, "Nội dung không được vượt quá 1000 ký tự.")
-        .test(
-            "issue-or-feedback-required",
-            "Vui lòng chọn ít nhất một vấn đề hoặc chia sẻ thêm phản hồi.",
-            function (value) {
-                const selectedOptions = (this.parent.selectedOptions ??
-                    []) as string[];
+const createValidationSchema = (t: SurveyTranslations) =>
+    Yup.object({
+        selectedOptions: Yup.array().of(Yup.string().required()).defined(),
 
-                return selectedOptions.length > 0 || Boolean(value?.trim());
-            },
-        ),
+        feedback: Yup.string()
+            .max(1000, t.feedbackMaxLength)
+            .test(
+                "issue-or-feedback-required",
+                t.issueOrFeedbackRequired,
+                function (value) {
+                    const selectedOptions = (this.parent.selectedOptions ??
+                        []) as string[];
 
-    phone: Yup.string()
-        .required("Vui lòng nhập số điện thoại.")
-        .test("valid-vietnam-phone", "Số điện thoại không hợp lệ.", (value) => {
-            const normalizedPhone = value?.replace(/\s/g, "") ?? "";
+                    return selectedOptions.length > 0 || Boolean(value?.trim());
+                },
+            ),
 
-            return (
-                normalizedPhone.length > 0 &&
-                VIETNAM_PHONE_REGEX.test(normalizedPhone)
-            );
-        }),
-});
+        phone: Yup.string()
+            .required(t.phoneRequired)
+            .test("valid-vietnam-phone", t.invalidPhone, (value) => {
+                const normalizedPhone = value?.replace(/\s/g, "") ?? "";
+
+                return (
+                    normalizedPhone.length > 0 &&
+                    VIETNAM_PHONE_REGEX.test(normalizedPhone)
+                );
+            }),
+    });
+
+const ISSUE_TRANSLATION_KEYS = {
+    food_quality: "foodQuality",
+    food_presentation: "foodPresentation",
+    service: "serviceIssue",
+    space_cleanliness: "spaceCleanliness",
+    service_time: "serviceTime",
+} as const;
 
 const lightSurveyTokens = {
     "--color-input-background": "#FFFFFF",
@@ -158,7 +171,11 @@ export default function SurveyForm({
     tableToken,
     restaurantName,
     restaurantLogoUrl,
+    locale,
 }: SurveyFormProps) {
+    const t = translations[locale].survey;
+    const validationSchema = createValidationSchema(t);
+
     return (
         <Formik<SurveyFormValues>
             initialValues={initialValues}
@@ -186,16 +203,14 @@ export default function SurveyForm({
                     const data = (await response.json()) as FeedbackApiResponse;
 
                     if (!response.ok) {
-                        setStatus(data.message || "Không thể gửi phản hồi.");
+                        setStatus(data.message || t.submitFeedbackError);
                         return;
                     }
 
                     setStatus({ success: true });
                 } catch (error) {
                     console.error("Failed to submit feedback:", error);
-                    setStatus(
-                        "Không thể kết nối đến hệ thống. Vui lòng thử lại.",
-                    );
+                    setStatus(t.connectionError);
                 } finally {
                     setSubmitting(false);
                 }
@@ -221,6 +236,7 @@ export default function SurveyForm({
                         <FeedbackSuccess
                             restaurantName={restaurantName}
                             restaurantLogoUrl={restaurantLogoUrl}
+                            locale={locale}
                         />
                     );
                 }
@@ -322,7 +338,7 @@ export default function SurveyForm({
                                             overflowWrap: "anywhere",
                                         }}
                                     >
-                                        {restaurantName || "Nhà hàng"}
+                                        {restaurantName || t.restaurantFallback}
                                     </Typography>
 
                                     <Typography
@@ -336,7 +352,7 @@ export default function SurveyForm({
                                             mt: 1,
                                         }}
                                     >
-                                        Phản hồi của bạn
+                                        {t.feedbackTitle}
                                     </Typography>
 
                                     <Typography
@@ -348,8 +364,7 @@ export default function SurveyForm({
                                             lineHeight: 1.65,
                                         }}
                                     >
-                                        Chia sẻ trải nghiệm của bạn để chúng tôi
-                                        phục vụ tốt hơn.
+                                        {t.feedbackDescription}
                                     </Typography>
                                 </Box>
 
@@ -370,11 +385,11 @@ export default function SurveyForm({
                                             component="h2"
                                             sx={sectionTitleSx}
                                         >
-                                            Bạn gặp vấn đề gì?
+                                            {t.issuesTitle}
                                         </Typography>
 
                                         <Typography sx={sectionDescriptionSx}>
-                                            Bạn có thể chọn nhiều vấn đề.
+                                            {t.issuesDescription}
                                         </Typography>
 
                                         <Stack sx={{ gap: 1 }}>
@@ -383,6 +398,13 @@ export default function SurveyForm({
                                                     values.selectedOptions.includes(
                                                         issue.option,
                                                     );
+
+                                                const issueLabel =
+                                                    t[
+                                                        ISSUE_TRANSLATION_KEYS[
+                                                            issue.option as keyof typeof ISSUE_TRANSLATION_KEYS
+                                                        ]
+                                                    ];
 
                                                 return (
                                                     <Box
@@ -422,7 +444,7 @@ export default function SurveyForm({
                                                                 );
                                                             }}
                                                             aria-label={
-                                                                issue.label
+                                                                issueLabel
                                                             }
                                                             sx={checkboxInputSx(
                                                                 checked,
@@ -438,7 +460,7 @@ export default function SurveyForm({
                                                                 lineHeight: 1.5,
                                                             }}
                                                         >
-                                                            {issue.label}
+                                                            {issueLabel}
                                                         </Typography>
                                                     </Box>
                                                 );
@@ -460,12 +482,11 @@ export default function SurveyForm({
                                             component="h2"
                                             sx={sectionTitleSx}
                                         >
-                                            Bạn có thể chia sẻ thêm
+                                            {t.additionalFeedbackTitle}
                                         </Typography>
 
                                         <Typography sx={sectionDescriptionSx}>
-                                            Thông tin chi tiết giúp chúng tôi
-                                            hiểu vấn đề rõ hơn.
+                                            {t.additionalFeedbackDescription}
                                         </Typography>
 
                                         <QRTextField
@@ -480,7 +501,7 @@ export default function SurveyForm({
                                                     true,
                                                 )
                                             }
-                                            placeholder="Ví dụ: Món ăn hôm nay chưa hợp khẩu vị..."
+                                            placeholder={t.feedbackPlaceholder}
                                             errorMessage={
                                                 touched.feedback &&
                                                 errors.feedback
@@ -500,7 +521,7 @@ export default function SurveyForm({
                                             component="h2"
                                             sx={sectionTitleSx}
                                         >
-                                            Số điện thoại{" "}
+                                            {t.phoneTitle}{" "}
                                             <Box
                                                 component="span"
                                                 sx={{ color: "#D92D20" }}
@@ -510,8 +531,7 @@ export default function SurveyForm({
                                         </Typography>
 
                                         <Typography sx={sectionDescriptionSx}>
-                                            Để chúng tôi có thể liên hệ và hỗ
-                                            trợ bạn khi cần thiết.
+                                            {t.phoneDescription}
                                         </Typography>
 
                                         <QRTextField
@@ -527,7 +547,7 @@ export default function SurveyForm({
                                                     true,
                                                 )
                                             }
-                                            placeholder="Nhập số điện thoại"
+                                            placeholder={t.phonePlaceholder}
                                             errorMessage={
                                                 touched.phone && errors.phone
                                                     ? errors.phone
@@ -575,13 +595,7 @@ export default function SurveyForm({
                                                 fontStyle: "italic",
                                             }}
                                         >
-                                            Thông tin của bạn được bảo mật và
-                                            chỉ được sử dụng để tiếp nhận, xử lý
-                                            phản hồi và hỗ trợ chăm sóc khách
-                                            hàng khi cần thiết. Chúng tôi không
-                                            sử dụng số điện thoại cho mục đích
-                                            quảng cáo hoặc chia sẻ cho bên thứ
-                                            ba khi chưa có sự đồng ý của bạn.
+                                            {t.privacyNotice}
                                         </Typography>
                                     </Box>
 
@@ -669,10 +683,10 @@ export default function SurveyForm({
                                                     }}
                                                 />
 
-                                                <span>Đang gửi...</span>
+                                                <span>{t.submitting}</span>
                                             </Stack>
                                         ) : (
-                                            "Gửi phản hồi"
+                                            t.submitFeedback
                                         )}
                                     </Button>
                                 </Box>

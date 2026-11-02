@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Box, CircularProgress, Switch, Typography } from "@mui/material";
 import { updateTableStatusAction } from "@/app/dashboard/tables/actions";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import {
     getTableStatusLabelSx,
     tableStatusSwitchSx,
@@ -26,6 +27,8 @@ export default function TableStatusSwitch({
     isActive,
     canManageTables,
 }: TableStatusSwitchProps) {
+    const { t } = useTranslation();
+
     const [checked, setChecked] = useState(isActive);
     const [loading, setLoading] = useState(false);
 
@@ -51,7 +54,7 @@ export default function TableStatusSwitch({
                 setSnackbar({
                     open: true,
                     message:
-                        result.message || "Không thể cập nhật trạng thái bàn.",
+                        result.message || t("table", "updateTableStatusFailed"),
                     severity: "error",
                 });
 
@@ -60,16 +63,19 @@ export default function TableStatusSwitch({
 
             setSnackbar({
                 open: true,
-                message: nextValue
-                    ? "Đã bật bàn thành công."
-                    : "Đã tắt bàn thành công.",
+                message: t(
+                    "table",
+                    nextValue
+                        ? "activateTableSuccess"
+                        : "deactivateTableSuccess",
+                ),
                 severity: "success",
             });
         } catch {
             setChecked(previousValue);
             setSnackbar({
                 open: true,
-                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: t("table", "updateTableStatusError"),
                 severity: "error",
             });
         } finally {
@@ -100,7 +106,12 @@ export default function TableStatusSwitch({
                         disabled={loading || !canManageTables}
                         slotProps={{
                             input: {
-                                "aria-label": checked ? "Tắt bàn" : "Bật bàn",
+                                "aria-label": t(
+                                    "table",
+                                    checked
+                                        ? "deactivateTable"
+                                        : "activateTable",
+                                ),
                             },
                         }}
                         sx={tableStatusSwitchSx}
@@ -129,7 +140,10 @@ export default function TableStatusSwitch({
                 </Box>
 
                 <Typography sx={getTableStatusLabelSx(checked)}>
-                    {checked ? "Đang hoạt động" : "Đã tắt"}
+                    {t(
+                        "table",
+                        checked ? "tableStatusActive" : "tableStatusInactive",
+                    )}
                 </Typography>
             </Box>
 

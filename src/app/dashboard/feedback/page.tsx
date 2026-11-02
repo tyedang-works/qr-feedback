@@ -9,7 +9,9 @@ import { getUserContext } from "@/lib/auth/queries";
 import { FEEDBACK_ISSUES, FEEDBACK_PAGE_SIZE } from "@/lib/feedback/constants";
 import { getFeedbackList, getFeedbackSummary } from "@/lib/feedback/queries";
 import { getRestaurantTables } from "@/lib/tables/queries";
+import { translations, type Locale } from "@/i18n/translations";
 import { Stack } from "@mui/material";
+import { cookies } from "next/headers";
 import { MessageCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 
@@ -27,6 +29,13 @@ export default async function FeedbackPage({
     searchParams,
 }: FeedbackPageProps) {
     const params = await searchParams;
+    const cookieStore = await cookies();
+    const cookieLocale = cookieStore.get("qr-locale")?.value;
+
+    const locale: Locale =
+        cookieLocale && cookieLocale in translations
+            ? (cookieLocale as Locale)
+            : "vi";
 
     const keyword = params.keyword ?? "";
     const rawIssues = params.issue
@@ -109,8 +118,10 @@ export default async function FeedbackPage({
             }}
         >
             <PageHeader
-                title="Phản hồi"
-                subtitle="Theo dõi và xử lý phản hồi của khách hàng."
+                title={translations[locale].navigation.feedback}
+                subtitle={
+                    translations[locale].dashboard.feedbackPageDescription
+                }
                 icon={MessageCircle}
             />
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
 import {
@@ -15,7 +16,6 @@ import {
     chipBaseSx,
 } from "@/styles/button.styles";
 import { cardSx } from "@/styles/card.styles";
-
 import { useDashboardLoading } from "@/components/dashboard/DashboardLoadingProvider";
 import {
     Box,
@@ -58,28 +58,13 @@ type FilterOverrides = Partial<Record<FilterKey, string | string[] | null>>;
 
 const SEARCH_DEBOUNCE_MS = 400;
 
-const STATUS_OPTIONS = [
-    {
-        value: "all",
-        label: "Tất cả",
-        getCount: (summary: FeedbackSummary) => summary.total,
-    },
-    {
-        value: FEEDBACK_STATUS.NEW,
-        label: STATUS_CONFIG[FEEDBACK_STATUS.NEW].label,
-        getCount: (summary: FeedbackSummary) => summary.new,
-    },
-    {
-        value: FEEDBACK_STATUS.IN_PROGRESS,
-        label: STATUS_CONFIG[FEEDBACK_STATUS.IN_PROGRESS].label,
-        getCount: (summary: FeedbackSummary) => summary.inProgress,
-    },
-    {
-        value: FEEDBACK_STATUS.RESOLVED,
-        label: STATUS_CONFIG[FEEDBACK_STATUS.RESOLVED].label,
-        getCount: (summary: FeedbackSummary) => summary.resolved,
-    },
-] as const;
+const ISSUE_TRANSLATION_KEYS: Record<string, string> = {
+    food_quality: "foodQuality",
+    food_presentation: "foodPresentation",
+    service: "serviceIssue",
+    space_cleanliness: "spaceCleanliness",
+    service_time: "serviceTime",
+};
 
 export default function FeedbackToolbar({
     keyword,
@@ -89,6 +74,7 @@ export default function FeedbackToolbar({
     tables,
     summary,
 }: FeedbackToolbarProps) {
+    const { t } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
 
@@ -104,15 +90,47 @@ export default function FeedbackToolbar({
     const { startNavigation } = useDashboardLoading();
     const isLoading = keywordValue.trim() !== keyword.trim();
 
+    const getIssueLabel = (option: string, fallbackLabel: string) => {
+        const translationKey = ISSUE_TRANSLATION_KEYS[option];
+
+        return translationKey ? t("dashboard", translationKey) : fallbackLabel;
+    };
+
     const selectedIssues = FEEDBACK_ISSUES.filter(({ option }) =>
         issues.includes(option),
-    );
+    ).map((issue) => ({
+        ...issue,
+        label: getIssueLabel(issue.option, issue.label),
+    }));
 
     const tableLabel = tables.find((table) => table.id === tableId)?.name;
 
     const activeFilterCount = [issues.length > 0, Boolean(tableId)].filter(
         Boolean,
     ).length;
+
+    const statusOptions = [
+        {
+            value: "all",
+            label: t("dashboard", "all"),
+            getCount: (summary: FeedbackSummary) => summary.total,
+        },
+        {
+            value: FEEDBACK_STATUS.NEW,
+            label: t("dashboard", "new"),
+            getCount: (summary: FeedbackSummary) => summary.new,
+        },
+        {
+            value: FEEDBACK_STATUS.IN_PROGRESS,
+            label: t("dashboard", "inProgress"),
+            getCount: (summary: FeedbackSummary) => summary.inProgress,
+        },
+        {
+            value: FEEDBACK_STATUS.RESOLVED,
+            label: t("dashboard", "resolved"),
+            getCount: (summary: FeedbackSummary) => summary.resolved,
+        },
+    ] as const;
 
     useEffect(() => {
         const nextKeyword = keywordValue.trim();
@@ -300,7 +318,10 @@ export default function FeedbackToolbar({
                 >
                     <QRTextField
                         name="keyword"
-                        placeholder="Tìm theo nội dung phản hồi..."
+                        placeholder={t(
+                            "dashboard",
+                            "searchFeedbackPlaceholder",
+                        )}
                         value={keywordValue}
                         onChange={(event) =>
                             setKeywordValue(event.target.value)
@@ -312,7 +333,10 @@ export default function FeedbackToolbar({
                         }}
                         slotProps={{
                             htmlInput: {
-                                "aria-label": "Tìm kiếm phản hồi",
+                                "aria-label": t(
+                                    "dashboard",
+                                    "searchFeedbackAriaLabel",
+                                ),
                                 "aria-busy": isLoading,
                             },
                             input: {
@@ -336,7 +360,7 @@ export default function FeedbackToolbar({
                         <MuiCircularProgress
                             size={18}
                             thickness={5}
-                            aria-label="Đang tìm kiếm phản hồi"
+                            aria-label={t("dashboard", "searchingFeedback")}
                             sx={{
                                 position: "absolute",
                                 right: 14,
@@ -394,7 +418,7 @@ export default function FeedbackToolbar({
                         },
                     }}
                 >
-                    Bộ lọc
+                    {t("dashboard", "filter")}
                     {activeFilterCount > 0 && (
                         <Box
                             component="span"
@@ -465,7 +489,7 @@ export default function FeedbackToolbar({
                                 color: "var(--color-text-primary)",
                             }}
                         >
-                            Bộ lọc phản hồi
+                            {t("dashboard", "feedbackFilters")}
                         </Typography>
 
                         <Typography
@@ -475,13 +499,13 @@ export default function FeedbackToolbar({
                                 color: "var(--color-text-secondary)",
                             }}
                         >
-                            Thu hẹp kết quả theo vấn đề và bàn.
+                            {t("dashboard", "filterDescription")}
                         </Typography>
                     </Box>
 
                     <IconButton
                         size="small"
-                        aria-label="Đóng bộ lọc"
+                        aria-label={t("dashboard", "closeFilters")}
                         onClick={() => setFilterOpen(false)}
                         sx={{
                             color: "var(--color-text-secondary)",
@@ -500,7 +524,7 @@ export default function FeedbackToolbar({
 
                 <Stack sx={{ gap: 2 }}>
                     <QRSelect<string[]>
-                        label="Vấn đề"
+                        label={t("dashboard", "issue")}
                         multiple
                         value={draftIssues}
                         onChange={(event) => {
@@ -515,8 +539,11 @@ export default function FeedbackToolbar({
                         displayEmpty
                         renderValue={(selected) =>
                             selected.length === 0
-                                ? "Tất cả vấn đề"
-                                : `${selected.length} vấn đề đã chọn`
+                                ? t("dashboard", "allIssues")
+                                : t("dashboard", "selectedIssuesCount").replace(
+                                      "{count}",
+                                      String(selected.length),
+                                  )
                         }
                         sx={{
                             "& .MuiSelect-select": {
@@ -542,7 +569,7 @@ export default function FeedbackToolbar({
                                 />
 
                                 <ListItemText
-                                    primary={label}
+                                    primary={getIssueLabel(option, label)}
                                     slotProps={{
                                         primary: {
                                             sx: {
@@ -557,13 +584,15 @@ export default function FeedbackToolbar({
                     </QRSelect>
 
                     <QRSelect
-                        label="Bàn"
+                        label={t("dashboard", "table")}
                         value={draftTableId}
                         onChange={(event) =>
                             setDraftTableId(event.target.value)
                         }
                     >
-                        <MenuItem value="all">Tất cả bàn</MenuItem>
+                        <MenuItem value="all">
+                            {t("dashboard", "allTables")}
+                        </MenuItem>
 
                         {tables.map(({ id, name }) => (
                             <MenuItem key={id} value={id}>
@@ -594,7 +623,7 @@ export default function FeedbackToolbar({
                         startIcon={<RotateCcw size={14} />}
                         sx={buttonBaseCancelSx}
                     >
-                        Xóa bộ lọc
+                        {t("dashboard", "clearFilters")}
                     </Button>
 
                     <Button
@@ -605,7 +634,7 @@ export default function FeedbackToolbar({
                         startIcon={<CircleCheckBig size={16} />}
                         sx={buttonBaseSx}
                     >
-                        Áp dụng
+                        {t("dashboard", "applyFilters")}
                     </Button>
                 </Stack>
             </Popover>
@@ -619,7 +648,7 @@ export default function FeedbackToolbar({
                         color: "var(--color-text-secondary)",
                     }}
                 >
-                    Trạng thái phản hồi
+                    {t("dashboard", "feedbackStatus")}
                 </Typography>
 
                 <Stack
@@ -629,7 +658,7 @@ export default function FeedbackToolbar({
                         gap: 1,
                     }}
                 >
-                    {STATUS_OPTIONS.map((option) => {
+                    {statusOptions.map((option) => {
                         const selected =
                             option.value === "all"
                                 ? !status
@@ -721,13 +750,13 @@ export default function FeedbackToolbar({
                                 color: "var(--color-text-secondary)",
                             }}
                         >
-                            Đang lọc:
+                            {t("dashboard", "currentlyFiltering")}
                         </Typography>
 
                         {keywordValue.trim() && (
                             <Chip
                                 size="small"
-                                label={`Từ khóa: ${keywordValue.trim()}`}
+                                label={`${t("dashboard", "keyword")}: ${keywordValue.trim()}`}
                                 onDelete={() => removeFilter("keyword")}
                                 deleteIcon={<X size={16} />}
                                 sx={chipBaseSx}
@@ -737,11 +766,14 @@ export default function FeedbackToolbar({
                         {issues.length > 0 && (
                             <Chip
                                 size="small"
-                                label={`Vấn đề: ${
+                                label={`${t("dashboard", "issue")}: ${
                                     selectedIssues
                                         .map(({ label }) => label)
                                         .join(", ") ||
-                                    `${issues.length} đã chọn`
+                                    t("dashboard", "selectedCount").replace(
+                                        "{count}",
+                                        String(issues.length),
+                                    )
                                 }`}
                                 onDelete={() => removeFilter("issue")}
                                 deleteIcon={<X size={16} />}
@@ -752,7 +784,7 @@ export default function FeedbackToolbar({
                         {tableId && (
                             <Chip
                                 size="small"
-                                label={`Bàn: ${tableLabel ?? "Đã chọn"}`}
+                                label={`${t("dashboard", "table")}: ${tableLabel ?? t("dashboard", "selected")}`}
                                 onDelete={() => removeFilter("tableId")}
                                 deleteIcon={<X size={16} />}
                                 sx={chipBaseSx}
@@ -772,7 +804,7 @@ export default function FeedbackToolbar({
                                 color: "var(--color-text-secondary)",
                             }}
                         >
-                            Xóa tất cả
+                            {t("dashboard", "clearAll")}
                         </Button>
                     </Stack>
                 </>

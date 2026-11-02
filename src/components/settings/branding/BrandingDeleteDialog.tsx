@@ -4,6 +4,7 @@ import { Button, Typography } from "@mui/material";
 import { Trash2 } from "lucide-react";
 
 import QRDialog from "@/components/common/dialog/QRDialog";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 
 type Props = {
@@ -21,11 +22,13 @@ export default function BrandingDeleteDialog({
     onClose,
     onConfirm,
 }: Props) {
+    const { t } = useTranslation();
+
     return (
         <QRDialog
             open={open}
             onClose={onClose}
-            title="Xóa ảnh?"
+            title={t("settings", "deleteImageTitle")}
             maxWidth="xs"
             actions={
                 <>
@@ -35,7 +38,7 @@ export default function BrandingDeleteDialog({
                         onClick={onClose}
                         sx={buttonBaseCancelSx}
                     >
-                        Hủy
+                        {t("settings", "cancel")}
                     </Button>
 
                     <Button
@@ -50,7 +53,7 @@ export default function BrandingDeleteDialog({
                             "&:hover": { bgcolor: "error.dark" },
                         }}
                     >
-                        Xác nhận
+                        {t("settings", "confirm")}
                     </Button>
                 </>
             }
@@ -62,8 +65,10 @@ export default function BrandingDeleteDialog({
                     color: "var(--color-text-secondary)",
                 }}
             >
-                Bạn có muốn đánh dấu xóa {title}? Ảnh chỉ bị xóa khỏi hệ thống
-                khi bạn nhấn Lưu thay đổi.
+                {t("settings", "deleteImageDescription").replace(
+                    "{title}",
+                    title,
+                )}
             </Typography>
         </QRDialog>
     );

@@ -394,6 +394,9 @@ body {
     .qr-page .qr-print-note {
         display: block !important;
     }
+    body:has(.qr-page) .dashboard-footer {
+        display: none !important;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

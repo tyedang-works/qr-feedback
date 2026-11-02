@@ -1,6 +1,7 @@
 "use client";
 
 import { buttonBaseSx } from "@/styles/button.styles";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { Box, Button, Typography } from "@mui/material";
 import { CircleCheck, Printer, X } from "lucide-react";
 
@@ -21,6 +22,8 @@ export default function QRCodeSelectionToolbar({
     onPrint,
     onClear,
 }: QRCodeSelectionToolbarProps) {
+    const { t } = useTranslation();
+
     if (selectedCount <= 0) {
         return null;
     }
@@ -84,7 +87,7 @@ export default function QRCodeSelectionToolbar({
                     >
                         <CircleCheck size={16} strokeWidth={2} />
                     </Box>
-                    {selectedCount} bàn đã chọn
+                    {selectedCount} {t("qrCode", "tablesSelected")}
                 </Typography>
 
                 {showSelectAll && selectableTotal > selectedCount && (
@@ -120,7 +123,8 @@ export default function QRCodeSelectionToolbar({
                             },
                         }}
                     >
-                        Chọn tất cả {selectableTotal} bàn phù hợp với bộ lọc
+                        {t("qrCode", "selectAllMatchingTables")}{" "}
+                        {selectableTotal} {t("qrCode", "matchingTables")}
                     </Button>
                 )}
             </Box>
@@ -146,14 +150,14 @@ export default function QRCodeSelectionToolbar({
                     onClick={onPrint}
                     sx={buttonBaseSx}
                 >
-                    In QR ({selectedCount})
+                    {t("qrCode", "printQR")} ({selectedCount})
                 </Button>
 
                 <Box
                     component="button"
                     type="button"
                     onClick={onClear}
-                    aria-label="Bỏ chọn"
+                    aria-label={t("qrCode", "clearSelection")}
                     sx={{
                         display: "inline-flex",
                         alignItems: "center",

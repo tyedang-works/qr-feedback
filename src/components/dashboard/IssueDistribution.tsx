@@ -1,5 +1,10 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
+import {
+    FEEDBACK_ISSUES,
+    type FeedbackIssueOption,
+} from "@/lib/feedback/constants";
 import type {
     IssueComparisonPeriod,
     IssueComparisonResult,
@@ -32,10 +37,26 @@ type IssueDistributionProps = {
     data: IssueWeeklyComparisonItem[];
 };
 
+type IssueDistributionErrorKey = "comparisonLoadError" | "retryLoadError";
+
+const ISSUE_TRANSLATION_KEYS: Record<
+    FeedbackIssueOption,
+    | "foodQuality"
+    | "foodPresentation"
+    | "serviceIssue"
+    | "spaceCleanliness"
+    | "serviceTime"
+> = {
+    food_quality: "foodQuality",
+    food_presentation: "foodPresentation",
+    service: "serviceIssue",
+    space_cleanliness: "spaceCleanliness",
+    service_time: "serviceTime",
+};
+
 const CURRENT_COLOR = "var(--color-chart-current)";
 const PREVIOUS_COLOR = "var(--color-chart-previous)";
 
-const numberFormatter = new Intl.NumberFormat("vi-VN");
 const currentDate = new Date();
 
 const chartTickStyle = {
@@ -73,20 +94,24 @@ const periodButtonSx = (selected: boolean) => ({
     },
 });
 
-const MONTH_OPTIONS = Array.from({ length: 12 }, (_, index) => ({
-    value: index + 1,
-    label: new Intl.DateTimeFormat("vi-VN", {
-        month: "long",
-        timeZone: "UTC",
-    }).format(new Date(Date.UTC(2020, index, 1))),
-}));
-
 const YEAR_OPTIONS = Array.from(
     { length: currentDate.getFullYear() - 2023 + 1 },
     (_, index) => currentDate.getFullYear() - index,
 );
 
 export default function IssueDistribution({ data }: IssueDistributionProps) {
+    const { t } = useTranslation();
+    const dateLocale = t("dashboard", "dateLocale");
+    const numberFormatter = new Intl.NumberFormat(dateLocale);
+
+    const monthOptions = Array.from({ length: 12 }, (_, index) => ({
+        value: index + 1,
+        label: new Intl.DateTimeFormat(dateLocale, {
+            month: "long",
+            timeZone: "UTC",
+        }).format(new Date(Date.UTC(2020, index, 1))),
+    }));
+
     const [period, setPeriod] = useState<IssueComparisonPeriod>("week");
 
     const [appliedMonth, setAppliedMonth] = useState(
@@ -105,13 +130,14 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
 
     const [result, setResult] = useState<IssueComparisonResult>({
         period: "week",
-        currentLabel: "7 ngày gần nhất",
-        previousLabel: "7 ngày trước đó",
+        currentLabel: t("dashboard", "currentPeriod"),
+        previousLabel: t("dashboard", "previousPeriod"),
         data,
     });
 
     const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage, setErrorMessage] =
+        useState<IssueDistributionErrorKey | null>(null);
 
     const handleOpenPeriodPopover = (event: MouseEvent<HTMLElement>) => {
         setSelectedMonth(appliedMonth);
@@ -132,7 +158,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
 
     const handleSelectWeek = () => {
         setIsLoading(false);
-        setErrorMessage("");
+        setErrorMessage(null);
         setPeriod("week");
         setPeriodAnchor(null);
     };
@@ -146,7 +172,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
 
         async function fetchComparison() {
             setIsLoading(true);
-            setErrorMessage("");
+            setErrorMessage(null);
 
             try {
                 const params = new URLSearchParams({
@@ -161,7 +187,8 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                 );
 
                 if (!response.ok) {
-                    throw new Error("Không thể tải dữ liệu so sánh.");
+                    setErrorMessage("comparisonLoadError");
+                    return;
                 }
 
                 const nextResult: IssueComparisonResult = await response.json();
@@ -172,7 +199,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                     return;
                 }
 
-                setErrorMessage("Không thể tải dữ liệu. Vui lòng thử lại.");
+                setErrorMessage("retryLoadError");
             } finally {
                 if (!controller.signal.aborted) {
                     setIsLoading(false);
@@ -185,14 +212,33 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
         return () => controller.abort();
     }, [period, appliedMonth, appliedYear]);
 
-    const chartData = period === "week" ? data : result.data;
+    const sourceChartData = period === "week" ? data : result.data;
+
+    const chartData = sourceChartData.map((item) => {
+        // Prefer the stable option when the API provides it.
+        // Fall back to the existing Vietnamese label for compatibility.
+        const option =
+            "option" in item &&
+            typeof item.option === "string" &&
+            item.option in ISSUE_TRANSLATION_KEYS
+                ? (item.option as FeedbackIssueOption)
+                : FEEDBACK_ISSUES.find((issue) => issue.label === item.label)
+                      ?.option;
+
+        return {
+            ...item,
+            label: option
+                ? t("dashboard", ISSUE_TRANSLATION_KEYS[option])
+                : item.label,
+        };
+    });
 
     const displayedResult: IssueComparisonResult =
         period === "week"
             ? {
                   period: "week",
-                  currentLabel: "7 ngày gần nhất",
-                  previousLabel: "7 ngày trước đó",
+                  currentLabel: t("dashboard", "currentPeriod"),
+                  previousLabel: t("dashboard", "previousPeriod"),
                   data,
               }
             : result;
@@ -233,7 +279,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             color: "var(--color-text-primary, #111827)",
                         }}
                     >
-                        Phân bố vấn đề
+                        {t("dashboard", "issueDistributionTitle")}
                     </Typography>
 
                     <Typography
@@ -244,7 +290,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             color: "var(--color-text-secondary, #6B7280)",
                         }}
                     >
-                        So sánh các vấn đề khách hàng lựa chọn
+                        {t("dashboard", "issueDistributionDescription")}
                     </Typography>
                 </Box>
 
@@ -253,6 +299,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                         flexDirection: "row",
                         flexWrap: "wrap",
                         alignItems: "center",
+                        justifyContent: "flex-end",
                         gap: 1,
                     }}
                 >
@@ -262,7 +309,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                         onClick={handleSelectWeek}
                         sx={periodButtonSx(period === "week")}
                     >
-                        7 ngày
+                        {t("dashboard", "weekly")}
                     </Button>
 
                     <Button
@@ -275,7 +322,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             period === "month" || isPeriodPopoverOpen,
                         )}
                     >
-                        Theo tháng
+                        {t("dashboard", "monthly")}
                     </Button>
 
                     <Popover
@@ -318,7 +365,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                         color: "var(--color-text-primary)",
                                     }}
                                 >
-                                    Chọn thời gian
+                                    {t("dashboard", "selectTime")}
                                 </Typography>
 
                                 <Typography
@@ -329,8 +376,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                         color: "var(--color-text-secondary)",
                                     }}
                                 >
-                                    So sánh số lượt phản hồi của tháng đã chọn
-                                    với tháng trước đó.
+                                    {t("dashboard", "compareMonthDescription")}
                                 </Typography>
                             </Box>
 
@@ -344,7 +390,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
                                     <QRSelect
                                         fullWidth
-                                        label="Tháng"
+                                        label={t("dashboard", "month")}
                                         size="small"
                                         value={selectedMonth}
                                         onChange={(event) =>
@@ -353,10 +399,13 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                             )
                                         }
                                         inputProps={{
-                                            "aria-label": "Chọn tháng",
+                                            "aria-label": t(
+                                                "dashboard",
+                                                "selectMonth",
+                                            ),
                                         }}
                                     >
-                                        {MONTH_OPTIONS.map((option) => (
+                                        {monthOptions.map((option) => (
                                             <MenuItem
                                                 key={option.value}
                                                 value={option.value}
@@ -377,7 +426,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                     <QRSelect
                                         fullWidth
                                         size="small"
-                                        label="Năm"
+                                        label={t("dashboard", "year")}
                                         value={selectedYear}
                                         onChange={(event) =>
                                             setSelectedYear(
@@ -385,7 +434,10 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                             )
                                         }
                                         inputProps={{
-                                            "aria-label": "Chọn năm",
+                                            "aria-label": t(
+                                                "dashboard",
+                                                "selectYear",
+                                            ),
                                         }}
                                     >
                                         {YEAR_OPTIONS.map((year) => (
@@ -420,7 +472,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                     onClick={handleClosePeriodPopover}
                                     sx={buttonBaseCancelSx}
                                 >
-                                    Hủy
+                                    {t("dashboard", "cancel")}
                                 </Button>
 
                                 <Button
@@ -429,7 +481,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                     onClick={handleApplyPeriod}
                                     sx={buttonBaseSx}
                                 >
-                                    Áp dụng
+                                    {t("dashboard", "apply")}
                                 </Button>
                             </Stack>
                         </Stack>
@@ -530,7 +582,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             color: "var(--color-feedback-status-new-text, #B42318)",
                         }}
                     >
-                        {errorMessage}
+                        {t("dashboard", errorMessage)}
                     </Typography>
                 </Box>
             ) : chartData.length === 0 ? (
@@ -548,7 +600,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                             color: "var(--color-text-secondary, #6B7280)",
                         }}
                     >
-                        Chưa có dữ liệu phân bố vấn đề.
+                        {t("dashboard", "noIssueData")}
                     </Typography>
                 </Box>
             ) : (
@@ -615,7 +667,7 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                 formatter={(value, name) => [
                                     `${numberFormatter.format(
                                         Number(value ?? 0),
-                                    )} lượt`,
+                                    )} ${t("dashboard", "feedbackUnit")}`,
                                     name === "currentCount"
                                         ? displayedResult.currentLabel
                                         : displayedResult.previousLabel,
@@ -650,6 +702,8 @@ export default function IssueDistribution({ data }: IssueDistributionProps) {
                                 dataKey="previousCount"
                                 name="previousCount"
                                 fill={PREVIOUS_COLOR}
+                                stroke="var(--color-chart-previous-border, #75a99f)"
+                                strokeWidth={0.75}
                                 radius={[0, 4, 4, 0]}
                                 maxBarSize={14}
                                 isAnimationActive={false}

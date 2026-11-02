@@ -5,6 +5,7 @@ import { UserRoundCog } from "lucide-react";
 import { useState } from "react";
 
 import PageHeader from "@/components/common/layout/PageHeader";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import AddUserDialog from "@/components/users-roles/AddUserDialog";
 import DeleteUserDialog from "@/components/users-roles/DeleteUserDialog";
 import EditUserDialog from "@/components/users-roles/EditUserDialog";
@@ -26,6 +27,7 @@ type UserRoleItemProps = {
 const GRID_COLUMNS = "1.5fr 1.5fr 1fr 160px";
 
 function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
+    const { t } = useTranslation();
     const isOwner = member.role === USER_ROLES.OWNER;
 
     return (
@@ -57,7 +59,7 @@ function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
                                 overflowWrap: "anywhere",
                             }}
                         >
-                            {member.fullName || "Chưa cập nhật"}
+                            {member.fullName || t("usersRoles", "notUpdated")}
                         </Typography>
 
                         <Typography
@@ -91,7 +93,7 @@ function UserRoleCard({ member, onEdit }: UserRoleItemProps) {
                             onClick={() => onEdit(member)}
                             sx={tableEditButtonSx}
                         >
-                            Chỉnh sửa
+                            {t("usersRoles", "edit")}
                         </Button>
 
                         <DeleteUserDialog
@@ -111,6 +113,8 @@ function UsersTable({
 }: UsersRolesClientProps & {
     onEdit: (member: UserRoleMember) => void;
 }) {
+    const { t } = useTranslation();
+
     return (
         <Box
             sx={{
@@ -132,10 +136,18 @@ function UsersTable({
                     borderBottom: "1px solid var(--color-border)",
                 }}
             >
-                <Typography sx={tableColumnHeaderSx}>Người dùng</Typography>
-                <Typography sx={tableColumnHeaderSx}>Email</Typography>
-                <Typography sx={tableColumnHeaderSx}>Role</Typography>
-                <Typography sx={tableColumnHeaderSx}>Thao tác</Typography>
+                <Typography sx={tableColumnHeaderSx}>
+                    {t("usersRoles", "user")}
+                </Typography>
+                <Typography sx={tableColumnHeaderSx}>
+                    {t("usersRoles", "email")}
+                </Typography>
+                <Typography sx={tableColumnHeaderSx}>
+                    {t("usersRoles", "role")}
+                </Typography>
+                <Typography sx={{ ...tableColumnHeaderSx, textAlign: "right" }}>
+                    {t("usersRoles", "actions")}
+                </Typography>
             </Box>
 
             {members.length === 0 ? (
@@ -170,7 +182,10 @@ function UsersTable({
                             >
                                 <Avatar
                                     src={member.avatarUrl || undefined}
-                                    alt={member.fullName || "Người dùng"}
+                                    alt={
+                                        member.fullName ||
+                                        t("usersRoles", "user")
+                                    }
                                     sx={{
                                         width: 40,
                                         height: 40,
@@ -197,9 +212,13 @@ function UsersTable({
                                         textOverflow: "ellipsis",
                                         whiteSpace: "nowrap",
                                     }}
-                                    title={member.fullName || "Chưa cập nhật"}
+                                    title={
+                                        member.fullName ||
+                                        t("usersRoles", "notUpdated")
+                                    }
                                 >
-                                    {member.fullName || "Chưa cập nhật"}
+                                    {member.fullName ||
+                                        t("usersRoles", "notUpdated")}
                                 </Typography>
                             </Stack>
 
@@ -236,7 +255,7 @@ function UsersTable({
                                             onClick={() => onEdit(member)}
                                             sx={tableEditButtonSx}
                                         >
-                                            Chỉnh sửa
+                                            {t("usersRoles", "edit")}
                                         </Button>
 
                                         <DeleteUserDialog
@@ -255,6 +274,8 @@ function UsersTable({
 }
 
 function EmptyUsersState() {
+    const { t } = useTranslation();
+
     return (
         <Box sx={{ px: 3, py: 5 }}>
             <Typography
@@ -264,13 +285,15 @@ function EmptyUsersState() {
                     color: "var(--color-text-muted)",
                 }}
             >
-                Chưa có người dùng.
+                {t("usersRoles", "emptyUsers")}
             </Typography>
         </Box>
     );
 }
 
 export default function UsersRolesClient({ members }: UsersRolesClientProps) {
+    const { t } = useTranslation();
+
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserRoleMember | null>(
         null,
@@ -318,8 +341,8 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                     }}
                 >
                     <PageHeader
-                        title="Người dùng & Phân quyền"
-                        subtitle="Quản lý người dùng và quyền truy cập của nhà hàng."
+                        title={t("usersRoles", "title")}
+                        subtitle={t("usersRoles", "subtitle")}
                         icon={UserRoundCog}
                     />
 
@@ -333,7 +356,7 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                             flexShrink: 0,
                         }}
                     >
-                        + Thêm người dùng
+                        {t("usersRoles", "addUser")}
                     </Button>
                 </Stack>
 
@@ -363,7 +386,7 @@ export default function UsersRolesClient({ members }: UsersRolesClientProps) {
                                     color: "var(--color-text-muted)",
                                 }}
                             >
-                                Chưa có người dùng.
+                                {t("usersRoles", "emptyUsers")}
                             </Typography>
                         </Box>
                     ) : (

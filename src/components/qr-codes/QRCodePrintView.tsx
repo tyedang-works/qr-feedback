@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -17,6 +18,7 @@ export default function QRCodePrintView({
     tableToken,
     onClose,
 }: QRCodePrintViewProps) {
+    const { t } = useTranslation();
     const qrUrl = `${APP_URL}/s/${tableToken}`;
 
     const handlePrint = () => {
@@ -110,7 +112,7 @@ export default function QRCodePrintView({
                             color: "var(--color-text-primary)",
                         }}
                     >
-                        Quét mã để gửi phản hồi
+                        {t("qrCode", "scanToSendFeedback")}
                     </Typography>
 
                     <Typography
@@ -139,7 +141,7 @@ export default function QRCodePrintView({
                         onClick={onClose}
                         sx={buttonBaseCancelSx}
                     >
-                        Quay lại
+                        {t("qrCode", "back")}
                     </Button>
 
                     <Button
@@ -148,7 +150,7 @@ export default function QRCodePrintView({
                         onClick={handlePrint}
                         sx={buttonBaseSx}
                     >
-                        In QR
+                        {t("qrCode", "printQR")}
                     </Button>
                 </Stack>
             </Stack>

@@ -10,11 +10,27 @@ import {
 } from "@/lib/tables/queries";
 import { revalidatePath } from "next/cache";
 
+export type TableActionMessageKey =
+    | "loginRequired"
+    | "tableManagePermissionDenied"
+    | "tableNameRequired"
+    | "createTableFailed"
+    | "createTableSuccess"
+    | "duplicateTableName"
+    | "tableNotFound"
+    | "noTableDataToUpdate"
+    | "updateTableFailed"
+    | "updateTableSuccess"
+    | "cannotDeleteTableWithFeedback"
+    | "deleteTableFailed"
+    | "deleteTableSuccess"
+    | "updateTableStatusFailed";
+
 export type TableActionState = {
     success: boolean;
-    message: string;
+    message: TableActionMessageKey | "";
     fieldErrors?: {
-        name?: string;
+        name?: TableActionMessageKey;
     };
 };
 
@@ -36,14 +52,14 @@ export async function createTableAction(
     if (!userContext) {
         return {
             success: false,
-            message: "Bạn chưa đăng nhập.",
+            message: "loginRequired",
         };
     }
 
     if (!canManageTables(userContext.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền quản lý bàn.",
+            message: "tableManagePermissionDenied",
         };
     }
 
@@ -54,7 +70,7 @@ export async function createTableAction(
             success: false,
             message: "",
             fieldErrors: {
-                name: "Vui lòng nhập tên bàn.",
+                name: "tableNameRequired",
             },
         };
     }
@@ -67,7 +83,7 @@ export async function createTableAction(
         if (!table) {
             return {
                 success: false,
-                message: "Không thể tạo bàn. Vui lòng thử lại.",
+                message: "createTableFailed",
             };
         }
 
@@ -75,7 +91,7 @@ export async function createTableAction(
 
         return {
             success: true,
-            message: "Đã tạo bàn thành công.",
+            message: "createTableSuccess",
         };
     } catch (error) {
         if (isDuplicateTableNameError(error)) {
@@ -83,7 +99,7 @@ export async function createTableAction(
                 success: false,
                 message: "",
                 fieldErrors: {
-                    name: "Tên bàn này đã tồn tại.",
+                    name: "duplicateTableName",
                 },
             };
         }
@@ -92,7 +108,7 @@ export async function createTableAction(
 
         return {
             success: false,
-            message: "Không thể tạo bàn. Vui lòng thử lại.",
+            message: "createTableFailed",
         };
     }
 }
@@ -106,14 +122,14 @@ export async function updateTableAction(
     if (!userContext) {
         return {
             success: false,
-            message: "Bạn chưa đăng nhập.",
+            message: "loginRequired",
         };
     }
 
     if (!canManageTables(userContext.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền quản lý bàn.",
+            message: "tableManagePermissionDenied",
         };
     }
 
@@ -126,7 +142,7 @@ export async function updateTableAction(
     if (!tableId) {
         return {
             success: false,
-            message: "Không xác định được bàn.",
+            message: "tableNotFound",
         };
     }
 
@@ -150,7 +166,7 @@ export async function updateTableAction(
     if (updateData.name === undefined && updateData.isActive === undefined) {
         return {
             success: false,
-            message: "Không có thông tin cần cập nhật.",
+            message: "noTableDataToUpdate",
         };
     }
 
@@ -164,7 +180,7 @@ export async function updateTableAction(
         if (!table) {
             return {
                 success: false,
-                message: "Không thể cập nhật bàn. Vui lòng thử lại.",
+                message: "updateTableFailed",
             };
         }
 
@@ -172,7 +188,7 @@ export async function updateTableAction(
 
         return {
             success: true,
-            message: "Đã cập nhật bàn thành công.",
+            message: "updateTableSuccess",
         };
     } catch (error) {
         if (isDuplicateTableNameError(error)) {
@@ -180,7 +196,7 @@ export async function updateTableAction(
                 success: false,
                 message: "",
                 fieldErrors: {
-                    name: "Tên bàn này đã tồn tại.",
+                    name: "duplicateTableName",
                 },
             };
         }
@@ -189,7 +205,7 @@ export async function updateTableAction(
 
         return {
             success: false,
-            message: "Không thể cập nhật bàn. Vui lòng thử lại.",
+            message: "updateTableFailed",
         };
     }
 }
@@ -203,14 +219,14 @@ export async function deleteTableAction(
     if (!userContext) {
         return {
             success: false,
-            message: "Bạn chưa đăng nhập.",
+            message: "loginRequired",
         };
     }
 
     if (!canManageTables(userContext.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền quản lý bàn.",
+            message: "tableManagePermissionDenied",
         };
     }
 
@@ -219,7 +235,7 @@ export async function deleteTableAction(
     if (!tableId) {
         return {
             success: false,
-            message: "Không xác định được bàn.",
+            message: "tableNotFound",
         };
     }
 
@@ -232,8 +248,7 @@ export async function deleteTableAction(
         if (hasFeedback) {
             return {
                 success: false,
-                message:
-                    "Không thể xóa bàn đã có phản hồi. Vui lòng tắt bàn thay vì xóa.",
+                message: "cannotDeleteTableWithFeedback",
             };
         }
 
@@ -245,7 +260,7 @@ export async function deleteTableAction(
         if (!deleted) {
             return {
                 success: false,
-                message: "Không thể xóa bàn. Vui lòng thử lại.",
+                message: "deleteTableFailed",
             };
         }
 
@@ -253,14 +268,14 @@ export async function deleteTableAction(
 
         return {
             success: true,
-            message: "Đã xóa bàn thành công.",
+            message: "deleteTableSuccess",
         };
     } catch (error) {
         console.error("Failed to delete table:", error);
 
         return {
             success: false,
-            message: "Không thể xóa bàn. Vui lòng thử lại.",
+            message: "deleteTableFailed",
         };
     }
 }
@@ -274,21 +289,21 @@ export async function updateTableStatusAction(
     if (!userContext) {
         return {
             success: false,
-            message: "Bạn chưa đăng nhập.",
+            message: "loginRequired",
         };
     }
 
     if (!canManageTables(userContext.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền quản lý bàn.",
+            message: "tableManagePermissionDenied",
         };
     }
 
     if (!tableId) {
         return {
             success: false,
-            message: "Không xác định được bàn.",
+            message: "tableNotFound",
         };
     }
 
@@ -304,7 +319,7 @@ export async function updateTableStatusAction(
         if (!table) {
             return {
                 success: false,
-                message: "Không thể cập nhật trạng thái bàn.",
+                message: "updateTableStatusFailed",
             };
         }
 
@@ -319,7 +334,7 @@ export async function updateTableStatusAction(
 
         return {
             success: false,
-            message: "Không thể cập nhật trạng thái bàn.",
+            message: "updateTableStatusFailed",
         };
     }
 }

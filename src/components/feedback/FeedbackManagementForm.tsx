@@ -4,11 +4,8 @@ import { updateFeedback } from "@/app/dashboard/feedback/[id]/actions";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
-import {
-    FEEDBACK_STATUS,
-    STATUS_CONFIG,
-    type FeedbackStatus,
-} from "@/lib/feedback/constants";
+import { useTranslation } from "@/components/common/providers/useTranslation";
+import { FEEDBACK_STATUS, type FeedbackStatus } from "@/lib/feedback/constants";
 import { buttonBaseSx } from "@/styles/button.styles";
 import { Box, Button, MenuItem, Stack } from "@mui/material";
 import type { FormikHelpers } from "formik";
@@ -34,32 +31,44 @@ type SnackbarState = {
     severity: "success" | "error";
 };
 
-const FEEDBACK_STATUS_OPTIONS = Object.values(FEEDBACK_STATUS).map((value) => ({
-    value,
-    label: STATUS_CONFIG[value].label,
-}));
-
-const validationSchema = Yup.object({
-    status: Yup.mixed<FeedbackStatus>()
-        .oneOf(Object.values(FEEDBACK_STATUS), "Trạng thái không hợp lệ.")
-        .required(" "),
-    internalNote: Yup.string()
-        .defined(" ")
-        .trim()
-        .max(1000, "Ghi chú nội bộ không được vượt quá 1000 ký tự."),
-});
+const STATUS_TRANSLATION_KEYS: Record<FeedbackStatus, string> = {
+    new: "new",
+    in_progress: "inProgress",
+    resolved: "resolved",
+};
 
 export default function FeedbackManagementForm({
     feedbackPublicId,
     initialStatus,
     initialInternalNote,
 }: FeedbackManagementFormProps) {
+    const { t } = useTranslation();
     const router = useRouter();
 
     const [snackbar, setSnackbar] = useState<SnackbarState>({
         open: false,
         message: "",
         severity: "success",
+    });
+
+    const FEEDBACK_STATUS_OPTIONS = Object.values(FEEDBACK_STATUS).map(
+        (value) => ({
+            value,
+            label: t("dashboard", STATUS_TRANSLATION_KEYS[value]),
+        }),
+    );
+
+    const validationSchema = Yup.object({
+        status: Yup.mixed<FeedbackStatus>()
+            .oneOf(
+                Object.values(FEEDBACK_STATUS),
+                t("dashboard", "invalidFeedbackStatus"),
+            )
+            .required(" "),
+        internalNote: Yup.string()
+            .defined(" ")
+            .trim()
+            .max(1000, t("dashboard", "internalNoteMaxLength")),
     });
 
     const initialValues: FeedbackManagementFormValues = {
@@ -88,7 +97,7 @@ export default function FeedbackManagementForm({
 
                 setSnackbar({
                     open: true,
-                    message: result.message,
+                    message: t("dashboard", result.message),
                     severity: result.success ? "success" : "error",
                 });
 
@@ -98,14 +107,14 @@ export default function FeedbackManagementForm({
             } catch {
                 setSnackbar({
                     open: true,
-                    message: "Đã xảy ra lỗi khi cập nhật phản hồi.",
+                    message: t("dashboard", "updateFeedbackError"),
                     severity: "error",
                 });
             } finally {
                 setSubmitting(false);
             }
         },
-        [feedbackPublicId, router],
+        [feedbackPublicId, router, t],
     );
 
     return (
@@ -130,7 +139,7 @@ export default function FeedbackManagementForm({
                             <QRSelect
                                 name="status"
                                 value={values.status}
-                                label="Trạng thái"
+                                label={t("dashboard", "feedbackStatus")}
                                 required
                                 onChange={(event) => {
                                     void setFieldValue(
@@ -158,8 +167,11 @@ export default function FeedbackManagementForm({
                             <QRTextField
                                 name="internalNote"
                                 required
-                                label="Ghi chú nội bộ"
-                                placeholder="Nhập ghi chú xử lý..."
+                                label={t("dashboard", "internalNote")}
+                                placeholder={t(
+                                    "dashboard",
+                                    "internalNotePlaceholder",
+                                )}
                                 multiline
                                 minRows={3}
                                 maxRows={6}
@@ -193,8 +205,8 @@ export default function FeedbackManagementForm({
                                     }}
                                 >
                                     {isSubmitting
-                                        ? "Đang lưu..."
-                                        : "Lưu thay đổi"}
+                                        ? t("dashboard", "saving")
+                                        : t("dashboard", "saveChanges")}
                                 </Button>
                             </Box>
                         </Stack>

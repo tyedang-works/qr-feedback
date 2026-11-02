@@ -4,6 +4,7 @@ import { createTableAction } from "@/app/dashboard/tables/actions";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 import { Button, CircularProgress } from "@mui/material";
 import { Form, Formik, type FormikHelpers } from "formik";
@@ -28,7 +29,10 @@ const initialValues: AddTableFormValues = {
     name: "",
 };
 
-function createValidationSchema(tableNames: string[]) {
+function createValidationSchema(
+    tableNames: string[],
+    t: ReturnType<typeof useTranslation>["t"],
+) {
     const normalizedTableNames = tableNames.map((tableName) =>
         tableName.trim().toLowerCase(),
     );
@@ -38,19 +42,25 @@ function createValidationSchema(tableNames: string[]) {
             .string()
             .trim()
             .required(" ")
-            .test("unique-table-name", "Tên bàn này đã tồn tại.", (value) => {
-                if (!value) {
-                    return true;
-                }
+            .test(
+                "unique-table-name",
+                t("table", "duplicateTableName"),
+                (value) => {
+                    if (!value) {
+                        return true;
+                    }
 
-                const normalizedName = value.trim().toLowerCase();
+                    const normalizedName = value.trim().toLowerCase();
 
-                return !normalizedTableNames.includes(normalizedName);
-            }),
+                    return !normalizedTableNames.includes(normalizedName);
+                },
+            ),
     });
 }
 
 export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
+    const { t } = useTranslation();
+
     const [open, setOpen] = useState(false);
 
     const [snackbar, setSnackbar] = useState<SnackbarState>({
@@ -60,8 +70,8 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
     });
 
     const validationSchema = useMemo(
-        () => createValidationSchema(tableNames),
-        [tableNames],
+        () => createValidationSchema(tableNames, t),
+        [tableNames, t],
     );
 
     const handleSnackbarClose = () => {
@@ -95,16 +105,16 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
 
             if (!result.success) {
                 if (result.fieldErrors?.name) {
-                    setFieldError("name", result.fieldErrors.name);
+                    setFieldError("name", t("table", result.fieldErrors.name));
 
                     return;
                 }
 
                 setSnackbar({
                     open: true,
-                    message:
-                        result.message ||
-                        "Không thể tạo bàn. Vui lòng thử lại.",
+                    message: result.message
+                        ? t("table", result.message)
+                        : t("table", "createTableFailed"),
                     severity: "error",
                 });
 
@@ -116,7 +126,9 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
 
             setSnackbar({
                 open: true,
-                message: result.message || "Đã tạo bàn thành công.",
+                message: result.message
+                    ? t("table", result.message)
+                    : t("table", "createTableSuccess"),
                 severity: "success",
             });
         } catch (error) {
@@ -124,7 +136,7 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
 
             setSnackbar({
                 open: true,
-                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: t("table", "createTableError"),
                 severity: "error",
             });
         } finally {
@@ -139,7 +151,7 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
                 onClick={() => setOpen(true)}
                 sx={buttonBaseSx}
             >
-                + Thêm bàn
+                + {t("table", "addTable")}
             </Button>
 
             <Formik
@@ -173,7 +185,7 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
                         <QRDialog
                             open={open}
                             onClose={handleClose}
-                            title="Thêm bàn"
+                            title={t("table", "addTableTitle")}
                             actions={
                                 <>
                                     <Button
@@ -183,7 +195,7 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
                                         disabled={isSubmitting}
                                         sx={buttonBaseCancelSx}
                                     >
-                                        Hủy
+                                        {t("table", "cancel")}
                                     </Button>
 
                                     <Button
@@ -203,10 +215,10 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
                                                         mr: 1,
                                                     }}
                                                 />
-                                                Đang thêm...
+                                                {t("table", "adding")}
                                             </>
                                         ) : (
-                                            "Thêm bàn"
+                                            t("table", "addTable")
                                         )}
                                     </Button>
                                 </>
@@ -215,8 +227,11 @@ export default function AddTableDialog({ tableNames }: AddTableDialogProps) {
                             <Form id="add-table-form" noValidate>
                                 <QRTextField
                                     name="name"
-                                    label="Tên bàn"
-                                    placeholder="Ví dụ: Bàn 03"
+                                    label={t("table", "tableName")}
+                                    placeholder={t(
+                                        "table",
+                                        "tableNamePlaceholder",
+                                    )}
                                     required
                                     value={values.name}
                                     onChange={(event) => {

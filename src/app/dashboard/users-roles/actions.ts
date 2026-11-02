@@ -1,10 +1,26 @@
 "use server";
 
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
+
 import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
 import { canManageUsers } from "@/lib/auth/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { revalidatePath } from "next/cache";
+import { translations, type Locale } from "@/i18n/translations";
+
+type UsersRolesMessages = {
+    [Key in keyof typeof translations.vi.usersRoles]: string;
+};
+
+async function getUsersRolesMessages(): Promise<UsersRolesMessages> {
+    const cookieStore = await cookies();
+
+    const locale: Locale =
+        cookieStore.get("qr-locale")?.value === "en" ? "en" : "vi";
+
+    return translations[locale].usersRoles;
+}
 
 type AddUserInput = {
     fullName: string;
@@ -30,9 +46,12 @@ export type ChangeUserRoleActionState = {
     message: string;
 };
 
-function getAuthErrorMessage(message?: string): string {
+function getAuthErrorMessage(
+    message: string | undefined,
+    messages: UsersRolesMessages,
+): string {
     if (!message) {
-        return "Không thể tạo tài khoản với email này.";
+        return messages["action.authCreateFallback"];
     }
 
     const normalizedMessage = message.toLowerCase();
@@ -42,28 +61,28 @@ function getAuthErrorMessage(message?: string): string {
         normalizedMessage.includes("already exists") ||
         normalizedMessage.includes("user already registered")
     ) {
-        return "Email này đã được đăng ký.";
+        return messages["action.emailAlreadyRegistered"];
     }
 
     if (
         normalizedMessage.includes("invalid email") ||
         normalizedMessage.includes("email address is invalid")
     ) {
-        return "Địa chỉ email không hợp lệ.";
+        return messages["action.invalidEmail"];
     }
 
     if (normalizedMessage.includes("password")) {
-        return "Thông tin mật khẩu không hợp lệ.";
+        return messages["action.invalidPassword"];
     }
 
     if (
         normalizedMessage.includes("rate limit") ||
         normalizedMessage.includes("too many requests")
     ) {
-        return "Bạn đã thực hiện quá nhiều yêu cầu. Vui lòng thử lại sau.";
+        return messages["action.tooManyRequests"];
     }
 
-    return "Không thể tạo tài khoản với email này.";
+    return messages["action.authCreateFallback"];
 }
 
 const MAX_AVATAR_SIZE = 1024 * 1024;
@@ -77,6 +96,8 @@ const ALLOWED_AVATAR_TYPES = {
 export async function addUserAction(
     input: AddUserInput,
 ): Promise<AddUserResult> {
+    const messages = await getUsersRolesMessages();
+
     const supabase = await createClient();
 
     const {
@@ -86,7 +107,7 @@ export async function addUserAction(
     if (!currentUser) {
         return {
             success: false,
-            message: "Phiên đăng nhập đã hết hạn.",
+            message: messages["action.sessionExpired"],
         };
     }
 
@@ -101,14 +122,14 @@ export async function addUserAction(
 
         return {
             success: false,
-            message: "Không thể xác định thông tin người dùng.",
+            message: messages["action.userContextError"],
         };
     }
 
     if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền thêm người dùng.",
+            message: messages["action.addPermissionDenied"],
         };
     }
 
@@ -121,25 +142,25 @@ export async function addUserAction(
     const fieldErrors: NonNullable<AddUserResult["fieldErrors"]> = {};
 
     if (!fullName || fullName.length > 100) {
-        fieldErrors.fullName = "Tên phải có từ 1 đến 100 ký tự.";
+        fieldErrors.fullName = messages["action.fullNameValidation"];
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
-        fieldErrors.email = "Địa chỉ email không hợp lệ.";
+        fieldErrors.email = messages["action.invalidEmail"];
     }
 
     if (role !== USER_ROLES.MANAGER && role !== USER_ROLES.STAFF) {
-        fieldErrors.role = "Vui lòng chọn role hợp lệ.";
+        fieldErrors.role = messages["action.invalidRole"];
     }
 
     if (password.length < 8 || password.length > 72) {
-        fieldErrors.password = "Mật khẩu phải có từ 8 đến 72 ký tự.";
+        fieldErrors.password = messages["action.passwordLength"];
     }
 
     if (Object.keys(fieldErrors).length > 0) {
         return {
             success: false,
-            message: "Vui lòng kiểm tra lại thông tin.",
+            message: messages["action.checkInformation"],
             fieldErrors,
         };
     }
@@ -148,14 +169,14 @@ export async function addUserAction(
         if (!(avatar.type in ALLOWED_AVATAR_TYPES)) {
             return {
                 success: false,
-                message: "Avatar chỉ chấp nhận PNG, JPEG hoặc WebP.",
+                message: messages["action.avatarFormatError"],
             };
         }
 
         if (avatar.size > MAX_AVATAR_SIZE) {
             return {
                 success: false,
-                message: "Dung lượng avatar không được vượt quá 1 MB.",
+                message: messages["action.avatarSizeError"],
             };
         }
     }
@@ -177,9 +198,9 @@ export async function addUserAction(
 
         return {
             success: false,
-            message: "Không thể thêm người dùng.",
+            message: messages["action.addUserFailed"],
             fieldErrors: {
-                email: getAuthErrorMessage(authError?.message),
+                email: getAuthErrorMessage(authError?.message, messages),
             },
         };
     }
@@ -236,7 +257,7 @@ export async function addUserAction(
 
         return {
             success: false,
-            message: "Không thể tạo hồ sơ người dùng. Vui lòng thử lại.",
+            message: messages["action.profileCreateFailed"],
         };
     }
 
@@ -262,7 +283,7 @@ export async function addUserAction(
 
             return {
                 success: false,
-                message: "Không thể tải avatar lên. Vui lòng thử lại.",
+                message: messages["action.avatarUploadFailed"],
             };
         }
 
@@ -285,7 +306,7 @@ export async function addUserAction(
 
             return {
                 success: false,
-                message: "Không thể lưu avatar. Vui lòng thử lại.",
+                message: messages["action.avatarSaveFailed"],
             };
         }
     }
@@ -295,7 +316,7 @@ export async function addUserAction(
 
     return {
         success: true,
-        message: "Đã thêm người dùng thành công.",
+        message: messages["action.addSuccess"],
     };
 }
 
@@ -303,6 +324,8 @@ export async function deleteUserAction(userId: string): Promise<{
     success: boolean;
     message: string;
 }> {
+    const messages = await getUsersRolesMessages();
+
     const supabase = await createClient();
 
     const {
@@ -312,7 +335,7 @@ export async function deleteUserAction(userId: string): Promise<{
     if (!currentUser) {
         return {
             success: false,
-            message: "Phiên đăng nhập đã hết hạn.",
+            message: messages["action.sessionExpired"],
         };
     }
 
@@ -327,21 +350,21 @@ export async function deleteUserAction(userId: string): Promise<{
 
         return {
             success: false,
-            message: "Không thể xác định thông tin người dùng.",
+            message: messages["action.userContextError"],
         };
     }
 
     if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền xóa người dùng.",
+            message: messages["action.deletePermissionDenied"],
         };
     }
 
     if (userId === currentUser.id) {
         return {
             success: false,
-            message: "Bạn không thể xóa tài khoản của chính mình.",
+            message: messages["action.cannotDeleteSelf"],
         };
     }
 
@@ -359,21 +382,21 @@ export async function deleteUserAction(userId: string): Promise<{
 
         return {
             success: false,
-            message: "Không tìm thấy người dùng.",
+            message: messages["action.userNotFound"],
         };
     }
 
     if (targetProfile.restaurant_id !== currentProfile.restaurant_id) {
         return {
             success: false,
-            message: "Bạn không có quyền xóa người dùng này.",
+            message: messages["action.deleteTargetPermissionDenied"],
         };
     }
 
     if (targetProfile.role === USER_ROLES.OWNER) {
         return {
             success: false,
-            message: "Không thể xóa tài khoản Owner.",
+            message: messages["action.cannotDeleteOwner"],
         };
     }
 
@@ -388,7 +411,7 @@ export async function deleteUserAction(userId: string): Promise<{
 
         return {
             success: false,
-            message: "Không thể xóa thông tin người dùng. Vui lòng thử lại.",
+            message: messages["action.deleteProfileFailed"],
         };
     }
 
@@ -397,6 +420,7 @@ export async function deleteUserAction(userId: string): Promise<{
 
     if (deleteAuthUserError) {
         console.error("Failed to delete auth user:", deleteAuthUserError);
+
         const { error: rollbackError } = await adminSupabase
             .from("profiles")
             .insert({
@@ -412,13 +436,13 @@ export async function deleteUserAction(userId: string): Promise<{
 
         return {
             success: false,
-            message: "Không thể xóa tài khoản người dùng. Vui lòng thử lại.",
+            message: messages["action.deleteAuthFailed"],
         };
     }
 
     return {
         success: true,
-        message: "Đã xóa người dùng thành công.",
+        message: messages["action.deleteSuccess"],
     };
 }
 
@@ -426,6 +450,8 @@ export async function changeUserRoleAction(
     _previousState: ChangeUserRoleActionState,
     formData: FormData,
 ): Promise<ChangeUserRoleActionState> {
+    const messages = await getUsersRolesMessages();
+
     const supabase = await createClient();
 
     const {
@@ -435,7 +461,7 @@ export async function changeUserRoleAction(
     if (!currentUser) {
         return {
             success: false,
-            message: "Phiên đăng nhập đã hết hạn.",
+            message: messages["action.sessionExpired"],
         };
     }
 
@@ -448,14 +474,14 @@ export async function changeUserRoleAction(
     if (currentProfileError || !currentProfile) {
         return {
             success: false,
-            message: "Không thể xác định thông tin người dùng.",
+            message: messages["action.userContextError"],
         };
     }
 
     if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền thay đổi vai trò.",
+            message: messages["action.changeRolePermissionDenied"],
         };
     }
 
@@ -465,21 +491,21 @@ export async function changeUserRoleAction(
     if (!userId) {
         return {
             success: false,
-            message: "Không tìm thấy người dùng cần cập nhật.",
+            message: messages["action.userIdRequired"],
         };
     }
 
     if (role !== USER_ROLES.MANAGER && role !== USER_ROLES.STAFF) {
         return {
             success: false,
-            message: "Vai trò không hợp lệ.",
+            message: messages["action.invalidRole"],
         };
     }
 
     if (userId === currentUser.id) {
         return {
             success: false,
-            message: "Bạn không thể thay đổi vai trò của chính mình.",
+            message: messages["action.cannotChangeSelfRole"],
         };
     }
 
@@ -495,28 +521,28 @@ export async function changeUserRoleAction(
     if (targetProfileError || !targetProfile) {
         return {
             success: false,
-            message: "Không tìm thấy người dùng.",
+            message: messages["action.userNotFound"],
         };
     }
 
     if (targetProfile.restaurant_id !== currentProfile.restaurant_id) {
         return {
             success: false,
-            message: "Bạn không có quyền thay đổi người dùng này.",
+            message: messages["action.changeTargetRolePermissionDenied"],
         };
     }
 
     if (targetProfile.role === USER_ROLES.OWNER) {
         return {
             success: false,
-            message: "Không thể thay đổi vai trò của Owner.",
+            message: messages["action.cannotChangeOwnerRole"],
         };
     }
 
     if (targetProfile.role === role) {
         return {
             success: true,
-            message: "Vai trò không có thay đổi.",
+            message: messages["action.roleUnchanged"],
         };
     }
 
@@ -533,7 +559,7 @@ export async function changeUserRoleAction(
 
         return {
             success: false,
-            message: "Không thể cập nhật vai trò. Vui lòng thử lại.",
+            message: messages["action.updateRoleFailed"],
         };
     }
 
@@ -541,7 +567,7 @@ export async function changeUserRoleAction(
 
     return {
         success: true,
-        message: "Đã cập nhật vai trò thành công.",
+        message: messages["action.updateRoleSuccess"],
     };
 }
 
@@ -565,6 +591,8 @@ type UpdateUserResult = {
 export async function updateUserAction(
     input: UpdateUserInput,
 ): Promise<UpdateUserResult> {
+    const messages = await getUsersRolesMessages();
+
     const supabase = await createClient();
 
     const {
@@ -574,7 +602,7 @@ export async function updateUserAction(
     if (!currentUser) {
         return {
             success: false,
-            message: "Phiên đăng nhập đã hết hạn.",
+            message: messages["action.sessionExpired"],
         };
     }
 
@@ -592,14 +620,14 @@ export async function updateUserAction(
 
         return {
             success: false,
-            message: "Không thể xác định thông tin người dùng.",
+            message: messages["action.userContextError"],
         };
     }
 
     if (!canManageUsers(currentProfile.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền chỉnh sửa người dùng.",
+            message: messages["action.editPermissionDenied"],
         };
     }
 
@@ -613,22 +641,22 @@ export async function updateUserAction(
     if (!userId) {
         return {
             success: false,
-            message: "Không tìm thấy người dùng cần cập nhật.",
+            message: messages["action.userIdRequired"],
         };
     }
 
     if (!fullName || fullName.length > 100) {
-        fieldErrors.fullName = "Tên phải có từ 1 đến 100 ký tự.";
+        fieldErrors.fullName = messages["action.fullNameValidation"];
     }
 
     if (role !== USER_ROLES.MANAGER && role !== USER_ROLES.STAFF) {
-        fieldErrors.role = "Vui lòng chọn role hợp lệ.";
+        fieldErrors.role = messages["action.invalidRole"];
     }
 
     if (Object.keys(fieldErrors).length > 0) {
         return {
             success: false,
-            message: "Vui lòng kiểm tra lại thông tin.",
+            message: messages["action.checkInformation"],
             fieldErrors,
         };
     }
@@ -636,14 +664,14 @@ export async function updateUserAction(
     if (avatar && !(avatar.type in ALLOWED_AVATAR_TYPES)) {
         return {
             success: false,
-            message: "Avatar chỉ chấp nhận PNG, JPEG hoặc WebP.",
+            message: messages["action.avatarFormatError"],
         };
     }
 
     if (avatar && avatar.size > MAX_AVATAR_SIZE) {
         return {
             success: false,
-            message: "Dung lượng avatar không được vượt quá 1 MB.",
+            message: messages["action.avatarSizeError"],
         };
     }
 
@@ -659,21 +687,21 @@ export async function updateUserAction(
     if (targetProfileError || !targetProfile) {
         return {
             success: false,
-            message: "Không tìm thấy người dùng.",
+            message: messages["action.userNotFound"],
         };
     }
 
     if (targetProfile.restaurant_id !== currentProfile.restaurant_id) {
         return {
             success: false,
-            message: "Bạn không có quyền chỉnh sửa người dùng này.",
+            message: messages["action.editTargetPermissionDenied"],
         };
     }
 
     if (targetProfile.role === USER_ROLES.OWNER) {
         return {
             success: false,
-            message: "Không thể chỉnh sửa tài khoản Owner.",
+            message: messages["action.cannotEditOwner"],
         };
     }
 
@@ -702,7 +730,7 @@ export async function updateUserAction(
 
             return {
                 success: false,
-                message: "Không thể tải avatar lên. Vui lòng thử lại.",
+                message: messages["action.avatarUploadFailed"],
             };
         }
 
@@ -739,7 +767,7 @@ export async function updateUserAction(
 
         return {
             success: false,
-            message: "Không thể cập nhật người dùng. Vui lòng thử lại.",
+            message: messages["action.updateUserFailed"],
         };
     }
 
@@ -774,7 +802,7 @@ export async function updateUserAction(
 
     return {
         success: true,
-        message: "Đã cập nhật người dùng thành công.",
+        message: messages["action.updateSuccess"],
         avatarUrl: nextAvatarUrl,
     };
 }

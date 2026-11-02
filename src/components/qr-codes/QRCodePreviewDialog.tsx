@@ -1,6 +1,7 @@
 "use client";
 
 import QRDialog from "@/components/common/dialog/QRDialog";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { APP_URL } from "@/lib/config/app";
 import { buttonBaseSx } from "@/styles/button.styles";
 import { Box, Button, Stack, Typography } from "@mui/material";
@@ -36,7 +37,7 @@ async function downloadQRCode(tableName: string) {
     ) as SVGSVGElement | null;
 
     if (!svgElement) {
-        throw new Error("Không tìm thấy mã QR.");
+        throw new Error("QR code not found.");
     }
 
     const svgClone = svgElement.cloneNode(true) as SVGSVGElement;
@@ -57,7 +58,8 @@ async function downloadQRCode(tableName: string) {
 
         await new Promise<void>((resolve, reject) => {
             image.onload = () => resolve();
-            image.onerror = () => reject(new Error("Không thể tạo ảnh QR."));
+            image.onerror = () =>
+                reject(new Error("Unable to generate QR image."));
 
             image.src = svgUrl;
         });
@@ -71,7 +73,7 @@ async function downloadQRCode(tableName: string) {
         const context = canvas.getContext("2d");
 
         if (!context) {
-            throw new Error("Không thể tạo ảnh QR.");
+            throw new Error("Unable to generate QR image.");
         }
 
         context.fillStyle = "#ffffff";
@@ -100,6 +102,7 @@ export default function QRCodePreviewDialog({
     onClose,
     onPrint,
 }: QRCodePreviewDialogProps) {
+    const { t } = useTranslation();
     const [downloading, setDownloading] = useState(false);
 
     const qrUrl = `${APP_URL}/s/${tableToken}`;
@@ -121,7 +124,12 @@ export default function QRCodePreviewDialog({
     };
 
     return (
-        <QRDialog open={open} onClose={onClose} title="Xem mã QR" maxWidth="xs">
+        <QRDialog
+            open={open}
+            onClose={onClose}
+            title={t("qrCode", "previewQRCode")}
+            maxWidth="xs"
+        >
             <Stack
                 spacing={3}
                 sx={{
@@ -193,7 +201,9 @@ export default function QRCodePreviewDialog({
                         startIcon={<CloudDownload size={18} strokeWidth={2} />}
                         sx={buttonBaseSx}
                     >
-                        {downloading ? "Đang tải..." : "Tải xuống"}
+                        {downloading
+                            ? t("qrCode", "downloading")
+                            : t("qrCode", "download")}
                     </Button>
 
                     <Button
@@ -202,7 +212,7 @@ export default function QRCodePreviewDialog({
                         onClick={onPrint}
                         sx={buttonBaseSx}
                     >
-                        In QR
+                        {t("qrCode", "printQR")}
                     </Button>
                 </Stack>
             </Stack>

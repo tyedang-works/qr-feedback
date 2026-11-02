@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
 import { animatedAvatarRingSx } from "@/styles/avatar.styles";
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
@@ -23,52 +24,52 @@ type DashboardSidebarProps = {
 };
 
 type NavigationItem = {
-    label: string;
+    labelKey: string;
     href: string;
     icon: LucideIcon;
 };
 
 type NavigationGroup = {
-    label: string;
+    labelKey: string;
     items: NavigationItem[];
 };
 
 const navigationGroups: NavigationGroup[] = [
     {
-        label: "Tổng quan",
+        labelKey: "overview",
         items: [
             {
-                label: "Bảng điều khiển",
+                labelKey: "dashboard",
                 href: "/dashboard",
                 icon: LayoutDashboard,
             },
         ],
     },
     {
-        label: "Quản lý nhà hàng",
+        labelKey: "restaurantManagement",
         items: [
             {
-                label: "Phản hồi",
+                labelKey: "feedback",
                 href: "/dashboard/feedback",
                 icon: MessagesSquare,
             },
             {
-                label: "Bàn ăn",
+                labelKey: "tables",
                 href: "/dashboard/tables",
                 icon: Table2,
             },
             {
-                label: "Mã QR",
+                labelKey: "qrCodes",
                 href: "/dashboard/qr-codes",
                 icon: QrCode,
             },
         ],
     },
     {
-        label: "Quản lý người dùng",
+        labelKey: "userManagement",
         items: [
             {
-                label: "Người dùng & phân quyền",
+                labelKey: "usersRoles",
                 href: "/dashboard/users-roles",
                 icon: UsersRound,
             },
@@ -77,6 +78,8 @@ const navigationGroups: NavigationGroup[] = [
 ];
 
 const DEFAULT_RESTAURANT_LOGO = "/assets/default-restaurant-logo.png";
+
+const OWNER_ONLY_ROUTES = ["/dashboard/settings", "/dashboard/users-roles"];
 
 export default function DashboardSidebar({
     role,
@@ -88,8 +91,10 @@ export default function DashboardSidebar({
     const router = useRouter();
     const pathname = usePathname();
     const { startNavigation } = useDashboardLoading();
+    const { t } = useTranslation();
 
     const isOwner = role === USER_ROLES.OWNER;
+
     const isActive = (href: string) => {
         if (href === "/dashboard") {
             return pathname === href;
@@ -108,8 +113,6 @@ export default function DashboardSidebar({
         startNavigation();
         router.push(href);
     };
-
-    const OWNER_ONLY_ROUTES = ["/dashboard/settings", "/dashboard/users-roles"];
 
     const visibleGroups = navigationGroups
         .map((group) => ({
@@ -149,7 +152,6 @@ export default function DashboardSidebar({
                 borderRight: "1px solid var(--color-border, #F0F1F3)",
             }}
         >
-            {/* main logo */}
             <Box
                 sx={{
                     display: "flex",
@@ -207,7 +209,7 @@ export default function DashboardSidebar({
                     <Box
                         component="img"
                         src={logoUrl || DEFAULT_RESTAURANT_LOGO}
-                        alt={restaurantName || "Logo nhà hàng"}
+                        alt={restaurantName || t("common", "restaurant")}
                         onError={(event) => {
                             const image = event.currentTarget;
 
@@ -257,7 +259,7 @@ export default function DashboardSidebar({
                             color: "var(--color-text-primary, #111827)",
                         }}
                     >
-                        {restaurantName ?? "Nhà hàng"}
+                        {restaurantName ?? t("common", "restaurant")}
                     </Typography>
                 )}
             </Box>
@@ -269,10 +271,9 @@ export default function DashboardSidebar({
                 }}
             />
 
-            {/* navigation */}
             <Stack
                 component="nav"
-                aria-label="Dashboard navigation"
+                aria-label={t("navigation", "dashboard")}
                 sx={{
                     flex: 1,
                     gap: collapsed ? 1.5 : 2.5,
@@ -280,7 +281,7 @@ export default function DashboardSidebar({
             >
                 {visibleGroups.map((group) => (
                     <Stack
-                        key={group.label}
+                        key={group.labelKey}
                         sx={{
                             gap: 0.5,
                         }}
@@ -299,7 +300,7 @@ export default function DashboardSidebar({
                                     color: "var(--color-text-muted, #9CA3AF)",
                                 }}
                             >
-                                {group.label}
+                                {t("navigation", group.labelKey)}
                             </Typography>
                         )}
 
@@ -311,16 +312,15 @@ export default function DashboardSidebar({
                             {group.items.map((item) => {
                                 const active = isActive(item.href);
                                 const Icon = item.icon;
+                                const label = t("navigation", item.labelKey);
 
                                 return (
                                     <Button
                                         key={item.href}
                                         fullWidth
                                         disableElevation
-                                        title={
-                                            collapsed ? item.label : undefined
-                                        }
-                                        aria-label={item.label}
+                                        title={collapsed ? label : undefined}
+                                        aria-label={label}
                                         aria-current={
                                             active ? "page" : undefined
                                         }
@@ -376,7 +376,7 @@ export default function DashboardSidebar({
                                             },
                                         }}
                                     >
-                                        {!collapsed && item.label}
+                                        {!collapsed && label}
                                     </Button>
                                 );
                             })}

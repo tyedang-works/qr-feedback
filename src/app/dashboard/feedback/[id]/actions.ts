@@ -6,6 +6,16 @@ import { FEEDBACK_STATUS } from "@/lib/feedback/constants";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
+export type UpdateFeedbackMessageKey =
+    | "loginRequired"
+    | "feedbackManagePermissionDenied"
+    | "feedbackNotFound"
+    | "invalidFeedbackStatus"
+    | "internalNoteMaxLength"
+    | "findFeedbackFailed"
+    | "updateFeedbackFailed"
+    | "updateFeedbackSuccess";
+
 type UpdateFeedbackInput = {
     feedbackPublicId: string;
     status: string;
@@ -14,7 +24,7 @@ type UpdateFeedbackInput = {
 
 type UpdateFeedbackResult = {
     success: boolean;
-    message: string;
+    message: UpdateFeedbackMessageKey;
 };
 
 export async function updateFeedback(
@@ -25,14 +35,14 @@ export async function updateFeedback(
     if (!userContext) {
         return {
             success: false,
-            message: "Bạn cần đăng nhập để thực hiện thao tác này.",
+            message: "loginRequired",
         };
     }
 
     if (!canManageFeedback(userContext.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền quản lý phản hồi.",
+            message: "feedbackManagePermissionDenied",
         };
     }
 
@@ -42,7 +52,7 @@ export async function updateFeedback(
     if (!feedbackPublicId) {
         return {
             success: false,
-            message: "Không tìm thấy phản hồi.",
+            message: "feedbackNotFound",
         };
     }
 
@@ -53,14 +63,14 @@ export async function updateFeedback(
     ) {
         return {
             success: false,
-            message: "Trạng thái phản hồi không hợp lệ.",
+            message: "invalidFeedbackStatus",
         };
     }
 
     if (internalNote.length > 1000) {
         return {
             success: false,
-            message: "Ghi chú nội bộ không được vượt quá 1000 ký tự.",
+            message: "internalNoteMaxLength",
         };
     }
 
@@ -78,14 +88,14 @@ export async function updateFeedback(
 
         return {
             success: false,
-            message: "Không thể tìm thấy phản hồi.",
+            message: "findFeedbackFailed",
         };
     }
 
     if (!feedback) {
         return {
             success: false,
-            message: "Không tìm thấy phản hồi.",
+            message: "feedbackNotFound",
         };
     }
 
@@ -103,7 +113,7 @@ export async function updateFeedback(
 
         return {
             success: false,
-            message: "Không thể cập nhật phản hồi.",
+            message: "updateFeedbackFailed",
         };
     }
 
@@ -112,6 +122,6 @@ export async function updateFeedback(
 
     return {
         success: true,
-        message: "Cập nhật phản hồi thành công.",
+        message: "updateFeedbackSuccess",
     };
 }

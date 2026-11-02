@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import {
     FEEDBACK_ISSUE_LABEL_MAP,
     isFeedbackIssueOption,
@@ -17,8 +18,16 @@ type FeedbackListProps = {
     data: FeedbackListItem[];
 };
 
-function formatDateTime(dateString: string) {
-    const parts = new Intl.DateTimeFormat("vi-VN", {
+const ISSUE_TRANSLATION_KEYS: Record<string, string> = {
+    food_quality: "foodQuality",
+    food_presentation: "foodPresentation",
+    service: "serviceIssue",
+    space_cleanliness: "spaceCleanliness",
+    service_time: "serviceTime",
+};
+
+function formatDateTime(dateString: string, locale: string) {
+    const parts = new Intl.DateTimeFormat(locale, {
         timeZone: "Asia/Ho_Chi_Minh",
         day: "2-digit",
         month: "2-digit",
@@ -42,6 +51,7 @@ function FeedbackRowContent({
     item: FeedbackListItem;
     isSelected: boolean;
 }) {
+    const { t, locale } = useTranslation();
     const visibleIssues = item.selectedOptions.slice(0, 2);
     const remainingIssues = item.selectedOptions.length - visibleIssues.length;
 
@@ -108,7 +118,10 @@ function FeedbackRowContent({
                         color: "var(--color-text-secondary, #667085)",
                     }}
                 >
-                    {formatDateTime(item.createdAt)}
+                    {formatDateTime(
+                        item.createdAt,
+                        locale === "en" ? "en-US" : "vi-VN",
+                    )}
                 </Typography>
             </Stack>
 
@@ -125,11 +138,16 @@ function FeedbackRowContent({
                         return null;
                     }
 
+                    const translationKey = ISSUE_TRANSLATION_KEYS[option];
+                    const label = translationKey
+                        ? t("dashboard", translationKey)
+                        : FEEDBACK_ISSUE_LABEL_MAP[option];
+
                     return (
                         <FeedbackIssueChip
                             key={option}
                             option={option}
-                            label={FEEDBACK_ISSUE_LABEL_MAP[option]}
+                            label={label}
                         />
                     );
                 })}
@@ -161,7 +179,7 @@ function FeedbackRowContent({
                     fontStyle: !item.feedback ? "italic" : "inherit",
                 }}
             >
-                {item.feedback || "Khách hàng không để lại nội dung bổ sung."}
+                {item.feedback || t("dashboard", "noAdditionalFeedback")}
             </Typography>
 
             <Typography
@@ -173,13 +191,15 @@ function FeedbackRowContent({
                     whiteSpace: "nowrap",
                 }}
             >
-                SĐT: {item.phone}
+                {t("dashboard", "phone")}: {item.phone}
             </Typography>
         </Stack>
     );
 }
 
 function EmptyFeedbackState() {
+    const { t } = useTranslation();
+
     return (
         <Card
             elevation={0}
@@ -218,7 +238,7 @@ function EmptyFeedbackState() {
                     color: "var(--color-text-primary, #344054)",
                 }}
             >
-                Chưa có phản hồi nào
+                {t("dashboard", "noFeedbackYet")}
             </Typography>
 
             <Typography
@@ -228,13 +248,15 @@ function EmptyFeedbackState() {
                     color: "var(--color-text-secondary, #667085)",
                 }}
             >
-                Phản hồi từ khách hàng sẽ xuất hiện tại đây.
+                {t("dashboard", "feedbackWillAppearHere")}
             </Typography>
         </Card>
     );
 }
 
 export default function FeedbackList({ data }: FeedbackListProps) {
+    const { t } = useTranslation();
+
     const [selectedId, setSelectedId] = useState<string | null>(
         data[0]?.id ?? null,
     );
@@ -306,7 +328,7 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                             color: "var(--color-text-primary, #193B56)",
                         }}
                     >
-                        Danh sách phản hồi
+                        {t("dashboard", "feedbackList")}
                     </Typography>
 
                     <Typography
@@ -316,7 +338,7 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                             color: "var(--color-text-secondary, #667085)",
                         }}
                     >
-                        Chọn một phản hồi để xem chi tiết.
+                        {t("dashboard", "selectFeedbackToViewDetails")}
                     </Typography>
                 </Box>
 
@@ -405,7 +427,7 @@ export default function FeedbackList({ data }: FeedbackListProps) {
                         }}
                     >
                         <Typography sx={{ fontSize: 13, color: "#667085" }}>
-                            Chọn một phản hồi để xem chi tiết.
+                            {t("dashboard", "selectFeedbackToViewDetails")}
                         </Typography>
                     </Card>
                 )}

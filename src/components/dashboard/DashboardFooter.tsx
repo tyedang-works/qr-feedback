@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { Box, Link, Stack, Typography } from "@mui/material";
 
 type DashboardFooterProps = {
@@ -7,9 +8,12 @@ type DashboardFooterProps = {
 };
 
 export default function DashboardFooter({ email }: DashboardFooterProps) {
+    const { t } = useTranslation();
+
     return (
         <Box
             component="footer"
+            className="dashboard-footer"
             sx={{
                 mt: 2,
                 pt: 2,
@@ -44,8 +48,8 @@ export default function DashboardFooter({ email }: DashboardFooterProps) {
                         color: "var(--color-text-muted, #9CA3AF)",
                     }}
                 >
-                    © {new Date().getFullYear()} QR Feedback. All rights
-                    reserved.
+                    © {new Date().getFullYear()} QR Feedback.{" "}
+                    {t("common", "allRightsReserved")}
                 </Typography>
 
                 <Stack
@@ -56,7 +60,7 @@ export default function DashboardFooter({ email }: DashboardFooterProps) {
                     }}
                 >
                     <Link
-                        href={`mailto:${email}?subject=${encodeURIComponent("Yêu cầu hỗ trợ QR Feedback")}`}
+                        href={`mailto:${email}?subject=${encodeURIComponent(t("common", "helpEmailSubject"))}`}
                         underline="none"
                         sx={{
                             fontSize: 12,
@@ -71,11 +75,11 @@ export default function DashboardFooter({ email }: DashboardFooterProps) {
                             },
                         }}
                     >
-                        Trợ giúp
+                        {t("common", "help")}
                     </Link>
 
                     <Link
-                        href={`mailto:${email}?subject=${encodeURIComponent("Liên hệ QR Feedback")}`}
+                        href={`mailto:${email}?subject=${encodeURIComponent(t("common", "contactEmailSubject"))}`}
                         underline="none"
                         sx={{
                             fontSize: 12,
@@ -90,7 +94,7 @@ export default function DashboardFooter({ email }: DashboardFooterProps) {
                             },
                         }}
                     >
-                        Liên hệ
+                        {t("common", "contact")}
                     </Link>
                 </Stack>
             </Stack>

@@ -8,6 +8,7 @@ import {
     getSelectedQRCodeTables,
 } from "@/app/dashboard/qr-codes/actions";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type {
     QRCodeFilters,
     QRCodeListResult,
@@ -28,13 +29,13 @@ import QRCodeSelectionToolbar from "./QRCodeSelectionToolbar";
 function getStatusStyles(isActive: boolean) {
     if (isActive) {
         return {
-            label: "Đang hoạt động",
+            labelKey: "tableStatusActive" as const,
             color: "var(--color-status-success)",
         };
     }
 
     return {
-        label: "Đang tắt",
+        labelKey: "tableStatusInactive" as const,
         color: "var(--color-text-muted)",
     };
 }
@@ -54,6 +55,8 @@ export default function QRCodeList({
     onBulkPrintClose,
     onPrintModeChange,
 }: QRCodeListProps) {
+    const { t } = useTranslation();
+
     const { data, total, page, pageSize, totalPages, selectableTotal } = result;
 
     const [selectedTable, setSelectedTable] = useState<QRCodeTable | null>(
@@ -337,7 +340,7 @@ export default function QRCodeList({
                             color: "var(--color-text-primary)",
                         }}
                     >
-                        Không tìm thấy bàn
+                        {t("qrCode", "noTablesFound")}
                     </Typography>
 
                     <Typography
@@ -347,7 +350,7 @@ export default function QRCodeList({
                             textAlign: "center",
                         }}
                     >
-                        Không có bàn nào phù hợp với bộ lọc hiện tại.
+                        {t("qrCode", "noTablesMatchFilters")}
                     </Typography>
                 </Stack>
             </Card>
@@ -389,7 +392,6 @@ export default function QRCodeList({
                             px: 3,
                             backgroundColor: "var(--color-table-header-bg)",
                             borderBottom: "1px solid var(--color-border)",
-
                             position: "sticky",
                             top: 0,
                             zIndex: 2,
@@ -404,12 +406,16 @@ export default function QRCodeList({
                             sx={checkboxStyleSx}
                         />
 
-                        <Typography sx={tableColumnHeaderSx}>Bàn</Typography>
-
-                        <Typography sx={tableColumnHeaderSx}>Mã QR</Typography>
+                        <Typography sx={tableColumnHeaderSx}>
+                            {t("qrCode", "tableName")}
+                        </Typography>
 
                         <Typography sx={tableColumnHeaderSx}>
-                            Trạng thái hoạt động
+                            {t("qrCode", "qrIdentifier")}
+                        </Typography>
+
+                        <Typography sx={tableColumnHeaderSx}>
+                            {t("qrCode", "activityStatus")}
                         </Typography>
 
                         <Typography
@@ -418,7 +424,7 @@ export default function QRCodeList({
                                 textAlign: "right",
                             }}
                         >
-                            Thao tác
+                            {t("qrCode", "actions")}
                         </Typography>
                     </Box>
 
@@ -497,7 +503,7 @@ export default function QRCodeList({
                                             }}
                                         />
 
-                                        {status.label}
+                                        {t("qrCode", status.labelKey)}
                                     </Box>
                                 </Box>
 
@@ -613,7 +619,7 @@ export default function QRCodeList({
                                                     }}
                                                 />
 
-                                                {status.label}
+                                                {t("qrCode", status.labelKey)}
                                             </Box>
                                         </Box>
                                     </Stack>
@@ -635,7 +641,7 @@ export default function QRCodeList({
                                                 color: "var(--color-text-muted)",
                                             }}
                                         >
-                                            Mã QR
+                                            {t("qrCode", "qrIdentifier")}
                                         </Typography>
 
                                         <Typography

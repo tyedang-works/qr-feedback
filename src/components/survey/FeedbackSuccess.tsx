@@ -4,16 +4,21 @@ import { Box, Typography } from "@mui/material";
 import { Check } from "lucide-react";
 
 import { animatedAvatarRingSx } from "@/styles/avatar.styles";
+import { Locale, translations } from "@/i18n/translations";
 
 type FeedbackSuccessProps = {
     restaurantName: string;
     restaurantLogoUrl: string | null;
+    locale: Locale;
 };
 
 export default function FeedbackSuccess({
     restaurantName,
     restaurantLogoUrl,
+    locale,
 }: FeedbackSuccessProps) {
+    const t = translations[locale].survey;
+
     return (
         <Box
             sx={{
@@ -304,7 +309,7 @@ export default function FeedbackSuccess({
                         animation: "successTextIn 400ms 300ms ease-out both",
                     }}
                 >
-                    Cảm ơn bạn!
+                    {t.thankYou}
                 </Typography>
 
                 <Typography
@@ -326,11 +331,9 @@ export default function FeedbackSuccess({
                         },
                     }}
                 >
-                    Phản hồi của bạn đã được ghi nhận.
+                    {t.feedbackReceived}
                     <br />
-                    Chúng tôi sẽ tiếp nhận và xử lý
-                    <br />
-                    trong thời gian sớm nhất.
+                    {t.feedbackProcessing}
                 </Typography>
 
                 <Box

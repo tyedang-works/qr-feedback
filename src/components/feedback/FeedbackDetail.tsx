@@ -1,14 +1,12 @@
+import FeedbackDetailText from "@/components/feedback/FeedbackDetailText";
 import FeedbackManagementForm from "@/components/feedback/FeedbackManagementForm";
-import {
-    FEEDBACK_ISSUE_LABEL_MAP,
-    isFeedbackIssueOption,
-} from "@/lib/feedback/constants";
+import { isFeedbackIssueOption } from "@/lib/feedback/constants";
 import type { FeedbackDetail as FeedbackDetailData } from "@/lib/feedback/types";
 import { cardSx } from "@/styles/card.styles";
 import { Box, Divider, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import FeedbackStatusChip from "../common/feedback/FeedbackStatusChip";
-import FeedbackIssueChip from "./FeedbackIssueChip";
+import FeedbackIssueChipTranslated from "./FeedbackIssueChipTranslated";
 
 type FeedbackDetailProps = {
     data: FeedbackDetailData;
@@ -49,8 +47,8 @@ function SectionHeading({
     title,
     description,
 }: {
-    title: string;
-    description?: string;
+    title: React.ReactNode;
+    description?: React.ReactNode;
 }) {
     return (
         <Box>
@@ -99,7 +97,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                     }}
                 >
                     <span aria-hidden="true">←</span>
-                    Quay lại Feedback
+                    <FeedbackDetailText translationKey="backToFeedback" />
                 </Link>
 
                 <Stack
@@ -119,7 +117,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                 color: "var(--color-text-primary, #111827)",
                             }}
                         >
-                            Chi tiết phản hồi
+                            <FeedbackDetailText translationKey="detailTitle" />
                         </Typography>
 
                         <Typography
@@ -130,8 +128,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                 color: "var(--color-text-secondary, #667085)",
                             }}
                         >
-                            Xem nội dung và theo dõi quá trình xử lý phản hồi
-                            của khách hàng.
+                            <FeedbackDetailText translationKey="detailSubtitle" />
                         </Typography>
                     </Box>
 
@@ -154,8 +151,12 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                     <SectionCard>
                         <Stack sx={{ p: { xs: 2, sm: 2.5 }, gap: 2.5 }}>
                             <SectionHeading
-                                title="Thông tin phản hồi"
-                                description="Thông tin bàn và thời điểm khách hàng gửi phản hồi."
+                                title={
+                                    <FeedbackDetailText translationKey="feedbackInformation" />
+                                }
+                                description={
+                                    <FeedbackDetailText translationKey="feedbackInformationDescription" />
+                                }
                             />
 
                             <Box
@@ -184,7 +185,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                             color: "var(--color-text-secondary, #667085)",
                                         }}
                                     >
-                                        Bàn
+                                        <FeedbackDetailText translationKey="table" />
                                     </Typography>
 
                                     <Typography
@@ -217,7 +218,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                             color: "var(--color-text-secondary, #667085)",
                                         }}
                                     >
-                                        Thời gian gửi
+                                        <FeedbackDetailText translationKey="submittedAt" />
                                     </Typography>
 
                                     <Typography
@@ -249,7 +250,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                         color: "var(--color-text-primary, #111827)",
                                     }}
                                 >
-                                    Vấn đề khách hàng chọn
+                                    <FeedbackDetailText translationKey="selectedIssues" />
                                 </Typography>
 
                                 {data.selectedOptions.length > 0 ? (
@@ -269,14 +270,9 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                             }
 
                                             return (
-                                                <FeedbackIssueChip
+                                                <FeedbackIssueChipTranslated
                                                     key={option}
                                                     option={option}
-                                                    label={
-                                                        FEEDBACK_ISSUE_LABEL_MAP[
-                                                            option
-                                                        ]
-                                                    }
                                                 />
                                             );
                                         })}
@@ -290,7 +286,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                             color: "var(--color-text-muted, #9CA3AF)",
                                         }}
                                     >
-                                        Khách hàng không chọn vấn đề cụ thể.
+                                        <FeedbackDetailText translationKey="noSelectedIssues" />
                                     </Typography>
                                 )}
                             </Box>
@@ -300,8 +296,12 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                     <SectionCard>
                         <Box sx={{ p: { xs: 2, sm: 2.5 } }}>
                             <SectionHeading
-                                title="Góp ý của khách hàng"
-                                description="Nội dung khách hàng chia sẻ khi gửi phản hồi."
+                                title={
+                                    <FeedbackDetailText translationKey="customerFeedback" />
+                                }
+                                description={
+                                    <FeedbackDetailText translationKey="customerFeedbackDescription" />
+                                }
                             />
 
                             <Box
@@ -326,8 +326,9 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                         overflowWrap: "anywhere",
                                     }}
                                 >
-                                    {data.feedback ||
-                                        "Khách hàng không để lại nội dung góp ý."}
+                                    {data.feedback || (
+                                        <FeedbackDetailText translationKey="noFeedbackContent" />
+                                    )}
                                 </Typography>
                             </Box>
 
@@ -344,7 +345,7 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                                     color: "var(--color-text-secondary, #667085)",
                                 }}
                             >
-                                Số điện thoại liên hệ
+                                <FeedbackDetailText translationKey="contactPhone" />
                             </Typography>
 
                             <Typography
@@ -374,8 +375,12 @@ export default function FeedbackDetail({ data }: FeedbackDetailProps) {
                             }}
                         >
                             <SectionHeading
-                                title="Xử lý phản hồi"
-                                description="Cập nhật trạng thái và lưu ghi chú nội bộ cho nhân viên."
+                                title={
+                                    <FeedbackDetailText translationKey="feedbackManagement" />
+                                }
+                                description={
+                                    <FeedbackDetailText translationKey="feedbackManagementDescription" />
+                                }
                             />
                         </Box>
 

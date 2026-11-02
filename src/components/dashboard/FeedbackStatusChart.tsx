@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { FeedbackStatusDistributionItem } from "@/lib/dashboard/types";
 import { Box, Card, Stack, Typography } from "@mui/material";
 
@@ -7,26 +8,32 @@ type FeedbackStatusChartProps = {
     data: FeedbackStatusDistributionItem[];
 };
 
+type StatusLabelKey = "new" | "inProgress" | "resolved";
+
 const numberFormatter = new Intl.NumberFormat("vi-VN");
+
+const percentageFormatter = new Intl.NumberFormat("vi-VN", {
+    maximumFractionDigits: 1,
+});
 
 const RING_ITEMS: {
     status: FeedbackStatusDistributionItem["status"];
-    label: string;
+    labelKey: StatusLabelKey;
     color: string;
 }[] = [
     {
         status: "new",
-        label: "Chưa xử lý",
+        labelKey: "new",
         color: "var(--color-chart-new)",
     },
     {
         status: "in_progress",
-        label: "Đang xử lý",
+        labelKey: "inProgress",
         color: "var(--color-chart-in-progress)",
     },
     {
         status: "resolved",
-        label: "Đã giải quyết",
+        labelKey: "resolved",
         color: "var(--color-chart-resolved)",
     },
 ];
@@ -47,8 +54,15 @@ function StatusRings({
     data: FeedbackStatusDistributionItem[];
     total: number;
 }) {
+    const { t } = useTranslation();
+
     const countByStatus = new Map(
         data.map((item) => [item.status, item.count]),
+    );
+
+    const ariaLabel = t("dashboard", "statusChartAriaLabel").replace(
+        "{count}",
+        numberFormatter.format(total),
     );
 
     return (
@@ -66,7 +80,7 @@ function StatusRings({
                 width="100%"
                 height="100%"
                 role="img"
-                aria-label={`Tổng ${numberFormatter.format(total)} phản hồi, phân bố theo ba trạng thái xử lý`}
+                aria-label={ariaLabel}
             >
                 {RING_ITEMS.map((item, index) => {
                     const radius = RING_RADII[index];
@@ -116,12 +130,12 @@ function StatusRings({
             >
                 <Typography
                     sx={{
-                        fontSize: 11,
+                        fontSize: 10,
                         lineHeight: 1.5,
                         color: "var(--color-text-secondary)",
                     }}
                 >
-                    Tổng phản hồi
+                    {t("dashboard", "totalFeedbackLabel")}
                 </Typography>
 
                 <Typography
@@ -148,6 +162,8 @@ function StatusLegend({
     data: FeedbackStatusDistributionItem[];
     total: number;
 }) {
+    const { t } = useTranslation();
+
     const countByStatus = new Map(
         data.map((item) => [item.status, item.count]),
     );
@@ -181,6 +197,7 @@ function StatusLegend({
                         }}
                     >
                         <Box
+                            aria-hidden="true"
                             sx={{
                                 width: 10,
                                 height: 10,
@@ -197,7 +214,7 @@ function StatusLegend({
                                 color: "var(--color-text-secondary)",
                             }}
                         >
-                            {item.label}
+                            {t("dashboard", item.labelKey)}
                         </Typography>
 
                         <Typography
@@ -213,16 +230,14 @@ function StatusLegend({
                         </Typography>
 
                         <Typography
+                            component="span"
                             sx={{
                                 fontSize: 11,
                                 color: "var(--color-text-secondary)",
                                 fontVariantNumeric: "tabular-nums",
                             }}
                         >
-                            {percentage.toLocaleString("vi-VN", {
-                                maximumFractionDigits: 1,
-                            })}
-                            %
+                            {percentageFormatter.format(percentage)}%
                         </Typography>
                     </Stack>
                 );
@@ -234,6 +249,8 @@ function StatusLegend({
 export default function FeedbackStatusChart({
     data,
 }: FeedbackStatusChartProps) {
+    const { t } = useTranslation();
+
     const total = data.reduce((sum, item) => sum + item.count, 0);
 
     return (
@@ -265,7 +282,7 @@ export default function FeedbackStatusChart({
                         color: "var(--color-text-primary)",
                     }}
                 >
-                    Trạng thái phản hồi
+                    {t("dashboard", "statusTitle")}
                 </Typography>
 
                 <Typography
@@ -275,7 +292,7 @@ export default function FeedbackStatusChart({
                         color: "var(--color-text-secondary)",
                     }}
                 >
-                    Phân bố theo tình trạng xử lý
+                    {t("dashboard", "statusDescription")}
                 </Typography>
 
                 {total === 0 ? (
@@ -295,7 +312,7 @@ export default function FeedbackStatusChart({
                                 textAlign: "center",
                             }}
                         >
-                            Chưa có dữ liệu phản hồi.
+                            {t("dashboard", "noFeedbackData")}
                         </Typography>
                     </Box>
                 ) : (

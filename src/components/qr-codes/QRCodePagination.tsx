@@ -1,6 +1,7 @@
 "use client";
 
 import { useDashboardLoading } from "@/components/dashboard/DashboardLoadingProvider";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { QRCodePageSize } from "@/lib/qr-codes/types";
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -18,6 +19,7 @@ export default function QRCodePagination({
     total,
     pageSize,
 }: QRCodePaginationProps) {
+    const { t, locale } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -49,6 +51,11 @@ export default function QRCodePagination({
     const from = (currentPage - 1) * pageSize + 1;
     const to = Math.min(currentPage * pageSize, total);
 
+    const formatNumber = (value: number) =>
+        new Intl.NumberFormat(locale === "en" ? "en-US" : "vi-VN").format(
+            value,
+        );
+
     return (
         <Box sx={{ width: "100%", pt: 1 }}>
             <Stack
@@ -72,7 +79,7 @@ export default function QRCodePagination({
                         whiteSpace: "nowrap",
                     }}
                 >
-                    Hiển thị{" "}
+                    {t("qrCode", "showing")}{" "}
                     <Box
                         component="span"
                         sx={{
@@ -80,9 +87,9 @@ export default function QRCodePagination({
                             color: "var(--color-text-primary, #193B56)",
                         }}
                     >
-                        {from}–{to}
+                        {formatNumber(from)}–{formatNumber(to)}
                     </Box>{" "}
-                    trong{" "}
+                    {t("qrCode", "of")}{" "}
                     <Box
                         component="span"
                         sx={{
@@ -90,9 +97,9 @@ export default function QRCodePagination({
                             color: "var(--color-text-primary, #193B56)",
                         }}
                     >
-                        {total}
+                        {formatNumber(total)}
                     </Box>{" "}
-                    bàn
+                    {t("qrCode", "tables")}
                 </Typography>
 
                 <Pagination

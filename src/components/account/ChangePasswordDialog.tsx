@@ -12,6 +12,7 @@ import {
     InputAdornment,
 } from "@mui/material";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRTextField from "@/components/common/input/QRTextField";
@@ -42,29 +43,12 @@ const initialValues: FormValues = {
     confirmPassword: "",
 };
 
-const validationSchema = yup.object({
-    currentPassword: yup.string().required(" "),
-    newPassword: yup
-        .string()
-        .required(" ")
-        .min(8, "Mật khẩu phải có ít nhất 8 ký tự.")
-        .max(72, "Mật khẩu không được vượt quá 72 ký tự.")
-        .test(
-            "different-password",
-            "Mật khẩu mới phải khác mật khẩu hiện tại.",
-            (value, context) =>
-                !value || value !== context.parent.currentPassword,
-        ),
-    confirmPassword: yup
-        .string()
-        .required(" ")
-        .oneOf([yup.ref("newPassword")], "Mật khẩu xác nhận không khớp."),
-});
-
 export default function ChangePasswordDialog({
     open,
     onClose,
 }: ChangePasswordDialogProps) {
+    const { t } = useTranslation();
+
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -75,6 +59,27 @@ export default function ChangePasswordDialog({
         severity: "success",
     });
 
+    const validationSchema = yup.object({
+        currentPassword: yup.string().required(" "),
+
+        newPassword: yup
+            .string()
+            .required(" ")
+            .min(8, t("profile", "passwordMinLength"))
+            .max(72, t("profile", "passwordMaxLength"))
+            .test(
+                "different-password",
+                t("profile", "passwordMustBeDifferent"),
+                (value, context) =>
+                    !value || value !== context.parent.currentPassword,
+            ),
+
+        confirmPassword: yup
+            .string()
+            .required(" ")
+            .oneOf([yup.ref("newPassword")], t("profile", "passwordMismatch")),
+    });
+
     const handleCloseSnackbar = () => {
         setSnackbar((previous) => ({
             ...previous,
@@ -82,11 +87,15 @@ export default function ChangePasswordDialog({
         }));
     };
 
-    const handleClose = (_values?: FormValues, resetForm?: () => void) => {
-        resetForm?.();
+    const resetPasswordVisibility = () => {
         setShowCurrentPassword(false);
         setShowNewPassword(false);
         setShowConfirmPassword(false);
+    };
+
+    const handleClose = (resetForm?: () => void) => {
+        resetForm?.();
+        resetPasswordVisibility();
         onClose();
     };
 
@@ -105,13 +114,13 @@ export default function ChangePasswordDialog({
             if (userError || !user?.email) {
                 setSnackbar({
                     open: true,
-                    message:
-                        "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+                    message: t("profile", "sessionExpired"),
                     severity: "error",
                 });
                 return;
             }
 
+            // Verify the current password before updating it.
             const { error: verifyError } =
                 await supabase.auth.signInWithPassword({
                     email: user.email,
@@ -121,7 +130,7 @@ export default function ChangePasswordDialog({
             if (verifyError) {
                 setSnackbar({
                     open: true,
-                    message: "Mật khẩu hiện tại không chính xác.",
+                    message: t("profile", "currentPasswordIncorrect"),
                     severity: "error",
                 });
                 return;
@@ -134,18 +143,19 @@ export default function ChangePasswordDialog({
             if (updateError) {
                 setSnackbar({
                     open: true,
-                    message: "Không thể đổi mật khẩu. Vui lòng thử lại.",
+                    message: t("profile", "changePasswordError"),
                     severity: "error",
                 });
                 return;
             }
 
             resetForm();
-            handleClose();
+            resetPasswordVisibility();
+            onClose();
 
             setSnackbar({
                 open: true,
-                message: "Đổi mật khẩu thành công.",
+                message: t("profile", "changePasswordSuccess"),
                 severity: "success",
             });
         } catch (error) {
@@ -153,7 +163,7 @@ export default function ChangePasswordDialog({
 
             setSnackbar({
                 open: true,
-                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: t("profile", "unexpectedError"),
                 severity: "error",
             });
         } finally {
@@ -172,7 +182,11 @@ export default function ChangePasswordDialog({
                 edge="end"
                 size="small"
                 disabled={disabled}
-                aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                aria-label={
+                    visible
+                        ? t("profile", "hidePassword")
+                        : t("profile", "showPassword")
+                }
                 onClick={onToggle}
             >
                 {visible ? <Eye size={14} /> : <EyeOff size={14} />}
@@ -211,22 +225,20 @@ export default function ChangePasswordDialog({
                             open={open}
                             onClose={() => {
                                 if (!isBusy) {
-                                    handleClose(values, resetForm);
+                                    handleClose(resetForm);
                                 }
                             }}
-                            title="Đổi mật khẩu"
+                            title={t("profile", "changePasswordTitle")}
                             actions={
                                 <>
                                     <Button
                                         type="button"
                                         variant="outlined"
                                         disabled={isBusy}
-                                        onClick={() =>
-                                            handleClose(values, resetForm)
-                                        }
+                                        onClick={() => handleClose(resetForm)}
                                         sx={buttonBaseCancelSx}
                                     >
-                                        Hủy
+                                        {t("profile", "cancel")}
                                     </Button>
 
                                     <Button
@@ -246,10 +258,10 @@ export default function ChangePasswordDialog({
                                                         mr: 1,
                                                     }}
                                                 />
-                                                Đang cập nhật...
+                                                {t("profile", "updating")}
                                             </>
                                         ) : (
-                                            "Đổi mật khẩu"
+                                            t("profile", "changePassword")
                                         )}
                                     </Button>
                                 </>
@@ -265,8 +277,14 @@ export default function ChangePasswordDialog({
                                 >
                                     <QRTextField
                                         name="currentPassword"
-                                        label="Mật khẩu hiện tại"
-                                        placeholder="Nhập mật khẩu hiện tại"
+                                        label={t(
+                                            "profile",
+                                            "currentPasswordLabel",
+                                        )}
+                                        placeholder={t(
+                                            "profile",
+                                            "currentPasswordPlaceholder",
+                                        )}
                                         type={
                                             showCurrentPassword
                                                 ? "text"
@@ -303,8 +321,11 @@ export default function ChangePasswordDialog({
 
                                     <QRTextField
                                         name="newPassword"
-                                        label="Mật khẩu mới"
-                                        placeholder="Nhập mật khẩu mới"
+                                        label={t("profile", "newPasswordLabel")}
+                                        placeholder={t(
+                                            "profile",
+                                            "newPasswordPlaceholder",
+                                        )}
                                         type={
                                             showNewPassword
                                                 ? "text"
@@ -342,8 +363,14 @@ export default function ChangePasswordDialog({
 
                                     <QRTextField
                                         name="confirmPassword"
-                                        label="Xác nhận mật khẩu mới"
-                                        placeholder="Nhập lại mật khẩu mới"
+                                        label={t(
+                                            "profile",
+                                            "confirmPasswordLabel",
+                                        )}
+                                        placeholder={t(
+                                            "profile",
+                                            "confirmPasswordPlaceholder",
+                                        )}
                                         type={
                                             showConfirmPassword
                                                 ? "text"

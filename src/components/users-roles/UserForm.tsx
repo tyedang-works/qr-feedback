@@ -20,8 +20,9 @@ import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 
-import { USER_ROLE_OPTIONS } from "@/lib/auth/constants";
+import { USER_ROLE_OPTIONS, USER_ROLES } from "@/lib/auth/constants";
 import {
     createUserFormSchema,
     type UserFormMode,
@@ -73,6 +74,9 @@ export default function UserForm({
     onClose,
     onSubmit,
 }: UserFormProps) {
+    const { t } = useTranslation();
+    const userFormT = (key: string) => t("usersRoles", `userForm.${key}`);
+    const userRoleT = (key: string) => t("userForm", key);
     const formId = useId();
     const inputRef = useRef<HTMLInputElement>(null);
     const avatarUrlRef = useRef<string | null>(null);
@@ -102,7 +106,7 @@ export default function UserForm({
 
     const isAddMode = mode === "add";
 
-    const title = isAddMode ? "Thêm người dùng" : "Chỉnh sửa người dùng";
+    const title = isAddMode ? userFormT("addTitle") : userFormT("editTitle");
 
     const showSnackbar = (
         message: string,
@@ -136,15 +140,12 @@ export default function UserForm({
         if (!file) return;
 
         if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-            showSnackbar("Avatar chỉ chấp nhận PNG, JPEG hoặc WebP.", "error");
+            showSnackbar(userFormT("avatarFormatError"), "error");
             return;
         }
 
         if (file.size > MAX_AVATAR_SIZE) {
-            showSnackbar(
-                "Dung lượng avatar không được vượt quá 1 MB.",
-                "error",
-            );
+            showSnackbar(userFormT("avatarSizeError"), "error");
             return;
         }
 
@@ -187,20 +188,14 @@ export default function UserForm({
             );
 
             if (file.size > MAX_AVATAR_SIZE) {
-                showSnackbar(
-                    "Ảnh sau khi crop vượt quá 1 MB. Vui lòng chọn ảnh khác hoặc crop vùng nhỏ hơn.",
-                    "error",
-                );
+                showSnackbar(userFormT("croppedAvatarSizeError"), "error");
                 return;
             }
 
             replaceAvatarPreview(file);
             handleCancelCrop();
         } catch {
-            showSnackbar(
-                "Không thể xử lý ảnh. Vui lòng chọn ảnh khác.",
-                "error",
-            );
+            showSnackbar(userFormT("imageProcessingError"), "error");
         } finally {
             setIsCropping(false);
         }
@@ -259,7 +254,7 @@ export default function UserForm({
 
                 if (!fieldErrors || Object.keys(fieldErrors).length === 0) {
                     showSnackbar(
-                        result.message || "Không thể lưu người dùng.",
+                        result.message || userFormT("saveError"),
                         "error",
                     );
                 }
@@ -269,8 +264,8 @@ export default function UserForm({
 
             showSnackbar(
                 isAddMode
-                    ? "Đã thêm người dùng thành công."
-                    : "Đã cập nhật người dùng thành công.",
+                    ? userFormT("addSuccess")
+                    : userFormT("updateSuccess"),
                 "success",
             );
 
@@ -278,7 +273,7 @@ export default function UserForm({
             resetAvatarState();
             onClose();
         } catch {
-            showSnackbar("Đã xảy ra lỗi. Vui lòng thử lại.", "error");
+            showSnackbar(userFormT("generalError"), "error");
         } finally {
             setSubmitting(false);
         }
@@ -335,7 +330,7 @@ export default function UserForm({
                                         disabled={isBusy}
                                         sx={buttonBaseCancelSx}
                                     >
-                                        Hủy
+                                        {userFormT("cancel")}
                                     </Button>
 
                                     <Button
@@ -355,10 +350,10 @@ export default function UserForm({
                                                         mr: 1,
                                                     }}
                                                 />
-                                                Đang lưu...
+                                                {userFormT("saving")}
                                             </>
                                         ) : (
-                                            "Lưu"
+                                            userFormT("save")
                                         )}
                                     </Button>
                                 </>
@@ -379,8 +374,8 @@ export default function UserForm({
                                             tabIndex={isBusy ? -1 : 0}
                                             aria-label={
                                                 avatarUrl
-                                                    ? "Thay đổi ảnh đại diện"
-                                                    : "Thêm ảnh đại diện"
+                                                    ? userFormT("changeAvatar")
+                                                    : userFormT("addAvatar")
                                             }
                                             onKeyDown={(event) => {
                                                 if (
@@ -460,8 +455,12 @@ export default function UserForm({
                                                     }}
                                                 >
                                                     {avatarUrl
-                                                        ? "Đổi ảnh"
-                                                        : "Tải ảnh"}
+                                                        ? userFormT(
+                                                              "changeImage",
+                                                          )
+                                                        : userFormT(
+                                                              "uploadImage",
+                                                          )}
                                                 </Typography>
                                             </Box>
                                         </Box>
@@ -490,14 +489,16 @@ export default function UserForm({
                                                 textAlign: "center",
                                             }}
                                         >
-                                            Ảnh đại diện
+                                            {userFormT("avatar")}
                                         </Typography>
                                     </Stack>
 
                                     <QRTextField
                                         name="fullName"
-                                        label="Tên"
-                                        placeholder="Nhập tên người dùng"
+                                        label={userFormT("fullName")}
+                                        placeholder={userFormT(
+                                            "fullNamePlaceholder",
+                                        )}
                                         required
                                         value={values.fullName}
                                         onChange={(event) => {
@@ -516,8 +517,10 @@ export default function UserForm({
                                     {isAddMode && (
                                         <QRTextField
                                             name="email"
-                                            label="Email"
-                                            placeholder="Nhập email"
+                                            label={userFormT("email")}
+                                            placeholder={userFormT(
+                                                "emailPlaceholder",
+                                            )}
                                             type="email"
                                             required
                                             value={values.email}
@@ -539,8 +542,10 @@ export default function UserForm({
                                         <>
                                             <QRTextField
                                                 name="password"
-                                                label="Mật khẩu"
-                                                placeholder="Nhập mật khẩu"
+                                                label={userFormT("password")}
+                                                placeholder={userFormT(
+                                                    "passwordPlaceholder",
+                                                )}
                                                 type={
                                                     showPassword
                                                         ? "text"
@@ -570,8 +575,12 @@ export default function UserForm({
                                                                     type="button"
                                                                     aria-label={
                                                                         showPassword
-                                                                            ? "Ẩn mật khẩu"
-                                                                            : "Hiện mật khẩu"
+                                                                            ? userFormT(
+                                                                                  "hidePassword",
+                                                                              )
+                                                                            : userFormT(
+                                                                                  "showPassword",
+                                                                              )
                                                                     }
                                                                     onClick={() =>
                                                                         setShowPassword(
@@ -616,8 +625,12 @@ export default function UserForm({
 
                                             <QRTextField
                                                 name="confirmPassword"
-                                                label="Xác nhận mật khẩu"
-                                                placeholder="Nhập lại mật khẩu"
+                                                label={userFormT(
+                                                    "confirmPassword",
+                                                )}
+                                                placeholder={userFormT(
+                                                    "confirmPasswordPlaceholder",
+                                                )}
                                                 type={
                                                     showConfirmPassword
                                                         ? "text"
@@ -646,8 +659,12 @@ export default function UserForm({
                                                                     type="button"
                                                                     aria-label={
                                                                         showConfirmPassword
-                                                                            ? "Ẩn mật khẩu xác nhận"
-                                                                            : "Hiện mật khẩu xác nhận"
+                                                                            ? userFormT(
+                                                                                  "hideConfirmPassword",
+                                                                              )
+                                                                            : userFormT(
+                                                                                  "showConfirmPassword",
+                                                                              )
                                                                     }
                                                                     onClick={() =>
                                                                         setShowConfirmPassword(
@@ -694,7 +711,7 @@ export default function UserForm({
 
                                     <QRSelect
                                         name="role"
-                                        label="Role"
+                                        label={userFormT("role")}
                                         required
                                         value={values.role}
                                         onChange={(event) => {
@@ -714,7 +731,12 @@ export default function UserForm({
                                                 key={option.value}
                                                 value={option.value}
                                             >
-                                                {option.label}
+                                                {userRoleT(
+                                                    option.value ===
+                                                        USER_ROLES.MANAGER
+                                                        ? "manager"
+                                                        : "staff",
+                                                )}
                                             </MenuItem>
                                         ))}
                                     </QRSelect>
@@ -728,7 +750,7 @@ export default function UserForm({
             <QRDialog
                 open={cropOpen}
                 onClose={isCropping ? () => {} : handleCancelCrop}
-                title="Căn chỉnh ảnh đại diện"
+                title={userFormT("cropTitle")}
                 maxWidth="sm"
                 actions={
                     <Stack
@@ -746,7 +768,7 @@ export default function UserForm({
                             disabled={isCropping}
                             sx={buttonBaseCancelSx}
                         >
-                            Hủy
+                            {userFormT("cancel")}
                         </Button>
 
                         <Button
@@ -763,10 +785,10 @@ export default function UserForm({
                                         thickness={5}
                                         sx={{ color: "inherit", mr: 1 }}
                                     />
-                                    Đang xử lý...
+                                    {userFormT("processing")}
                                 </>
                             ) : (
-                                "Dùng ảnh này"
+                                userFormT("useImage")
                             )}
                         </Button>
                     </Stack>
@@ -804,11 +826,11 @@ export default function UserForm({
                                     color: "var(--color-text-secondary)",
                                 }}
                             >
-                                Phóng to ảnh
+                                {userFormT("zoomImage")}
                             </Typography>
 
                             <input
-                                aria-label="Phóng to ảnh"
+                                aria-label={userFormT("zoomImage")}
                                 type="range"
                                 min={1}
                                 max={3}

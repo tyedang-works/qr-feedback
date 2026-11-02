@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { buttonBaseSx } from "@/styles/button.styles";
 import { Button, CircularProgress as MuiCircularProgress } from "@mui/material";
 import { FileSpreadsheet } from "lucide-react";
@@ -14,6 +15,7 @@ export default function ExportFeedbackButton({
     href,
     disabled = false,
 }: ExportFeedbackButtonProps) {
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleExport = async () => {
@@ -27,7 +29,7 @@ export default function ExportFeedbackButton({
             const response = await fetch(href);
 
             if (!response.ok) {
-                throw new Error("Không thể xuất file Excel.");
+                throw new Error("exportFeedbackFailed");
             }
 
             const blob = await response.blob();
@@ -46,7 +48,7 @@ export default function ExportFeedbackButton({
             }, 1000);
         } catch (error) {
             console.error("Failed to export feedback:", error);
-            window.alert("Xuất Excel thất bại. Vui lòng thử lại.");
+            window.alert(t("dashboard", "exportFeedbackError"));
         } finally {
             setIsLoading(false);
         }
@@ -63,7 +65,7 @@ export default function ExportFeedbackButton({
                         size={18}
                         thickness={5}
                         color="inherit"
-                        aria-label="Đang xuất Excel"
+                        aria-label={t("dashboard", "exportingFeedback")}
                     />
                 ) : (
                     <FileSpreadsheet size={18} strokeWidth={1.8} />
@@ -75,7 +77,9 @@ export default function ExportFeedbackButton({
                 whiteSpace: "nowrap",
             }}
         >
-            {isLoading ? "Đang xuất..." : "Xuất Excel"}
+            {isLoading
+                ? t("dashboard", "exporting")
+                : t("dashboard", "exportExcel")}
         </Button>
     );
 }

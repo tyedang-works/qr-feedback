@@ -1,6 +1,7 @@
 "use client";
 
 import MiniDonutChart from "@/components/common/charts/MiniDonutChart";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { RestaurantTableSummary } from "@/lib/tables/queries";
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Stack, Typography } from "@mui/material";
@@ -12,26 +13,23 @@ type TablesSummaryProps = {
 const SUMMARY_ITEMS = [
     {
         key: "total",
-        label: "Tổng số bàn",
+        labelKey: "totalTables",
         color: "#2563EB",
-        description: "Toàn bộ bàn của nhà hàng",
     },
     {
         key: "active",
-        label: "Đang hoạt động",
+        labelKey: "activeTables",
         color: "#039855",
-        description: "bàn đang hoạt động",
     },
     {
         key: "inactive",
-        label: "Đã tắt",
+        labelKey: "inactiveTables",
         color: "#EA580C",
-        description: "bàn đã tắt",
     },
 ] as const;
 
-function formatNumber(value: number): string {
-    return value.toLocaleString("vi-VN");
+function formatNumber(value: number, locale: string): string {
+    return value.toLocaleString(locale === "en" ? "en-US" : "vi-VN");
 }
 
 function getPercentage(value: number, total: number): number {
@@ -43,16 +41,18 @@ function getPercentage(value: number, total: number): number {
 }
 
 export default function TablesSummary({ data }: TablesSummaryProps) {
+    const { t, locale } = useTranslation();
+
     const total = data.total;
 
     const totalDonutData = [
         {
-            name: "Đang hoạt động",
+            name: t("table", "activeTables"),
             value: data.active,
             color: "#039855",
         },
         {
-            name: "Đã tắt",
+            name: t("table", "inactiveTables"),
             value: data.inactive,
             color: "#EA580C",
         },
@@ -76,17 +76,18 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                 const value = data[item.key];
                 const isTotal = item.key === "total";
                 const percentage = getPercentage(value, total);
+                const label = t("table", item.labelKey);
 
                 const chartData = isTotal
                     ? totalDonutData
                     : [
                           {
-                              name: item.label,
+                              name: label,
                               value,
                               color: item.color,
                           },
                           {
-                              name: "Còn lại",
+                              name: t("table", "remaining"),
                               value: Math.max(total - value, 0),
                               color: "var(--color-surface-active, #F3F4F6)",
                           },
@@ -120,7 +121,7 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                                         color: "var(--color-text-secondary, #193B56)",
                                     }}
                                 >
-                                    {item.label}
+                                    {label}
                                 </Typography>
 
                                 <MiniDonutChart
@@ -128,7 +129,7 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                                     size={68}
                                     centerLabel={
                                         isTotal
-                                            ? formatNumber(total)
+                                            ? formatNumber(total, locale)
                                             : `${percentage}%`
                                     }
                                 />
@@ -154,7 +155,7 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                                         fontVariantNumeric: "tabular-nums",
                                     }}
                                 >
-                                    {formatNumber(value)}
+                                    {formatNumber(value, locale)}
                                 </Typography>
                             </Stack>
 
@@ -166,8 +167,8 @@ export default function TablesSummary({ data }: TablesSummaryProps) {
                                 }}
                             >
                                 {isTotal
-                                    ? item.description
-                                    : `${formatNumber(value)} trên ${formatNumber(total)} bàn`}
+                                    ? t("table", "allRestaurantTables")
+                                    : `${formatNumber(value, locale)} ${t("table", "of")} ${formatNumber(total, locale)} ${t("table", "tables")}`}
                             </Typography>
                         </Stack>
                     </Card>

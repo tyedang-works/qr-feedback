@@ -1,7 +1,9 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
+import { translations, type Locale } from "@/i18n/translations";
 import { canManageSettings } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import type { UpdateRestaurantSettingsInput } from "@/lib/restaurant/types";
@@ -17,9 +19,20 @@ type UpdateRestaurantSettingsResult =
           message: string;
       };
 
+async function getSettingsMessages() {
+    const cookieStore = await cookies();
+
+    const locale: Locale =
+        cookieStore.get("qr-locale")?.value === "en" ? "en" : "vi";
+
+    return translations[locale].settings;
+}
+
 export async function updateRestaurantSettings(
     input: UpdateRestaurantSettingsInput,
 ): Promise<UpdateRestaurantSettingsResult> {
+    const messages = await getSettingsMessages();
+
     const name = input.name.trim();
     const phone = input.phone.trim();
     const email = input.email.trim();
@@ -28,42 +41,42 @@ export async function updateRestaurantSettings(
     if (!name) {
         return {
             success: false,
-            message: "Vui lòng nhập tên nhà hàng.",
+            message: messages.nameRequired,
         };
     }
 
     if (name.length > 100) {
         return {
             success: false,
-            message: "Tên nhà hàng không được vượt quá 100 ký tự.",
+            message: messages.nameMaxLength,
         };
     }
 
     if (phone.length > 30) {
         return {
             success: false,
-            message: "Số điện thoại không được vượt quá 30 ký tự.",
+            message: messages.phoneMaxLength,
         };
     }
 
     if (email.length > 254) {
         return {
             success: false,
-            message: "Email không được vượt quá 254 ký tự.",
+            message: messages.emailMaxLength,
         };
     }
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return {
             success: false,
-            message: "Email không hợp lệ.",
+            message: messages.invalidEmail,
         };
     }
 
     if (address.length > 500) {
         return {
             success: false,
-            message: "Địa chỉ không được vượt quá 500 ký tự.",
+            message: messages.addressMaxLength,
         };
     }
 
@@ -72,14 +85,14 @@ export async function updateRestaurantSettings(
     if (!userContext) {
         return {
             success: false,
-            message: "Không tìm thấy thông tin tài khoản.",
+            message: messages.loginRequired,
         };
     }
 
     if (!canManageSettings(userContext.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền cập nhật cài đặt nhà hàng.",
+            message: messages.permissionDenied,
         };
     }
 
@@ -101,7 +114,7 @@ export async function updateRestaurantSettings(
 
         return {
             success: false,
-            message: "Không thể cập nhật thông tin nhà hàng.",
+            message: messages.updateRestaurantFailed,
         };
     }
 
@@ -113,8 +126,7 @@ export async function updateRestaurantSettings(
 
         return {
             success: false,
-            message:
-                "Không thể cập nhật nhà hàng. Vui lòng kiểm tra quyền truy cập.",
+            message: messages.updateRestaurantNoPermission,
         };
     }
 
@@ -123,6 +135,6 @@ export async function updateRestaurantSettings(
 
     return {
         success: true,
-        message: "Đã cập nhật thông tin nhà hàng.",
+        message: messages.updateRestaurantSuccess,
     };
 }

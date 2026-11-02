@@ -1,5 +1,9 @@
 "use client";
 
+import { useState } from "react";
+
+import { Box } from "@mui/material";
+
 import TabBar from "@/components/common/tab/TabBar";
 import RestaurantSettingsForm from "@/components/settings/RestaurantSettingsForm";
 import RestaurantBrandingSection from "@/components/settings/RestaurantBrandingSection";
@@ -8,19 +12,12 @@ import {
     type SettingsTabValue,
 } from "@/lib/restaurant/constants";
 import type { RestaurantSettings } from "@/lib/restaurant/types";
-import { Box } from "@mui/material";
-import { useState } from "react";
+import { useTranslation } from "../common/providers/useTranslation";
 
-const SETTINGS_TABS = [
-    {
-        value: SETTINGS_TAB.GENERAL,
-        label: "Thông tin chung",
-    },
-    {
-        value: SETTINGS_TAB.BRANDING,
-        label: "Nhận diện thương hiệu",
-    },
-];
+type SettingsTab = {
+    value: SettingsTabValue;
+    label: string;
+};
 
 type RestaurantSettingsContentProps = {
     initialSettings: RestaurantSettings;
@@ -29,9 +26,22 @@ type RestaurantSettingsContentProps = {
 export default function RestaurantSettingsContent({
     initialSettings,
 }: RestaurantSettingsContentProps) {
+    const { t } = useTranslation();
+
     const [activeTab, setActiveTab] = useState<SettingsTabValue>(
         SETTINGS_TAB.GENERAL,
     );
+
+    const SETTINGS_TABS: SettingsTab[] = [
+        {
+            value: SETTINGS_TAB.GENERAL,
+            label: t("settings", "generalTab"),
+        },
+        {
+            value: SETTINGS_TAB.BRANDING,
+            label: t("settings", "brandingTab"),
+        },
+    ];
 
     const handleTabChange = (value: string | number) => {
         if (value === SETTINGS_TAB.GENERAL || value === SETTINGS_TAB.BRANDING) {
@@ -45,7 +55,7 @@ export default function RestaurantSettingsContent({
                 items={SETTINGS_TABS}
                 value={activeTab}
                 onChange={handleTabChange}
-                ariaLabel="Cài đặt nhà hàng"
+                ariaLabel={t("settings", "ariaLabel")}
                 variant="scrollable"
             />
 

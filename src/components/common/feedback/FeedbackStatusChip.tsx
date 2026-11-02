@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { FeedbackStatus } from "@/lib/feedback/constants";
 import { STATUS_CONFIG } from "@/lib/feedback/constants";
 import { Chip } from "@mui/material";
@@ -8,14 +9,30 @@ type FeedbackStatusChipProps = {
     status: FeedbackStatus;
 };
 
+type FeedbackStatusTranslationKey = "new" | "inProgress" | "resolved";
+
+function getStatusTranslationKey(
+    status: FeedbackStatus,
+): FeedbackStatusTranslationKey {
+    switch (status) {
+        case "new":
+            return "new";
+        case "in_progress":
+            return "inProgress";
+        case "resolved":
+            return "resolved";
+    }
+}
+
 export default function FeedbackStatusChip({
     status,
 }: FeedbackStatusChipProps) {
+    const { t } = useTranslation();
     const config = STATUS_CONFIG[status];
 
     return (
         <Chip
-            label={config.label}
+            label={t("dashboard", getStatusTranslationKey(status))}
             size="small"
             sx={{
                 height: 23,

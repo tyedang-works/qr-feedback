@@ -2,6 +2,7 @@ import PageHeader from "@/components/common/layout/PageHeader";
 import AddTableDialog from "@/components/tables/AddTableDialog";
 import TablesList from "@/components/tables/TablesList";
 import TablesSummary from "@/components/tables/TablesSummary";
+import { Locale, translations } from "@/i18n/translations";
 import { canManageTables as canManageTablesPermission } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import {
@@ -10,9 +11,14 @@ import {
 } from "@/lib/tables/queries";
 import { Box, Stack } from "@mui/material";
 import { Table2 } from "lucide-react";
+import { cookies } from "next/headers";
 
 export default async function TablesPage() {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    const cookieStore = await cookies();
+    const locale: Locale =
+        cookieStore.get("qr-locale")?.value === "en" ? "en" : "vi";
+
+    const t = translations[locale].table;
     const userContext = await getUserContext();
 
     if (!userContext) {
@@ -49,8 +55,8 @@ export default async function TablesPage() {
                 }}
             >
                 <PageHeader
-                    title="Quản lý bàn"
-                    subtitle="Quản lý bàn và mã QR của nhà hàng."
+                    title={t.tablesManagement}
+                    subtitle={t.tablesManagementDescription}
                     icon={Table2}
                 />
 

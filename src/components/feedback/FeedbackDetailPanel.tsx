@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import FeedbackManagementForm from "@/components/feedback/FeedbackManagementForm";
 import {
     FEEDBACK_ISSUE_LABEL_MAP,
@@ -15,8 +16,16 @@ type FeedbackDetailPanelProps = {
     data: FeedbackListItem;
 };
 
-function formatDateTime(value: string) {
-    return new Intl.DateTimeFormat("vi-VN", {
+const ISSUE_TRANSLATION_KEYS: Record<string, string> = {
+    food_quality: "foodQuality",
+    food_presentation: "foodPresentation",
+    service: "serviceIssue",
+    space_cleanliness: "spaceCleanliness",
+    service_time: "serviceTime",
+};
+
+function formatDateTime(value: string, locale: string) {
+    return new Intl.DateTimeFormat(locale, {
         timeZone: "Asia/Ho_Chi_Minh",
         day: "2-digit",
         month: "2-digit",
@@ -47,6 +56,10 @@ const dividerSx = {
 export default function FeedbackDetailPanel({
     data,
 }: FeedbackDetailPanelProps) {
+    const { t, locale } = useTranslation();
+
+    const numberLocale = locale === "en" ? "en-US" : "vi-VN";
+
     return (
         <Card elevation={0} sx={{ ...cardSx, p: 0, overflow: "hidden" }}>
             <Stack sx={{ gap: 0 }}>
@@ -76,7 +89,7 @@ export default function FeedbackDetailPanel({
                                     color: "var(--color-text-primary, #111827)",
                                 }}
                             >
-                                Chi tiết phản hồi
+                                {t("dashboard", "feedbackDetails")}
                             </Typography>
 
                             <Typography
@@ -88,7 +101,7 @@ export default function FeedbackDetailPanel({
                                     overflowWrap: "anywhere",
                                 }}
                             >
-                                Mã phản hồi: {data.publicId}
+                                {t("dashboard", "feedbackId")}: {data.publicId}
                             </Typography>
                         </Box>
 
@@ -106,7 +119,9 @@ export default function FeedbackDetailPanel({
                         }}
                     >
                         <Box sx={{ minWidth: 80 }}>
-                            <Typography sx={metadataLabelSx}>Bàn</Typography>
+                            <Typography sx={metadataLabelSx}>
+                                {t("dashboard", "table")}
+                            </Typography>
                             <Typography
                                 sx={{
                                     mt: 0.5,
@@ -121,7 +136,7 @@ export default function FeedbackDetailPanel({
 
                         <Box>
                             <Typography sx={metadataLabelSx}>
-                                Thời gian gửi
+                                {t("dashboard", "submittedAt")}
                             </Typography>
                             <Typography
                                 sx={{
@@ -131,7 +146,7 @@ export default function FeedbackDetailPanel({
                                     color: "var(--color-text-primary, #111827)",
                                 }}
                             >
-                                {formatDateTime(data.createdAt)}
+                                {formatDateTime(data.createdAt, numberLocale)}
                             </Typography>
                         </Box>
                     </Stack>
@@ -148,7 +163,7 @@ export default function FeedbackDetailPanel({
                 >
                     <Box>
                         <Typography component="h3" sx={sectionTitleSx}>
-                            Vấn đề khách hàng ghi nhận
+                            {t("dashboard", "customerReportedIssues")}
                         </Typography>
 
                         {data.selectedOptions.length > 0 ? (
@@ -165,12 +180,22 @@ export default function FeedbackDetailPanel({
                                         return null;
                                     }
 
+                                    const translationKey =
+                                        ISSUE_TRANSLATION_KEYS[option];
+
                                     return (
                                         <FeedbackIssueChip
                                             key={option}
                                             option={option}
                                             label={
-                                                FEEDBACK_ISSUE_LABEL_MAP[option]
+                                                translationKey
+                                                    ? t(
+                                                          "dashboard",
+                                                          translationKey,
+                                                      )
+                                                    : FEEDBACK_ISSUE_LABEL_MAP[
+                                                          option
+                                                      ]
                                             }
                                         />
                                     );
@@ -184,14 +209,14 @@ export default function FeedbackDetailPanel({
                                     color: "var(--color-text-muted, #98A2B3)",
                                 }}
                             >
-                                Không có vấn đề được chọn.
+                                {t("dashboard", "noIssuesSelected")}
                             </Typography>
                         )}
                     </Box>
 
                     <Box>
                         <Typography component="h3" sx={sectionTitleSx}>
-                            Nội dung phản hồi
+                            {t("dashboard", "feedbackContent")}
                         </Typography>
 
                         <Box
@@ -225,14 +250,14 @@ export default function FeedbackDetailPanel({
                                 }}
                             >
                                 {data.feedback ||
-                                    "Khách hàng không để lại nội dung bổ sung."}
+                                    t("dashboard", "noAdditionalFeedback")}
                             </Typography>
                         </Box>
                     </Box>
 
                     <Box>
                         <Typography component="h3" sx={sectionTitleSx}>
-                            Số điện thoại khách hàng
+                            {t("dashboard", "customerPhone")}
                         </Typography>
 
                         <Typography
@@ -269,7 +294,7 @@ export default function FeedbackDetailPanel({
                 >
                     <Box>
                         <Typography component="h3" sx={sectionTitleSx}>
-                            Xử lý phản hồi
+                            {t("dashboard", "processFeedback")}
                         </Typography>
 
                         <Typography
@@ -280,7 +305,7 @@ export default function FeedbackDetailPanel({
                                 color: "var(--color-text-secondary, #667085)",
                             }}
                         >
-                            Cập nhật trạng thái và ghi chú nội bộ.
+                            {t("dashboard", "updateFeedbackStatusDescription")}
                         </Typography>
                     </Box>
 

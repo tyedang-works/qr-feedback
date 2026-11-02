@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 
 import QRDialog from "@/components/common/dialog/QRDialog";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
 
 type Props = {
@@ -22,6 +23,7 @@ type Props = {
 function createImage(url: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
         const image = new Image();
+
         image.onload = () => resolve(image);
         image.onerror = reject;
         image.src = url;
@@ -39,7 +41,7 @@ async function createCroppedFile(
     const context = canvas.getContext("2d");
 
     if (!context) {
-        throw new Error("Không thể xử lý ảnh.");
+        throw new Error("Canvas context unavailable");
     }
 
     canvas.width = area.width;
@@ -61,8 +63,11 @@ async function createCroppedFile(
 
     const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob((result) => {
-            if (result) resolve(result);
-            else reject(new Error("Không thể tạo ảnh crop."));
+            if (result) {
+                resolve(result);
+            } else {
+                reject(new Error("Unable to create cropped image"));
+            }
         }, outputType);
     });
 
@@ -87,6 +92,8 @@ export default function BrandingPreviewDialog({
     onClose,
     onConfirm,
 }: Props) {
+    const { t } = useTranslation();
+
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedArea, setCroppedArea] = useState<Area | null>(null);
@@ -111,10 +118,11 @@ export default function BrandingPreviewDialog({
             );
 
             onConfirm(croppedFile);
+
             setCrop({ x: 0, y: 0 });
             setZoom(1);
         } catch {
-            setError("Không thể crop ảnh. Vui lòng thử lại.");
+            setError(t("settings", "cropError"));
         }
     }
 
@@ -122,7 +130,7 @@ export default function BrandingPreviewDialog({
         <QRDialog
             open={open}
             onClose={onClose}
-            title={`Crop ${title}`}
+            title={`${t("settings", "crop")} ${title}`}
             maxWidth="sm"
             actions={
                 <>
@@ -133,7 +141,7 @@ export default function BrandingPreviewDialog({
                         startIcon={<X size={15} />}
                         sx={buttonBaseCancelSx}
                     >
-                        Hủy
+                        {t("settings", "cancel")}
                     </Button>
 
                     <Button
@@ -143,7 +151,7 @@ export default function BrandingPreviewDialog({
                         startIcon={<Check size={15} />}
                         sx={buttonBaseSx}
                     >
-                        Xác nhận crop
+                        {t("settings", "confirmCrop")}
                     </Button>
                 </>
             }
@@ -155,8 +163,7 @@ export default function BrandingPreviewDialog({
                         color: "var(--color-text-secondary)",
                     }}
                 >
-                    Kéo ảnh để căn chỉnh và sử dụng thanh trượt để zoom. Ảnh sẽ
-                    chỉ được lưu khi bạn nhấn Lưu thay đổi.
+                    {t("settings", "cropDescription")}
                 </Typography>
 
                 <Box
@@ -195,21 +202,26 @@ export default function BrandingPreviewDialog({
                     }}
                 >
                     <Minus size={16} color="var(--color-text-secondary)" />
+
                     <Slider
                         value={zoom}
                         min={1}
                         max={3}
                         step={0.1}
                         onChange={(_, value) => setZoom(value as number)}
-                        aria-label="Phóng to ảnh"
+                        aria-label={t("settings", "zoomImage")}
                     />
+
                     <Plus size={16} color="var(--color-text-secondary)" />
                 </Stack>
 
                 {error && (
                     <Typography
                         role="alert"
-                        sx={{ fontSize: 12, color: "error.main" }}
+                        sx={{
+                            fontSize: 12,
+                            color: "error.main",
+                        }}
                     >
                         {error}
                     </Typography>

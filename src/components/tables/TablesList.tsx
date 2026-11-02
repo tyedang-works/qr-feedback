@@ -3,6 +3,7 @@
 import DeleteTableDialog from "@/components/tables/DeleteTableDialog";
 import EditTableDialog from "@/components/tables/EditTableDialog";
 import TableStatusSwitch from "@/components/tables/TableStatusSwitch";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { RestaurantTable } from "@/lib/tables/types";
 import { cardSx } from "@/styles/card.styles";
 import { tableColumnHeaderSx } from "@/styles/table.styles";
@@ -20,9 +21,9 @@ type TablesListProps = {
 type TableStatusFilter = "all" | "active" | "inactive";
 
 const STATUS_FILTER_OPTIONS = [
-    { value: "all", label: "Tất cả trạng thái" },
-    { value: "active", label: "Đang hoạt động" },
-    { value: "inactive", label: "Đã tắt" },
+    { value: "all", labelKey: "allTableStatuses" },
+    { value: "active", labelKey: "tableStatusActive" },
+    { value: "inactive", labelKey: "tableStatusInactive" },
 ] as const;
 
 const dividerSx = {
@@ -30,19 +31,22 @@ const dividerSx = {
 };
 
 export default function TablesList({ data, canManageTables }: TablesListProps) {
+    const { t, locale } = useTranslation();
+
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<TableStatusFilter>("all");
 
     const tableNames = useMemo(() => data.map((table) => table.name), [data]);
 
     const filteredTables = useMemo(() => {
-        const keyword = search.trim().toLocaleLowerCase("vi");
+        const searchLocale = locale === "en" ? "en-US" : "vi";
+        const keyword = search.trim().toLocaleLowerCase(searchLocale);
 
         return data.filter((table) => {
             const matchesSearch =
                 !keyword ||
-                table.name.toLocaleLowerCase("vi").includes(keyword) ||
-                table.token.toLocaleLowerCase("vi").includes(keyword);
+                table.name.toLocaleLowerCase(searchLocale).includes(keyword) ||
+                table.token.toLocaleLowerCase(searchLocale).includes(keyword);
 
             const matchesStatus =
                 statusFilter === "all" ||
@@ -51,7 +55,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
 
             return matchesSearch && matchesStatus;
         });
-    }, [data, search, statusFilter]);
+    }, [data, search, statusFilter, locale]);
 
     const hasFilters = search.trim().length > 0 || statusFilter !== "all";
 
@@ -74,8 +78,8 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                         <QRTextField
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
-                            placeholder="Tìm theo tên bàn hoặc mã QR..."
-                            aria-label="Tìm bàn"
+                            placeholder={t("table", "searchTablePlaceholder")}
+                            aria-label={t("table", "searchTableAriaLabel")}
                             slotProps={{
                                 input: {
                                     startAdornment: (
@@ -117,7 +121,10 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                     )
                                 }
                                 inputProps={{
-                                    "aria-label": "Lọc trạng thái bàn",
+                                    "aria-label": t(
+                                        "table",
+                                        "filterTableStatusAriaLabel",
+                                    ),
                                 }}
                             >
                                 {STATUS_FILTER_OPTIONS.map((option) => (
@@ -125,7 +132,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                         key={option.value}
                                         value={option.value}
                                     >
-                                        {option.label}
+                                        {t("table", option.labelKey)}
                                     </MenuItem>
                                 ))}
                             </QRSelect>
@@ -148,7 +155,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 color: "var(--color-text-secondary, #667085)",
                             }}
                         >
-                            Hiển thị{" "}
+                            {t("table", "showing")}{" "}
                             <Box
                                 component="span"
                                 sx={{
@@ -158,7 +165,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                             >
                                 {filteredTables.length}
                             </Box>{" "}
-                            / {data.length} bàn
+                            / {data.length} {t("table", "tables")}
                         </Typography>
 
                         {hasFilters && (
@@ -179,7 +186,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                     },
                                 }}
                             >
-                                Xóa bộ lọc
+                                {t("table", "clearFilters")}
                             </Box>
                         )}
                     </Stack>
@@ -202,7 +209,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 color: "var(--color-text-primary, #344054)",
                             }}
                         >
-                            Chưa có bàn nào
+                            {t("table", "noTablesYet")}
                         </Typography>
 
                         <Typography
@@ -212,7 +219,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 color: "var(--color-text-muted, #98A2B3)",
                             }}
                         >
-                            Hãy thêm bàn đầu tiên cho nhà hàng của bạn.
+                            {t("table", "addFirstTableDescription")}
                         </Typography>
                     </Box>
                 ) : filteredTables.length === 0 ? (
@@ -230,7 +237,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 color: "var(--color-text-primary, #344054)",
                             }}
                         >
-                            Không tìm thấy bàn phù hợp
+                            {t("table", "noMatchingTables")}
                         </Typography>
 
                         <Typography
@@ -240,7 +247,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 color: "var(--color-text-muted, #98A2B3)",
                             }}
                         >
-                            Thử thay đổi từ khóa hoặc bộ lọc trạng thái.
+                            {t("table", "changeTableSearchDescription")}
                         </Typography>
 
                         {hasFilters && (
@@ -259,7 +266,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                     cursor: "pointer",
                                 }}
                             >
-                                Xóa bộ lọc
+                                {t("table", "clearFilters")}
                             </Box>
                         )}
                     </Box>
@@ -287,25 +294,25 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 }}
                             >
                                 <Typography sx={tableColumnHeaderSx}>
-                                    Bàn
+                                    {t("table", "tableName")}
                                 </Typography>
 
                                 <Typography sx={tableColumnHeaderSx}>
-                                    Định danh QR
+                                    {t("table", "qrIdentifier")}
                                 </Typography>
 
                                 <Typography sx={tableColumnHeaderSx}>
-                                    Trạng thái hoạt động
+                                    {t("table", "tableActivityStatus")}
                                 </Typography>
 
                                 {canManageTables && (
                                     <Typography
                                         sx={{
                                             ...tableColumnHeaderSx,
-                                            textAlign: "left",
+                                            textAlign: "center",
                                         }}
                                     >
-                                        Thao tác
+                                        {t("table", "actions")}
                                     </Typography>
                                 )}
                             </Box>
@@ -436,7 +443,8 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                         whiteSpace: "nowrap",
                                                     }}
                                                 >
-                                                    Định danh QR: {table.token}
+                                                    {t("table", "qrIdentifier")}
+                                                    : {table.token}
                                                 </Typography>
                                             </Box>
 

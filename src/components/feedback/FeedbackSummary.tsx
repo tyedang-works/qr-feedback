@@ -1,6 +1,6 @@
 "use client";
 
-import { FEEDBACK_STATUS, STATUS_CONFIG } from "@/lib/feedback/constants";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { FeedbackSummary as FeedbackSummaryData } from "@/lib/feedback/types";
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Stack, Typography } from "@mui/material";
@@ -22,37 +22,14 @@ type DonutSegment = {
     color: string;
 };
 
-const SUMMARY_ITEMS: SummaryItem[] = [
-    {
-        key: "total",
-        label: "Tổng phản hồi",
-        color: "#193B56",
-    },
-    {
-        key: "new",
-        label: STATUS_CONFIG[FEEDBACK_STATUS.NEW].label,
-        color: "#EF4444",
-    },
-    {
-        key: "inProgress",
-        label: STATUS_CONFIG[FEEDBACK_STATUS.IN_PROGRESS].label,
-        color: "#3B82F6",
-    },
-    {
-        key: "resolved",
-        label: STATUS_CONFIG[FEEDBACK_STATUS.RESOLVED].label,
-        color: "#10B981",
-    },
-];
-
 const STATUS_COLORS = {
     new: "#EF4444",
     inProgress: "#3B82F6",
     resolved: "#10B981",
 };
 
-function formatNumber(value: number): string {
-    return value.toLocaleString("vi-VN");
+function formatNumber(value: number, locale: string): string {
+    return value.toLocaleString(locale);
 }
 
 function getPercentage(value: number, total: number): number {
@@ -63,20 +40,27 @@ function getPercentage(value: number, total: number): number {
     return Math.round((value / total) * 100);
 }
 
-function getTotalSegments(data: FeedbackSummaryData): DonutSegment[] {
+function getTotalSegments(
+    data: FeedbackSummaryData,
+    labels: {
+        new: string;
+        inProgress: string;
+        resolved: string;
+    },
+): DonutSegment[] {
     return [
         {
-            name: STATUS_CONFIG[FEEDBACK_STATUS.NEW].label,
+            name: labels.new,
             value: data.new,
             color: STATUS_COLORS.new,
         },
         {
-            name: STATUS_CONFIG[FEEDBACK_STATUS.IN_PROGRESS].label,
+            name: labels.inProgress,
             value: data.inProgress,
             color: STATUS_COLORS.inProgress,
         },
         {
-            name: STATUS_CONFIG[FEEDBACK_STATUS.RESOLVED].label,
+            name: labels.resolved,
             value: data.resolved,
             color: STATUS_COLORS.resolved,
         },
@@ -88,6 +72,7 @@ function getStatusSegments(
     value: number,
     total: number,
     color: string,
+    remainingLabel: string,
 ): DonutSegment[] {
     return [
         {
@@ -96,7 +81,7 @@ function getStatusSegments(
             color,
         },
         {
-            name: "Còn lại",
+            name: remainingLabel,
             value: Math.max(total - value, 0),
             color: "var(--color-chart-track, #374151)",
         },
@@ -111,8 +96,12 @@ type SummaryCardProps = {
 };
 
 function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
+    const { t, locale } = useTranslation();
     const isTotal = item.key === "total";
     const percentage = getPercentage(value, total);
+    const numberLocale = locale === "en" ? "en-US" : "vi-VN";
+    const formattedValue = formatNumber(value, numberLocale);
+    const formattedTotal = formatNumber(total, numberLocale);
 
     return (
         <Card elevation={0} sx={cardSx}>
@@ -164,7 +153,7 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
                         fontVariantNumeric: "tabular-nums",
                     }}
                 >
-                    {formatNumber(value)}
+                    {formattedValue}
                 </Typography>
 
                 <Typography
@@ -175,8 +164,13 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
                     }}
                 >
                     {isTotal
-                        ? `${percentage}% tổng phản hồi`
-                        : `${formatNumber(value)} trên ${formatNumber(total)} phản hồi`}
+                        ? t("dashboard", "totalFeedbackPercentage").replace(
+                              "{percentage}",
+                              String(percentage),
+                          )
+                        : t("dashboard", "feedbackCountOfTotal")
+                              .replace("{value}", formattedValue)
+                              .replace("{total}", formattedTotal)}
                 </Typography>
             </Stack>
         </Card>
@@ -184,7 +178,37 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
 }
 
 export default function FeedbackSummary({ data }: FeedbackSummaryProps) {
+    const { t } = useTranslation();
     const total = data.total;
+
+    const labels = {
+        new: t("dashboard", "new"),
+        inProgress: t("dashboard", "inProgress"),
+        resolved: t("dashboard", "resolved"),
+    };
+
+    const summaryItems: SummaryItem[] = [
+        {
+            key: "total",
+            label: t("dashboard", "totalFeedback"),
+            color: "#193B56",
+        },
+        {
+            key: "new",
+            label: labels.new,
+            color: "#EF4444",
+        },
+        {
+            key: "inProgress",
+            label: labels.inProgress,
+            color: "#3B82F6",
+        },
+        {
+            key: "resolved",
+            label: labels.resolved,
+            color: "#10B981",
+        },
+    ];
 
     const values = {
         total,
@@ -207,17 +231,18 @@ export default function FeedbackSummary({ data }: FeedbackSummaryProps) {
                 alignItems: "stretch",
             }}
         >
-            {SUMMARY_ITEMS.map((item) => {
+            {summaryItems.map((item) => {
                 const value = values[item.key];
 
                 const chartData =
                     item.key === "total"
-                        ? getTotalSegments(data)
+                        ? getTotalSegments(data, labels)
                         : getStatusSegments(
                               item.label,
                               value,
                               total,
                               item.color,
+                              t("dashboard", "remaining"),
                           );
 
                 return (

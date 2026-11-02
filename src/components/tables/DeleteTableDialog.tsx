@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteTableAction } from "@/app/dashboard/tables/actions";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import QRDialog from "@/components/common/dialog/QRDialog";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import {
@@ -33,6 +34,8 @@ export default function DeleteTableDialog({
     tableName,
     disabled,
 }: DeleteTableDialogProps) {
+    const { t } = useTranslation();
+
     const [open, setOpen] = useState(false);
 
     const [snackbar, setSnackbar] = useState<SnackbarState>({
@@ -75,9 +78,7 @@ export default function DeleteTableDialog({
 
                 setSnackbar({
                     open: true,
-                    message:
-                        result.message ||
-                        "Không thể xóa bàn. Vui lòng thử lại.",
+                    message: result.message || t("table", "deleteTableFailed"),
                     severity: "error",
                 });
 
@@ -89,7 +90,7 @@ export default function DeleteTableDialog({
 
             setSnackbar({
                 open: true,
-                message: result.message || "Đã xóa bàn thành công.",
+                message: t("table", "deleteTableSuccess"),
                 severity: "success",
             });
         } catch (error) {
@@ -99,7 +100,7 @@ export default function DeleteTableDialog({
 
             setSnackbar({
                 open: true,
-                message: "Đã xảy ra lỗi. Vui lòng thử lại.",
+                message: t("table", "deleteTableError"),
                 severity: "error",
             });
         } finally {
@@ -110,11 +111,7 @@ export default function DeleteTableDialog({
     return (
         <>
             <Tooltip
-                title={
-                    disabled
-                        ? "Không thể xóa bàn đã có phản hồi. Vui lòng tắt bàn."
-                        : ""
-                }
+                title={disabled ? t("table", "cannotDeleteTableTooltip") : ""}
                 placement="top"
                 arrow
                 slotProps={{
@@ -139,7 +136,7 @@ export default function DeleteTableDialog({
                         onClick={() => setOpen(true)}
                         sx={tableDeleteButtonSx}
                     >
-                        Xóa
+                        {t("table", "deleteTable")}
                     </Button>
                 </Box>
             </Tooltip>
@@ -162,7 +159,7 @@ export default function DeleteTableDialog({
                         <QRDialog
                             open={open}
                             onClose={handleClose}
-                            title="Xóa bàn"
+                            title={t("table", "deleteTableTitle")}
                             maxWidth="xs"
                             actions={
                                 <>
@@ -173,7 +170,7 @@ export default function DeleteTableDialog({
                                         disabled={isSubmitting}
                                         sx={buttonBaseCancelSx}
                                     >
-                                        Hủy
+                                        {t("table", "cancel")}
                                     </Button>
 
                                     <Button
@@ -191,8 +188,8 @@ export default function DeleteTableDialog({
                                         }}
                                     >
                                         {isSubmitting
-                                            ? "Đang xóa..."
-                                            : "Xóa bàn"}
+                                            ? t("table", "deleting")
+                                            : t("table", "confirmDeleteTable")}
                                     </Button>
                                 </>
                             }
@@ -205,7 +202,7 @@ export default function DeleteTableDialog({
                                         color: "var(--color-text-primary)",
                                     }}
                                 >
-                                    Bạn có chắc muốn xóa bàn{" "}
+                                    {t("table", "deleteTableConfirmation")}{" "}
                                     <Typography
                                         component="span"
                                         sx={{
@@ -227,7 +224,7 @@ export default function DeleteTableDialog({
                                         fontStyle: "italic",
                                     }}
                                 >
-                                    Bàn chỉ có thể xóa nếu chưa có phản hồi.
+                                    {t("table", "deleteTableWarning")}
                                 </Typography>
                             </Form>
                         </QRDialog>

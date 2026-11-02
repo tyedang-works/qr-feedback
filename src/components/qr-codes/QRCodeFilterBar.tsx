@@ -2,6 +2,7 @@
 
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { useDebounce } from "@/hooks/useDebounce";
 import type {
     QRCodePageSize,
@@ -27,19 +28,19 @@ const PAGE_SIZES: QRCodePageSize[] = [10, 25, 50];
 
 const STATUS_OPTIONS: {
     value: QRCodeStatusFilter;
-    label: string;
+    labelKey: "allStatuses" | "tableStatusActive" | "tableStatusInactive";
 }[] = [
-    { value: "all", label: "Tất cả trạng thái" },
-    { value: "active", label: "Đang hoạt động" },
-    { value: "inactive", label: "Đang tắt" },
+    { value: "all", labelKey: "allStatuses" },
+    { value: "active", labelKey: "tableStatusActive" },
+    { value: "inactive", labelKey: "tableStatusInactive" },
 ];
 
 const SORT_OPTIONS: {
     value: QRCodeSort;
-    label: string;
+    labelKey: "tableNameAscending" | "tableNameDescending";
 }[] = [
-    { value: "name_asc", label: "Tên bàn A → Z" },
-    { value: "name_desc", label: "Tên bàn Z → A" },
+    { value: "name_asc", labelKey: "tableNameAscending" },
+    { value: "name_desc", labelKey: "tableNameDescending" },
 ];
 
 function isPageSize(value: number): value is QRCodePageSize {
@@ -55,6 +56,8 @@ function isSort(value: string): value is QRCodeSort {
 }
 
 export default function QRCodeFilterBar() {
+    const { t } = useTranslation();
+
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -137,7 +140,7 @@ export default function QRCodeFilterBar() {
     return (
         <Card
             component="section"
-            aria-label="Bộ lọc bàn"
+            aria-label={t("qrCode", "qrCodeFilters")}
             elevation={0}
             sx={cardSx}
         >
@@ -159,14 +162,14 @@ export default function QRCodeFilterBar() {
                 }}
             >
                 <QRTextField
-                    label="Tìm kiếm bàn"
+                    label={t("qrCode", "searchTables")}
                     value={keyword}
                     onChange={handleKeywordChange}
-                    placeholder="Nhập tên bàn..."
+                    placeholder={t("qrCode", "searchTablePlaceholder")}
                     size="small"
                     slotProps={{
                         htmlInput: {
-                            "aria-label": "Tìm kiếm bàn",
+                            "aria-label": t("qrCode", "searchTables"),
                         },
                         input: {
                             startAdornment: (
@@ -184,11 +187,16 @@ export default function QRCodeFilterBar() {
 
                             endAdornment: keyword ? (
                                 <InputAdornment position="end">
-                                    <Tooltip title="Xóa từ khóa">
+                                    <Tooltip
+                                        title={t("qrCode", "clearKeyword")}
+                                    >
                                         <IconButton
                                             type="button"
                                             size="small"
-                                            aria-label="Xóa từ khóa tìm kiếm"
+                                            aria-label={t(
+                                                "qrCode",
+                                                "clearSearchKeyword",
+                                            )}
                                             onClick={handleClearKeyword}
                                             edge="end"
                                             sx={{
@@ -208,49 +216,49 @@ export default function QRCodeFilterBar() {
                 />
 
                 <QRSelect
-                    label="Trạng thái"
+                    label={t("qrCode", "status")}
                     value={status}
                     onChange={handleStatusChange}
                     size="small"
                     inputProps={{
-                        "aria-label": "Lọc trạng thái",
+                        "aria-label": t("qrCode", "filterStatus"),
                     }}
                 >
                     {STATUS_OPTIONS.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
-                            {option.label}
+                            {t("qrCode", option.labelKey)}
                         </MenuItem>
                     ))}
                 </QRSelect>
 
                 <QRSelect
-                    label="Sắp xếp theo"
+                    label={t("qrCode", "sortBy")}
                     value={sort}
                     onChange={handleSortChange}
                     size="small"
                     inputProps={{
-                        "aria-label": "Sắp xếp bàn",
+                        "aria-label": t("qrCode", "sortTables"),
                     }}
                 >
                     {SORT_OPTIONS.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
-                            {option.label}
+                            {t("qrCode", option.labelKey)}
                         </MenuItem>
                     ))}
                 </QRSelect>
 
                 <QRSelect
-                    label="Hiển thị"
+                    label={t("qrCode", "display")}
                     value={String(pageSize)}
                     onChange={handlePageSizeChange}
                     size="small"
                     inputProps={{
-                        "aria-label": "Số bàn mỗi trang",
+                        "aria-label": t("qrCode", "tablesPerPage"),
                     }}
                 >
                     {PAGE_SIZES.map((size) => (
                         <MenuItem key={size} value={String(size)}>
-                            {size} / trang
+                            {size} / {t("qrCode", "perPage")}
                         </MenuItem>
                     ))}
                 </QRSelect>

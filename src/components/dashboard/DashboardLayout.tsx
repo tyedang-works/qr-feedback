@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import ThemeToggle from "@/components/common/theme/ThemeToggle";
 import { USER_ROLES } from "@/lib/auth/constants";
 import type { UserContext } from "@/lib/auth/queries";
@@ -30,10 +31,10 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ChangePasswordDialog from "../account/ChangePasswordDialog";
-import RoleChip from "../common/RoleChip";
+import LanguageToggle from "../common/language/LanguageToggle";
 import DashboardFooter from "./DashboardFooter";
-import DashboardSidebar from "./DashboardSidebar";
 import { useDashboardLoading } from "./DashboardLoadingProvider";
+import DashboardSidebar from "./DashboardSidebar";
 
 type DashboardLayoutProps = {
     children: React.ReactNode;
@@ -47,11 +48,13 @@ export default function DashboardLayout({
     feedbackEmail,
 }: DashboardLayoutProps) {
     const router = useRouter();
+    const { t } = useTranslation();
 
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
     const role = userContext?.role ?? null;
     const fullName = userContext?.fullName ?? null;
@@ -83,6 +86,7 @@ export default function DashboardLayout({
     };
 
     const { startNavigation } = useDashboardLoading();
+
     const handleProfileNavigation = (href: string) => {
         handleCloseProfile();
         startNavigation();
@@ -115,8 +119,6 @@ export default function DashboardLayout({
         }
     };
 
-    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-
     return (
         <>
             <Box
@@ -127,7 +129,6 @@ export default function DashboardLayout({
                     color: "var(--color-text-primary, #111827)",
                 }}
             >
-                {/* desktop sidebar */}
                 <Box
                     className="dashboard-sidebar"
                     sx={{
@@ -179,7 +180,6 @@ export default function DashboardLayout({
                     </IconButton>
                 </Box>
 
-                {/* main area */}
                 <Box
                     component="main"
                     className="dashboard-main"
@@ -191,7 +191,6 @@ export default function DashboardLayout({
                         flexDirection: "column",
                     }}
                 >
-                    {/* navbar */}
                     <Box
                         component="header"
                         className="dashboard-navbar"
@@ -215,10 +214,9 @@ export default function DashboardLayout({
                                 "1px solid var(--color-border, #F0F1F3)",
                         }}
                     >
-                        {/* mobile hamburger */}
                         <IconButton
                             onClick={() => setIsMobileSidebarOpen(true)}
-                            aria-label="Mở menu"
+                            aria-label={t("account", "openMobileMenu")}
                             aria-expanded={isMobileSidebarOpen}
                             size="small"
                             sx={{
@@ -237,7 +235,6 @@ export default function DashboardLayout({
                             <MenuIcon size={21} strokeWidth={1.8} />
                         </IconButton>
 
-                        {/* user role */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -246,18 +243,28 @@ export default function DashboardLayout({
                                 flex: 1,
                             }}
                         >
-                            <RoleChip role={role ?? USER_ROLES.STAFF} />
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                sx={{
+                                    lineHeight: 1.2,
+                                    fontSize: 16,
+                                    fontWeight: 600,
+                                    paddingTop: { xs: 0, md: "6px" },
+                                }}
+                            >
+                                {fullName}
+                            </Typography>
                         </Box>
 
-                        {/* theme button */}
+                        <LanguageToggle />
+
                         <ThemeToggle />
 
-                        {/* profile */}
-
-                        <Tooltip title="Tài khoản">
+                        <Tooltip title={t("account", "account")}>
                             <IconButton
                                 onClick={handleOpenProfile}
-                                aria-label="Mở menu tài khoản"
+                                aria-label={t("account", "openAccountMenu")}
                                 aria-haspopup="menu"
                                 size="small"
                                 sx={{
@@ -339,7 +346,10 @@ export default function DashboardLayout({
                             >
                                 <IconButton
                                     onClick={handleCloseProfile}
-                                    aria-label="Đóng profile panel"
+                                    aria-label={t(
+                                        "account",
+                                        "closeProfilePanel",
+                                    )}
                                     size="small"
                                     sx={{
                                         width: 32,
@@ -356,7 +366,6 @@ export default function DashboardLayout({
                                 </IconButton>
                             </Box>
 
-                            {/* account information */}
                             <Box
                                 sx={{
                                     display: "flex",
@@ -418,7 +427,8 @@ export default function DashboardLayout({
                                         overflowWrap: "anywhere",
                                     }}
                                 >
-                                    {userContext?.email || "Chưa có email"}
+                                    {userContext?.email ||
+                                        t("common", "noEmail")}
                                 </Typography>
                             </Box>
 
@@ -427,8 +437,6 @@ export default function DashboardLayout({
                                     borderColor: "var(--color-border, #F0F1F3)",
                                 }}
                             />
-
-                            {/* sccount navigation */}
 
                             <List
                                 disablePadding
@@ -461,7 +469,7 @@ export default function DashboardLayout({
                                         strokeWidth={1.8}
                                         color="var(--color-text-secondary, #6B7280)"
                                     />
-                                    Hồ sơ cá nhân
+                                    {t("common", "profile")}
                                 </ListItemButton>
 
                                 <ListItemButton
@@ -487,7 +495,7 @@ export default function DashboardLayout({
                                         strokeWidth={1.8}
                                         color="var(--color-text-secondary, #6B7280)"
                                     />
-                                    Đổi mật khẩu
+                                    {t("common", "changePassword")}
                                 </ListItemButton>
 
                                 {role === USER_ROLES.OWNER && (
@@ -515,7 +523,7 @@ export default function DashboardLayout({
                                             strokeWidth={1.8}
                                             color="var(--color-text-secondary, #6B7280)"
                                         />
-                                        Cài đặt
+                                        {t("common", "settings")}
                                     </ListItemButton>
                                 )}
                             </List>
@@ -548,14 +556,13 @@ export default function DashboardLayout({
                                     }}
                                 >
                                     {isLoggingOut
-                                        ? "Đang đăng xuất..."
-                                        : "Đăng xuất"}
+                                        ? t("common", "loggingOut")
+                                        : t("common", "logout")}
                                 </Button>
                             </Box>
                         </Drawer>
                     </Box>
 
-                    {/* responsive page content */}
                     <Box
                         className="dashboard-content"
                         sx={{
@@ -606,7 +613,6 @@ export default function DashboardLayout({
                     </Box>
                 </Box>
 
-                {/* mobile drawer */}
                 <Drawer
                     anchor="left"
                     open={isMobileSidebarOpen}
@@ -629,7 +635,6 @@ export default function DashboardLayout({
                     <DashboardSidebar
                         {...sidebarProps}
                         collapsed={false}
-
                         onNavigate={() => setIsMobileSidebarOpen(false)}
                     />
                 </Drawer>

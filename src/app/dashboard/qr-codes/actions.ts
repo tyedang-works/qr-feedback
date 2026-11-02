@@ -15,7 +15,7 @@ export async function getSelectedQRCodeTables(ids: string[]) {
     const userContext = await getUserContext();
 
     if (!userContext) {
-        throw new Error("Không tìm thấy thông tin nhà hàng.");
+        throw new Error("restaurantContextNotFound");
     }
 
     return getQRCodeTablesByIds(userContext.restaurantId, ids);
@@ -28,7 +28,7 @@ export async function getAllQRCodeTablesForBulkPrint(
     const userContext = await getUserContext();
 
     if (!userContext) {
-        throw new Error("Không tìm thấy thông tin nhà hàng.");
+        throw new Error("restaurantContextNotFound");
     }
 
     return getQRCodeTablesForBulkPrint(

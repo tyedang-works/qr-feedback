@@ -21,6 +21,7 @@ import QRTextField from "@/components/common/input/QRTextField";
 import { VIETNAM_PHONE_REGEX } from "@/constants/validation.constants";
 import type { RestaurantSettings } from "@/lib/restaurant/types";
 import { buttonBaseCancelSx, buttonBaseSx } from "@/styles/button.styles";
+import { useTranslation } from "../common/providers/useTranslation";
 
 type RestaurantSettingsFormProps = {
     initialSettings: RestaurantSettings;
@@ -48,34 +49,38 @@ const createInitialValues = (
     address: settings.address ?? "",
 });
 
-const validationSchema = Yup.object({
-    name: Yup.string()
-        .trim()
-        .required(" ")
-        .max(100, "Tên nhà hàng không được vượt quá 100 ký tự."),
+const createValidationSchema = (
+    t: (section: "settings", key: string) => string,
+) =>
+    Yup.object({
+        name: Yup.string()
+            .trim()
+            .required(" ")
+            .max(100, t("settings", "nameMaxLength")),
 
-    phone: Yup.string()
-        .trim()
-        .max(30, "Số điện thoại không được vượt quá 30 ký tự.")
-        .test(
-            "valid-phone",
-            "Số điện thoại không hợp lệ. Ví dụ: 0912345678.",
-            (value) => !value || VIETNAM_PHONE_REGEX.test(value),
-        ),
+        phone: Yup.string()
+            .trim()
+            .max(30, t("settings", "phoneMaxLength"))
+            .test(
+                "valid-phone",
+                t("settings", "invalidPhone"),
+                (value) => !value || VIETNAM_PHONE_REGEX.test(value),
+            ),
 
-    email: Yup.string()
-        .trim()
-        .max(254, "Email không được vượt quá 254 ký tự.")
-        .email("Email không hợp lệ."),
+        email: Yup.string()
+            .trim()
+            .max(254, t("settings", "emailMaxLength"))
+            .email(t("settings", "invalidEmail")),
 
-    address: Yup.string()
-        .trim()
-        .max(500, "Địa chỉ không được vượt quá 500 ký tự."),
-});
+        address: Yup.string()
+            .trim()
+            .max(500, t("settings", "addressMaxLength")),
+    });
 
 async function saveRestaurantSettings(
     values: RestaurantSettingsFormValues,
     setSnackbar: Dispatch<SetStateAction<SnackbarState>>,
+    t: (section: "settings", key: string) => string,
 ): Promise<boolean> {
     try {
         const result = await updateRestaurantSettings({
@@ -97,7 +102,7 @@ async function saveRestaurantSettings(
 
         setSnackbar({
             open: true,
-            message: "Đã xảy ra lỗi khi lưu thông tin nhà hàng.",
+            message: t("settings", "saveUnexpectedError"),
             severity: "error",
         });
 
@@ -108,6 +113,10 @@ async function saveRestaurantSettings(
 export default function RestaurantSettingsForm({
     initialSettings,
 }: RestaurantSettingsFormProps) {
+    const { t } = useTranslation();
+
+    const validationSchema = createValidationSchema(t);
+
     const [snackbar, setSnackbar] = useState<SnackbarState>({
         open: false,
         message: "",
@@ -178,6 +187,7 @@ export default function RestaurantSettingsForm({
                         const success = await saveRestaurantSettings(
                             pendingValues,
                             setSnackbar,
+                            t,
                         );
 
                         if (success) {
@@ -293,7 +303,10 @@ export default function RestaurantSettingsForm({
                                                     color: "var(--color-text-muted)",
                                                 }}
                                             >
-                                                Tên nhà hàng
+                                                {t(
+                                                    "settings",
+                                                    "restaurantName",
+                                                )}
                                             </Typography>
                                         </Box>
 
@@ -306,9 +319,7 @@ export default function RestaurantSettingsForm({
                                                 fontStyle: "italic",
                                             }}
                                         >
-                                            Logo chỉ xem tại đây. Để thay đổi
-                                            logo, hãy sử dụng tab Nhận diện
-                                            thương hiệu.
+                                            {t("settings", "logoPreviewNote")}
                                         </Typography>
                                     </Stack>
 
@@ -329,7 +340,10 @@ export default function RestaurantSettingsForm({
                                                     color: "var(--color-text-primary)",
                                                 }}
                                             >
-                                                Thông tin nhà hàng
+                                                {t(
+                                                    "settings",
+                                                    "restaurantInformation",
+                                                )}
                                             </Typography>
 
                                             <Typography
@@ -340,15 +354,20 @@ export default function RestaurantSettingsForm({
                                                     color: "var(--color-text-secondary)",
                                                 }}
                                             >
-                                                Cập nhật thông tin liên hệ và
-                                                thông tin hiển thị của nhà hàng.
+                                                {t(
+                                                    "settings",
+                                                    "restaurantInformationDescription",
+                                                )}
                                             </Typography>
                                         </Box>
 
                                         <Stack sx={{ gap: 3 }}>
                                             <QRTextField
                                                 name="name"
-                                                label="Tên nhà hàng"
+                                                label={t(
+                                                    "settings",
+                                                    "restaurantName",
+                                                )}
                                                 value={values.name}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
@@ -356,7 +375,10 @@ export default function RestaurantSettingsForm({
                                                     "name",
                                                 )}
                                                 required
-                                                placeholder="Nhập tên nhà hàng"
+                                                placeholder={t(
+                                                    "settings",
+                                                    "restaurantNamePlaceholder",
+                                                )}
                                                 autoComplete="organization"
                                                 disabled={isFormBusy}
                                             />
@@ -374,7 +396,10 @@ export default function RestaurantSettingsForm({
                                             >
                                                 <QRTextField
                                                     name="phone"
-                                                    label="Số điện thoại"
+                                                    label={t(
+                                                        "settings",
+                                                        "phone",
+                                                    )}
                                                     type="tel"
                                                     value={values.phone}
                                                     onChange={handleChange}
@@ -382,14 +407,20 @@ export default function RestaurantSettingsForm({
                                                     errorMessage={getErrorMessage(
                                                         "phone",
                                                     )}
-                                                    placeholder="Ví dụ: 0912345678"
+                                                    placeholder={t(
+                                                        "settings",
+                                                        "phonePlaceholder",
+                                                    )}
                                                     autoComplete="tel"
                                                     disabled={isFormBusy}
                                                 />
 
                                                 <QRTextField
                                                     name="email"
-                                                    label="Email"
+                                                    label={t(
+                                                        "settings",
+                                                        "email",
+                                                    )}
                                                     type="email"
                                                     value={values.email}
                                                     onChange={handleChange}
@@ -397,7 +428,10 @@ export default function RestaurantSettingsForm({
                                                     errorMessage={getErrorMessage(
                                                         "email",
                                                     )}
-                                                    placeholder="Nhập email liên hệ"
+                                                    placeholder={t(
+                                                        "settings",
+                                                        "emailPlaceholder",
+                                                    )}
                                                     autoComplete="email"
                                                     disabled={isFormBusy}
                                                 />
@@ -405,14 +439,17 @@ export default function RestaurantSettingsForm({
 
                                             <QRTextField
                                                 name="address"
-                                                label="Địa chỉ"
+                                                label={t("settings", "address")}
                                                 value={values.address}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 errorMessage={getErrorMessage(
                                                     "address",
                                                 )}
-                                                placeholder="Nhập địa chỉ nhà hàng"
+                                                placeholder={t(
+                                                    "settings",
+                                                    "addressPlaceholder",
+                                                )}
                                                 autoComplete="street-address"
                                                 disabled={isFormBusy}
                                             />
@@ -448,10 +485,13 @@ export default function RestaurantSettingsForm({
                                                             color="inherit"
                                                             sx={{ mr: 1 }}
                                                         />
-                                                        Đang xử lý...
+                                                        {t(
+                                                            "settings",
+                                                            "processing",
+                                                        )}
                                                     </>
                                                 ) : (
-                                                    "Lưu thay đổi"
+                                                    t("settings", "saveChanges")
                                                 )}
                                             </Button>
                                         </Box>
@@ -462,7 +502,7 @@ export default function RestaurantSettingsForm({
                             <QRDialog
                                 open={confirmOpen}
                                 onClose={handleCancelConfirmation}
-                                title="Xác nhận thay đổi"
+                                title={t("settings", "confirmChanges")}
                                 maxWidth="xs"
                                 actions={
                                     <>
@@ -472,7 +512,7 @@ export default function RestaurantSettingsForm({
                                             onClick={handleCancelConfirmation}
                                             sx={buttonBaseCancelSx}
                                         >
-                                            Hủy
+                                            {t("settings", "cancel")}
                                         </Button>
 
                                         <Button
@@ -491,10 +531,10 @@ export default function RestaurantSettingsForm({
                                                         color="inherit"
                                                         sx={{ mr: 1 }}
                                                     />
-                                                    Đang lưu...
+                                                    {t("settings", "saving")}
                                                 </>
                                             ) : (
-                                                "Xác nhận và lưu"
+                                                t("settings", "confirmAndSave")
                                             )}
                                         </Button>
                                     </>
@@ -508,8 +548,10 @@ export default function RestaurantSettingsForm({
                                             color: "var(--color-text-secondary)",
                                         }}
                                     >
-                                        Bạn có chắc chắn muốn cập nhật thông tin
-                                        nhà hàng không?
+                                        {t(
+                                            "settings",
+                                            "confirmUpdateDescription",
+                                        )}
                                     </Typography>
 
                                     <Box
@@ -529,25 +571,40 @@ export default function RestaurantSettingsForm({
                                                 color: "var(--color-text-primary)",
                                             }}
                                         >
-                                            Thông tin sẽ được cập nhật
+                                            {t(
+                                                "settings",
+                                                "informationToUpdate",
+                                            )}
                                         </Typography>
 
                                         <Stack sx={{ gap: 1.25 }}>
                                             {[
                                                 {
-                                                    label: "Tên nhà hàng",
+                                                    label: t(
+                                                        "settings",
+                                                        "restaurantName",
+                                                    ),
                                                     value: pendingValues?.name,
                                                 },
                                                 {
-                                                    label: "Số điện thoại",
+                                                    label: t(
+                                                        "settings",
+                                                        "phone",
+                                                    ),
                                                     value: pendingValues?.phone,
                                                 },
                                                 {
-                                                    label: "Email",
+                                                    label: t(
+                                                        "settings",
+                                                        "email",
+                                                    ),
                                                     value: pendingValues?.email,
                                                 },
                                                 {
-                                                    label: "Địa chỉ",
+                                                    label: t(
+                                                        "settings",
+                                                        "address",
+                                                    ),
                                                     value: pendingValues?.address,
                                                 },
                                             ].map((item) => (
@@ -584,7 +641,10 @@ export default function RestaurantSettingsForm({
                                                         }}
                                                     >
                                                         {item.value?.trim() ||
-                                                            "Chưa cung cấp"}
+                                                            t(
+                                                                "settings",
+                                                                "notProvided",
+                                                            )}
                                                     </Typography>
                                                 </Stack>
                                             ))}
@@ -598,9 +658,7 @@ export default function RestaurantSettingsForm({
                                             color: "var(--color-text-secondary)",
                                         }}
                                     >
-                                        Vui lòng kiểm tra thông tin trước khi
-                                        xác nhận. Dữ liệu sẽ được cập nhật sau
-                                        khi hệ thống xử lý thành công.
+                                        {t("settings", "confirmUpdateNote")}
                                     </Typography>
                                 </Stack>
                             </QRDialog>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { FeedbackTrendItem } from "@/lib/dashboard/types";
 import {
     Box,
@@ -30,9 +31,14 @@ type FeedbackTrendResponse = {
     data: FeedbackTrendItem[];
 };
 
+type FeedbackTrendErrorKey = "trendLoadError" | "retryLoadError";
+
 const PERIODS: FeedbackTrendPeriod[] = [7, 30];
 const TREND_CHART_COLOR = "#F79009";
 const numberFormatter = new Intl.NumberFormat("vi-VN");
+const averageFormatter = new Intl.NumberFormat("vi-VN", {
+    maximumFractionDigits: 1,
+});
 
 const chartTickStyle = {
     fontSize: 11,
@@ -86,17 +92,25 @@ const periodButtonSx = (selected: boolean) => ({
 });
 
 export default function FeedbackTrend({ data }: FeedbackTrendProps) {
+    const { t } = useTranslation();
+
     const [period, setPeriod] = useState<FeedbackTrendPeriod>(7);
     const [chartData, setChartData] = useState<FeedbackTrendItem[]>(data);
     const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorKey, setErrorKey] = useState<FeedbackTrendErrorKey | null>(
+        null,
+    );
 
     const displayedData = period === 7 ? data : chartData;
 
     const handlePeriodChange = (nextPeriod: FeedbackTrendPeriod) => {
+        if (nextPeriod === period) {
+            return;
+        }
+
         if (nextPeriod === 7) {
             setIsLoading(false);
-            setErrorMessage("");
+            setErrorKey(null);
         }
 
         setPeriod(nextPeriod);
@@ -111,7 +125,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
 
         async function fetchFeedbackTrend() {
             setIsLoading(true);
-            setErrorMessage("");
+            setErrorKey(null);
 
             try {
                 const response = await fetch(
@@ -120,10 +134,16 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                 );
 
                 if (!response.ok) {
-                    throw new Error("Không thể tải dữ liệu xu hướng phản hồi.");
+                    setErrorKey("trendLoadError");
+                    return;
                 }
 
                 const result: FeedbackTrendResponse = await response.json();
+
+                if (!Array.isArray(result.data)) {
+                    setErrorKey("retryLoadError");
+                    return;
+                }
 
                 setChartData(result.data);
             } catch (error) {
@@ -131,7 +151,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                     return;
                 }
 
-                setErrorMessage("Không thể tải dữ liệu. Vui lòng thử lại.");
+                setErrorKey("retryLoadError");
             } finally {
                 if (!controller.signal.aborted) {
                     setIsLoading(false);
@@ -200,7 +220,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 color: "var(--color-text-primary)",
                             }}
                         >
-                            Xu hướng phản hồi
+                            {t("dashboard", "trendTitle")}
                         </Typography>
 
                         <Typography
@@ -211,13 +231,16 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 color: "var(--color-text-secondary)",
                             }}
                         >
-                            Số lượng phản hồi trong {period} ngày gần nhất
+                            {t("dashboard", "trendDescription").replace(
+                                "{days}",
+                                String(period),
+                            )}
                         </Typography>
                     </Box>
 
                     <Stack
                         role="group"
-                        aria-label="Chọn khoảng thời gian"
+                        aria-label={t("dashboard", "selectPeriod")}
                         sx={{
                             flexDirection: "row",
                             alignItems: "center",
@@ -239,14 +262,17 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     disabled={isLoading}
                                     sx={periodButtonSx(selected)}
                                 >
-                                    {value} ngày
+                                    {t("dashboard", "days").replace(
+                                        "{days}",
+                                        String(value),
+                                    )}
                                 </Button>
                             );
                         })}
                     </Stack>
                 </Stack>
 
-                {!isLoading && !errorMessage && displayedData.length > 0 && (
+                {!isLoading && !errorKey && displayedData.length > 0 && (
                     <Stack
                         sx={{
                             flexDirection: "row",
@@ -262,7 +288,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     color: "var(--color-text-secondary)",
                                 }}
                             >
-                                Tổng phản hồi trong kỳ
+                                {t("dashboard", "totalFeedbackInPeriod")}
                             </Typography>
 
                             <Typography
@@ -288,7 +314,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     color: "var(--color-text-secondary)",
                                 }}
                             >
-                                Trung bình mỗi ngày
+                                {t("dashboard", "dailyAverage")}
                             </Typography>
 
                             <Typography
@@ -302,9 +328,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     fontVariantNumeric: "tabular-nums",
                                 }}
                             >
-                                {summary.average.toLocaleString("vi-VN", {
-                                    maximumFractionDigits: 1,
-                                })}
+                                {averageFormatter.format(summary.average)}
                             </Typography>
                         </Box>
                     </Stack>
@@ -325,7 +349,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                     {isLoading ? (
                         <Box
                             role="status"
-                            aria-label="Đang tải dữ liệu"
+                            aria-label={t("dashboard", "loadingData")}
                             sx={{
                                 width: "100%",
                                 height: "100%",
@@ -341,7 +365,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                 }}
                             />
                         </Box>
-                    ) : errorMessage ? (
+                    ) : errorKey ? (
                         <Box
                             role="alert"
                             sx={{
@@ -359,7 +383,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     color: "var(--color-feedback-error, #B42318)",
                                 }}
                             >
-                                {errorMessage}
+                                {t("dashboard", errorKey)}
                             </Typography>
                         </Box>
                     ) : displayedData.length === 0 ? (
@@ -377,7 +401,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                     color: "var(--color-text-secondary)",
                                 }}
                             >
-                                Chưa có dữ liệu phản hồi.
+                                {t("dashboard", "noFeedbackData")}
                             </Typography>
                         </Box>
                     ) : (
@@ -424,10 +448,17 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
                                         fill: "var(--color-surface-hover)",
                                     }}
                                     formatter={(value) => [
-                                        `${numberFormatter.format(Number(value ?? 0))} lượt`,
-                                        "Số phản hồi",
+                                        `${numberFormatter.format(
+                                            Number(value ?? 0),
+                                        )} ${t("dashboard", "submissions")}`,
+                                        t("dashboard", "feedbackCount"),
                                     ]}
-                                    labelFormatter={(label) => `Ngày ${label}`}
+                                    labelFormatter={(label) =>
+                                        t("dashboard", "day").replace(
+                                            "{day}",
+                                            String(label),
+                                        )
+                                    }
                                     contentStyle={{
                                         border: "1px solid var(--color-border)",
                                         borderRadius: 10,
@@ -450,7 +481,7 @@ export default function FeedbackTrend({ data }: FeedbackTrendProps) {
 
                                 <Bar
                                     dataKey="count"
-                                    name="Số phản hồi"
+                                    name={t("dashboard", "feedbackCount")}
                                     fill={TREND_CHART_COLOR}
                                     radius={[5, 5, 0, 0]}
                                     maxBarSize={period === 7 ? 32 : 20}

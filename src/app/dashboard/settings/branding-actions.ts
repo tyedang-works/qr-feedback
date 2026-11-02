@@ -1,9 +1,12 @@
 "use server";
 
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
+
+import { translations, type Locale } from "@/i18n/translations";
 import { canManageSettings } from "@/lib/auth/permissions";
 import { getUserContext } from "@/lib/auth/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { revalidatePath } from "next/cache";
 
 export type BrandingType = "logo" | "favicon";
 
@@ -28,22 +31,33 @@ function isBrandingType(value: string): value is BrandingType {
     return value === "logo" || value === "favicon";
 }
 
+async function getSettingsMessages() {
+    const cookieStore = await cookies();
+
+    const locale: Locale =
+        cookieStore.get("qr-locale")?.value === "en" ? "en" : "vi";
+
+    return translations[locale].settings;
+}
+
 export async function uploadRestaurantBranding(
     formData: FormData,
 ): Promise<BrandingActionResult> {
+    const messages = await getSettingsMessages();
+
     const userContext = await getUserContext();
 
     if (!userContext) {
         return {
             success: false,
-            message: "Không tìm thấy thông tin tài khoản.",
+            message: messages.loginRequired,
         };
     }
 
     if (!canManageSettings(userContext.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền cập nhật cài đặt nhà hàng.",
+            message: messages.permissionDenied,
         };
     }
 
@@ -53,28 +67,28 @@ export async function uploadRestaurantBranding(
     if (typeof typeValue !== "string" || !isBrandingType(typeValue)) {
         return {
             success: false,
-            message: "Loại hình ảnh không hợp lệ.",
+            message: messages.invalidImageType,
         };
     }
 
     if (!(file instanceof File) || file.size === 0) {
         return {
             success: false,
-            message: "Vui lòng chọn hình ảnh.",
+            message: messages.imageRequired,
         };
     }
 
     if (file.size > MAX_FILE_SIZE) {
         return {
             success: false,
-            message: "Dung lượng hình ảnh không được vượt quá 1 MB.",
+            message: messages.imageSizeError,
         };
     }
 
     const isIcoExtension = /\.ico$/i.test(file.name);
 
     const extension =
-        ALLOWED_TYPES[file.type as keyof typeof ALLOWED_TYPES] ??
+        ALLOWED_TYPES[file.type] ??
         (typeValue === "favicon" && isIcoExtension ? "ico" : undefined);
 
     if (!extension) {
@@ -82,15 +96,15 @@ export async function uploadRestaurantBranding(
             success: false,
             message:
                 typeValue === "favicon"
-                    ? "Chỉ chấp nhận ảnh PNG, JPEG, WebP hoặc ICO."
-                    : "Logo chỉ hỗ trợ PNG, JPEG hoặc WebP.",
+                    ? messages.faviconFormatError
+                    : messages.logoFormatError,
         };
     }
 
     if (extension === "ico" && typeValue !== "favicon") {
         return {
             success: false,
-            message: "File ICO chỉ được sử dụng làm favicon.",
+            message: messages.icoOnlyFavicon,
         };
     }
 
@@ -114,7 +128,7 @@ export async function uploadRestaurantBranding(
 
         return {
             success: false,
-            message: "Không thể tải hình ảnh lên. Vui lòng thử lại.",
+            message: messages.uploadImageFailed,
         };
     }
 
@@ -138,7 +152,7 @@ export async function uploadRestaurantBranding(
 
         return {
             success: false,
-            message: "Không thể lưu hình ảnh vào cài đặt nhà hàng.",
+            message: messages.saveImageFailed,
         };
     }
 
@@ -149,8 +163,8 @@ export async function uploadRestaurantBranding(
         success: true,
         message:
             typeValue === "logo"
-                ? "Đã cập nhật logo nhà hàng."
-                : "Đã cập nhật favicon nhà hàng.",
+                ? messages.logoUpdateSuccess
+                : messages.faviconUpdateSuccess,
         url: publicUrl,
     };
 }
@@ -158,26 +172,28 @@ export async function uploadRestaurantBranding(
 export async function deleteRestaurantBranding(
     type: BrandingType,
 ): Promise<{ success: boolean; message: string }> {
+    const messages = await getSettingsMessages();
+
     const userContext = await getUserContext();
 
     if (!userContext) {
         return {
             success: false,
-            message: "Không tìm thấy thông tin tài khoản.",
+            message: messages.loginRequired,
         };
     }
 
     if (!canManageSettings(userContext.role)) {
         return {
             success: false,
-            message: "Bạn không có quyền cập nhật cài đặt nhà hàng.",
+            message: messages.permissionDenied,
         };
     }
 
     if (type !== "logo" && type !== "favicon") {
         return {
             success: false,
-            message: "Loại hình ảnh không hợp lệ.",
+            message: messages.invalidImageType,
         };
     }
 
@@ -196,7 +212,7 @@ export async function deleteRestaurantBranding(
 
         return {
             success: false,
-            message: "Không thể lấy thông tin hình ảnh nhà hàng.",
+            message: messages.getImageFailed,
         };
     }
 
@@ -206,7 +222,7 @@ export async function deleteRestaurantBranding(
     if (!imageUrl) {
         return {
             success: true,
-            message: "Hình ảnh đã được xóa trước đó.",
+            message: messages.imageAlreadyDeleted,
         };
     }
 
@@ -219,15 +235,16 @@ export async function deleteRestaurantBranding(
     if (typeof imageUrl !== "string" || !imageUrl.startsWith(`${baseUrl}/`)) {
         return {
             success: false,
-            message: "Đường dẫn hình ảnh không hợp lệ.",
+            message: messages.invalidImageUrl,
         };
     }
 
     const filePath = imageUrl.slice(baseUrl.length + 1);
+
     if (!filePath.startsWith(`${restaurantId}/`) || filePath.includes("..")) {
         return {
             success: false,
-            message: "Không thể xóa hình ảnh ngoài phạm vi nhà hàng.",
+            message: messages.imageOutsideRestaurant,
         };
     }
 
@@ -244,7 +261,7 @@ export async function deleteRestaurantBranding(
 
         return {
             success: false,
-            message: "Không thể cập nhật cài đặt hình ảnh.",
+            message: messages.updateImageSettingsFailed,
         };
     }
 
@@ -264,8 +281,7 @@ export async function deleteRestaurantBranding(
 
         return {
             success: true,
-            message:
-                "Đã gỡ hình ảnh khỏi cài đặt, nhưng chưa xóa được file lưu trữ.",
+            message: messages.deleteStorageFailed,
         };
     }
 
@@ -276,7 +292,7 @@ export async function deleteRestaurantBranding(
         success: true,
         message:
             type === "logo"
-                ? "Đã xóa logo nhà hàng."
-                : "Đã xóa favicon nhà hàng.",
+                ? messages.logoDeleteSuccess
+                : messages.faviconDeleteSuccess,
     };
 }

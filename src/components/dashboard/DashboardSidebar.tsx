@@ -77,7 +77,7 @@ const navigationGroups: NavigationGroup[] = [
     },
 ];
 
-const DEFAULT_RESTAURANT_LOGO = "/assets/default-restaurant-logo.png";
+const DEFAULT_RESTAURANT_LOGO = "/assets/restaurant-default-logo.svg";
 
 const OWNER_ONLY_ROUTES = ["/dashboard/settings", "/dashboard/users-roles"];
 

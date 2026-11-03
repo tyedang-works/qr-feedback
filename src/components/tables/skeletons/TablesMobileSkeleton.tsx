@@ -1,22 +1,75 @@
 import { Box, Skeleton, Stack } from "@mui/material";
 
-export default function TablesMobileSkeleton() {
-    const skeletonColor =
-        "var(--color-table-skeleton, var(--color-donut-skeleton))";
+const skeletonColor =
+    "var(--color-table-skeleton, var(--color-donut-skeleton))";
 
+function TableStatusSkeleton() {
     return (
         <Stack
             sx={{
-                display: { xs: "flex", sm: "none" },
-                border: "1px solid var(--color-border)",
-                borderRadius: 2,
-                overflow: "hidden",
-                backgroundColor: "var(--color-surface)",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 1,
+                mt: 1.25,
+            }}
+        >
+            <Box
+                sx={{
+                    position: "relative",
+                    width: 36,
+                    height: 20,
+                    flexShrink: 0,
+                    borderRadius: 999,
+                    bgcolor: skeletonColor,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    px: "2px",
+                }}
+            >
+                <Skeleton
+                    variant="circular"
+                    animation="wave"
+                    sx={{
+                        width: 16,
+                        height: 16,
+                        bgcolor: "var(--color-surface)",
+                    }}
+                />
+            </Box>
+
+            <Skeleton
+                variant="text"
+                animation="wave"
+                sx={{
+                    width: 88,
+                    height: 20,
+                    bgcolor: skeletonColor,
+                }}
+            />
+        </Stack>
+    );
+}
+
+export default function TablesMobileSkeleton() {
+    return (
+        <Stack
+            sx={{
+                display: {
+                    xs: "flex",
+                    sm: "none",
+                },
+                minWidth: 0,
             }}
         >
             {Array.from({ length: 5 }).map((_, index) => (
                 <Box key={index}>
-                    <Box sx={{ px: 2, py: 2 }}>
+                    <Box
+                        sx={{
+                            px: 2,
+                            py: 2,
+                        }}
+                    >
                         <Stack
                             sx={{
                                 flexDirection: "row",
@@ -27,13 +80,14 @@ export default function TablesMobileSkeleton() {
                         >
                             <Stack
                                 sx={{
-                                    gap: 0.75,
                                     flex: 1,
                                     minWidth: 0,
+                                    gap: 0.5,
                                 }}
                             >
                                 <Skeleton
                                     variant="text"
+                                    animation="wave"
                                     sx={{
                                         width: 100,
                                         maxWidth: "100%",
@@ -44,6 +98,7 @@ export default function TablesMobileSkeleton() {
 
                                 <Skeleton
                                     variant="text"
+                                    animation="wave"
                                     sx={{
                                         width: "85%",
                                         maxWidth: 230,
@@ -58,10 +113,12 @@ export default function TablesMobileSkeleton() {
                                     flexDirection: "row",
                                     alignItems: "center",
                                     gap: 0.5,
+                                    flexShrink: 0,
                                 }}
                             >
                                 <Skeleton
                                     variant="text"
+                                    animation="wave"
                                     sx={{
                                         width: 42,
                                         height: 22,
@@ -71,6 +128,7 @@ export default function TablesMobileSkeleton() {
 
                                 <Skeleton
                                     variant="text"
+                                    animation="wave"
                                     sx={{
                                         width: 32,
                                         height: 22,
@@ -80,16 +138,7 @@ export default function TablesMobileSkeleton() {
                             </Stack>
                         </Stack>
 
-                        <Skeleton
-                            variant="rounded"
-                            sx={{
-                                mt: 1.25,
-                                width: 112,
-                                height: 24,
-                                borderRadius: 1,
-                                bgcolor: skeletonColor,
-                            }}
-                        />
+                        <TableStatusSkeleton />
                     </Box>
 
                     {index < 4 && (

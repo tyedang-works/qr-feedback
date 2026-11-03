@@ -386,15 +386,22 @@ export default function QRCodeList({
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: "48px 1.5fr 1.5fr 1fr 120px",
+                            gridTemplateColumns:
+                                "48px minmax(0, 1.5fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 120px)",
                             alignItems: "center",
+                            width: "100%",
+                            minWidth: 0,
+                            boxSizing: "border-box",
                             minHeight: 56,
                             px: 3,
                             backgroundColor: "var(--color-table-header-bg)",
                             borderBottom: "1px solid var(--color-border)",
+                            borderTopLeftRadius: "inherit",
+                            borderTopRightRadius: "inherit",
                             position: "sticky",
                             top: 0,
                             zIndex: 2,
+                            overflow: "hidden",
                         }}
                     >
                         <Checkbox
@@ -406,21 +413,37 @@ export default function QRCodeList({
                             sx={checkboxStyleSx}
                         />
 
-                        <Typography sx={tableColumnHeaderSx}>
+                        <Typography
+                            sx={{
+                                ...tableColumnHeaderSx,
+                                minWidth: 0,
+                            }}
+                        >
                             {t("qrCode", "tableName")}
                         </Typography>
 
-                        <Typography sx={tableColumnHeaderSx}>
+                        <Typography
+                            sx={{
+                                ...tableColumnHeaderSx,
+                                minWidth: 0,
+                            }}
+                        >
                             {t("qrCode", "qrIdentifier")}
                         </Typography>
 
-                        <Typography sx={tableColumnHeaderSx}>
+                        <Typography
+                            sx={{
+                                ...tableColumnHeaderSx,
+                                minWidth: 0,
+                            }}
+                        >
                             {t("qrCode", "activityStatus")}
                         </Typography>
 
                         <Typography
                             sx={{
                                 ...tableColumnHeaderSx,
+                                minWidth: 0,
                                 textAlign: "right",
                             }}
                         >

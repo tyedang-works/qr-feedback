@@ -66,13 +66,26 @@ export const buttonBaseCancelSx: SxProps<Theme> = {
 
 export const chipBaseSx: SxProps<Theme> = {
     maxWidth: "100%",
+    height: 24,
     bgcolor: "var(--color-surface-active)",
-    color: "var(--color-text-secondary)",
+    color: "var(--color-text-primary)",
     fontSize: 12,
-    borderRadius: "5px",
+    fontWeight: 600,
+    borderRadius: "6px",
     "& .MuiChip-label": {
+        px: 1,
         overflow: "hidden",
         textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+    },
+    "& .MuiChip-deleteIcon": {
+        mr: 0.5,
+        ml: 0.25,
+        color: "var(--color-text-muted)",
+        transition: "color 150ms ease",
+        "&:hover": {
+            color: "var(--color-text-primary)",
+        },
     },
 };
 

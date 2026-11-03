@@ -1,17 +1,19 @@
 "use client";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import DeleteTableDialog from "@/components/tables/DeleteTableDialog";
 import EditTableDialog from "@/components/tables/EditTableDialog";
 import TableStatusSwitch from "@/components/tables/TableStatusSwitch";
-import { useTranslation } from "@/components/common/providers/useTranslation";
 import type { RestaurantTable } from "@/lib/tables/types";
+import { chipBaseSx } from "@/styles/button.styles";
 import { cardSx } from "@/styles/card.styles";
 import { tableColumnHeaderSx } from "@/styles/table.styles";
-import { Box, Divider, MenuItem, Stack, Typography } from "@mui/material";
-import { Search } from "lucide-react";
+import { Box, Chip, Divider, MenuItem, Stack, Typography } from "@mui/material";
+import { Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import QRSelect from "../common/input/QRSelect";
 import QRTextField from "../common/input/QRTextField";
+import ClearFiltersButton from "./ClearFiltersButton";
 
 type TablesListProps = {
     data: RestaurantTable[];
@@ -29,6 +31,67 @@ const STATUS_FILTER_OPTIONS = [
 const dividerSx = {
     borderColor: "var(--color-border, #E5E7EB)",
 };
+
+const DASHBOARD_STICKY_OFFSET = {
+    xs: "120px",
+    md: "130px",
+};
+
+const TABLE_GRID_COLUMNS = (canManageTables: boolean) =>
+    canManageTables
+        ? "minmax(120px, 1.2fr) minmax(150px, 1.5fr) minmax(175px, 1.3fr) 160px"
+        : "minmax(120px, 1.2fr) minmax(150px, 1.5fr) minmax(175px, 1.3fr)";
+
+function TableHeader({
+    canManageTables,
+    t,
+}: {
+    canManageTables: boolean;
+    t: ReturnType<typeof useTranslation>["t"];
+}) {
+    return (
+        <Box
+            sx={{
+                display: {
+                    xs: "none",
+                    sm: "grid",
+                },
+                gridTemplateColumns: TABLE_GRID_COLUMNS(canManageTables),
+                alignItems: "center",
+                gap: 2,
+                px: 2.5,
+                py: 1.5,
+                minHeight: 52,
+                boxSizing: "border-box",
+                borderBottom: "1px solid var(--color-border)",
+                bgcolor: "var(--color-table-header-bg)",
+            }}
+        >
+            <Typography sx={tableColumnHeaderSx}>
+                {t("table", "tableName")}
+            </Typography>
+
+            <Typography sx={tableColumnHeaderSx}>
+                {t("table", "qrIdentifier")}
+            </Typography>
+
+            <Typography sx={tableColumnHeaderSx}>
+                {t("table", "tableActivityStatus")}
+            </Typography>
+
+            {canManageTables && (
+                <Typography
+                    sx={{
+                        ...tableColumnHeaderSx,
+                        textAlign: "center",
+                    }}
+                >
+                    {t("table", "actions")}
+                </Typography>
+            )}
+        </Box>
+    );
+}
 
 export default function TablesList({ data, canManageTables }: TablesListProps) {
     const { t, locale } = useTranslation();
@@ -57,266 +120,443 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
         });
     }, [data, search, statusFilter, locale]);
 
-    const hasFilters = search.trim().length > 0 || statusFilter !== "all";
+    const hasSearch = search.trim().length > 0;
+    const hasStatusFilter = statusFilter !== "all";
+    const hasFilters = hasSearch || hasStatusFilter;
 
     const resetFilters = () => {
         setSearch("");
         setStatusFilter("all");
     };
 
+    const statusFilterLabel = STATUS_FILTER_OPTIONS.find(
+        (option) => option.value === statusFilter,
+    );
+
     return (
-        <Stack sx={{ gap: 2 }}>
-            {data.length > 0 && (
-                <Box sx={{ ...cardSx, p: { xs: 2, sm: 2.5 } }}>
-                    <Stack
+        <Box sx={{ minWidth: 0, minHeight: 0 }}>
+            <Box
+                sx={{
+                    ...cardSx,
+                    p: 0,
+                    mt: 2,
+                    position: "sticky",
+                    top: DASHBOARD_STICKY_OFFSET,
+                    zIndex: 10,
+                    display: "flex",
+                    flexDirection: "column",
+                    minWidth: 0,
+                    minHeight: 0,
+                    height:
+                        data.length > 0
+                            ? {
+                                  xs: "calc(100dvh - 200px)",
+                                  md: "calc(100dvh - 190px)",
+                              }
+                            : "auto",
+                    overflow: "hidden",
+                }}
+            >
+                {data.length > 0 && (
+                    <Box
                         sx={{
-                            flexDirection: { xs: "column", sm: "row" },
-                            alignItems: { xs: "stretch", sm: "center" },
-                            gap: 1.5,
+                            flexShrink: 0,
+                            zIndex: 1,
+                            bgcolor: "var(--color-surface)",
+                            borderRadius: "16px 16px 0 0",
                         }}
                     >
-                        <QRTextField
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            placeholder={t("table", "searchTablePlaceholder")}
-                            aria-label={t("table", "searchTableAriaLabel")}
-                            slotProps={{
-                                input: {
-                                    startAdornment: (
-                                        <Box
-                                            component="span"
-                                            sx={{
-                                                display: "inline-flex",
-                                                alignItems: "center",
-                                                color: "var(--color-text-muted, #98A2B3)",
-                                            }}
-                                        >
-                                            <Search size={16} />
-                                        </Box>
-                                    ),
-                                },
-                            }}
-                            sx={{
-                                flex: 1,
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: 1.5,
-                                },
-                                "& .MuiOutlinedInput-input": {
-                                    paddingTop: "14px",
-                                },
-                            }}
-                        />
-
                         <Box
                             sx={{
-                                width: { xs: "100%", sm: 230 },
-                                flexShrink: 0,
+                                px: { xs: 2, sm: 2.5 },
+                                pt: { xs: 2, sm: 2.5 },
+                                pb: 2,
+                                bgcolor: "var(--color-surface)",
+                                borderRadius: "16px 16px 0 0",
                             }}
                         >
-                            <QRSelect
-                                value={statusFilter}
-                                onChange={(event) =>
-                                    setStatusFilter(
-                                        event.target.value as TableStatusFilter,
-                                    )
-                                }
-                                inputProps={{
-                                    "aria-label": t(
-                                        "table",
-                                        "filterTableStatusAriaLabel",
-                                    ),
-                                }}
-                            >
-                                {STATUS_FILTER_OPTIONS.map((option) => (
-                                    <MenuItem
-                                        key={option.value}
-                                        value={option.value}
-                                    >
-                                        {t("table", option.labelKey)}
-                                    </MenuItem>
-                                ))}
-                            </QRSelect>
-                        </Box>
-                    </Stack>
-
-                    <Stack
-                        sx={{
-                            mt: 1.5,
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: 1,
-                            flexWrap: "wrap",
-                        }}
-                    >
-                        <Typography
-                            sx={{
-                                fontSize: 13,
-                                color: "var(--color-text-secondary, #667085)",
-                            }}
-                        >
-                            {t("table", "showing")}{" "}
-                            <Box
-                                component="span"
+                            <Stack
                                 sx={{
-                                    fontWeight: 600,
-                                    color: "var(--color-text-primary, #193B56)",
-                                }}
-                            >
-                                {filteredTables.length}
-                            </Box>{" "}
-                            / {data.length} {t("table", "tables")}
-                        </Typography>
-
-                        {hasFilters && (
-                            <Box
-                                component="button"
-                                type="button"
-                                onClick={resetFilters}
-                                sx={{
-                                    p: 0,
-                                    border: 0,
-                                    background: "transparent",
-                                    color: "var(--color-text-primary, #193B56)",
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                    "&:hover": {
-                                        textDecoration: "underline",
+                                    flexDirection: {
+                                        xs: "column",
+                                        md: "row",
                                     },
+                                    alignItems: {
+                                        xs: "stretch",
+                                        md: "center",
+                                    },
+                                    gap: 1.5,
                                 }}
                             >
-                                {t("table", "clearFilters")}
-                            </Box>
-                        )}
-                    </Stack>
-                </Box>
-            )}
+                                <QRTextField
+                                    value={search}
+                                    onChange={(event) =>
+                                        setSearch(event.target.value)
+                                    }
+                                    placeholder={t(
+                                        "table",
+                                        "searchTablePlaceholder",
+                                    )}
+                                    aria-label={t(
+                                        "table",
+                                        "searchTableAriaLabel",
+                                    )}
+                                    slotProps={{
+                                        input: {
+                                            startAdornment: (
+                                                <Box
+                                                    component="span"
+                                                    sx={{
+                                                        display: "inline-flex",
+                                                        alignItems: "center",
+                                                        color: "var(--color-text-muted)",
+                                                    }}
+                                                >
+                                                    <Search size={17} />
+                                                </Box>
+                                            ),
+                                        },
+                                    }}
+                                />
 
-            <Box sx={{ ...cardSx, p: 0, overflow: "clip" }}>
-                {data.length === 0 ? (
-                    <Box
-                        sx={{
-                            px: 2,
-                            py: 6,
-                            textAlign: "center",
-                        }}
-                    >
-                        <Typography
-                            sx={{
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "var(--color-text-primary, #344054)",
-                            }}
-                        >
-                            {t("table", "noTablesYet")}
-                        </Typography>
-
-                        <Typography
-                            sx={{
-                                mt: 0.5,
-                                fontSize: 13,
-                                color: "var(--color-text-muted, #98A2B3)",
-                            }}
-                        >
-                            {t("table", "addFirstTableDescription")}
-                        </Typography>
-                    </Box>
-                ) : filteredTables.length === 0 ? (
-                    <Box
-                        sx={{
-                            px: 2,
-                            py: 6,
-                            textAlign: "center",
-                        }}
-                    >
-                        <Typography
-                            sx={{
-                                fontSize: 14,
-                                fontWeight: 600,
-                                color: "var(--color-text-primary, #344054)",
-                            }}
-                        >
-                            {t("table", "noMatchingTables")}
-                        </Typography>
-
-                        <Typography
-                            sx={{
-                                mt: 0.5,
-                                fontSize: 13,
-                                color: "var(--color-text-muted, #98A2B3)",
-                            }}
-                        >
-                            {t("table", "changeTableSearchDescription")}
-                        </Typography>
-
-                        {hasFilters && (
-                            <Box
-                                component="button"
-                                type="button"
-                                onClick={resetFilters}
-                                sx={{
-                                    mt: 1.5,
-                                    p: 0,
-                                    border: 0,
-                                    background: "transparent",
-                                    color: "var(--color-text-primary, #193B56)",
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                }}
-                            >
-                                {t("table", "clearFilters")}
-                            </Box>
-                        )}
-                    </Box>
-                ) : (
-                    <>
-                        <Box sx={{ display: { xs: "none", sm: "block" } }}>
-                            <Box
-                                sx={{
-                                    display: "grid",
-                                    gridTemplateColumns: canManageTables
-                                        ? "minmax(120px, 1.2fr) minmax(150px, 1.5fr) minmax(175px, 1.3fr) 160px"
-                                        : "minmax(120px, 1.2fr) minmax(150px, 1.5fr) minmax(175px, 1.3fr)",
-                                    alignItems: "center",
-                                    gap: 2,
-                                    px: 2.5,
-                                    py: 1.5,
-                                    minHeight: 56,
-                                    boxSizing: "border-box",
-                                    backgroundColor:
-                                        "var(--color-table-header-bg)",
-                                    position: "sticky",
-                                    top: 0,
-                                    zIndex: 10,
-                                    boxShadow: "0 1px 0 var(--color-border)",
-                                }}
-                            >
-                                <Typography sx={tableColumnHeaderSx}>
-                                    {t("table", "tableName")}
-                                </Typography>
-
-                                <Typography sx={tableColumnHeaderSx}>
-                                    {t("table", "qrIdentifier")}
-                                </Typography>
-
-                                <Typography sx={tableColumnHeaderSx}>
-                                    {t("table", "tableActivityStatus")}
-                                </Typography>
-
-                                {canManageTables && (
-                                    <Typography
-                                        sx={{
-                                            ...tableColumnHeaderSx,
-                                            textAlign: "center",
+                                <Box
+                                    sx={{
+                                        width: {
+                                            xs: "100%",
+                                            md: 230,
+                                        },
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    <QRSelect
+                                        value={statusFilter}
+                                        onChange={(event) =>
+                                            setStatusFilter(
+                                                event.target
+                                                    .value as TableStatusFilter,
+                                            )
+                                        }
+                                        inputProps={{
+                                            "aria-label": t(
+                                                "table",
+                                                "filterTableStatusAriaLabel",
+                                            ),
                                         }}
                                     >
-                                        {t("table", "actions")}
-                                    </Typography>
+                                        {STATUS_FILTER_OPTIONS.map((option) => (
+                                            <MenuItem
+                                                key={option.value}
+                                                value={option.value}
+                                            >
+                                                {t("table", option.labelKey)}
+                                            </MenuItem>
+                                        ))}
+                                    </QRSelect>
+                                </Box>
+                            </Stack>
+
+                            <Stack
+                                sx={{
+                                    mt: 2,
+                                    flexDirection: {
+                                        xs: "column",
+                                        sm: "row",
+                                    },
+                                    alignItems: {
+                                        xs: "flex-start",
+                                        sm: "center",
+                                    },
+                                    justifyContent: "space-between",
+                                    gap: 1.25,
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        fontSize: 13,
+                                        color: "var(--color-text-secondary)",
+                                    }}
+                                >
+                                    {t("table", "showing")}{" "}
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            fontWeight: 700,
+                                            color: "var(--color-text-primary)",
+                                            fontVariantNumeric: "tabular-nums",
+                                        }}
+                                    >
+                                        {filteredTables.length}
+                                    </Box>{" "}
+                                    / {data.length}{" "}
+                                    {locale === "en"
+                                        ? data.length === 1
+                                            ? "table"
+                                            : "tables"
+                                        : "bàn"}
+                                </Typography>
+
+                                {hasFilters && (
+                                    <Stack
+                                        sx={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            flexWrap: "wrap",
+                                            gap: 1,
+                                        }}
+                                    >
+                                        {hasSearch && (
+                                            <Stack
+                                                sx={{
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    flexWrap: "nowrap",
+                                                    gap: 0.75,
+                                                    minWidth: 0,
+                                                    maxWidth: "100%",
+                                                    px: 1,
+                                                    py: 0.75,
+                                                    border: "1px dashed var(--color-border)",
+                                                    borderRadius: "9px",
+                                                    bgcolor:
+                                                        "var(--color-surface)",
+                                                }}
+                                            >
+                                                <Typography
+                                                    sx={{
+                                                        flexShrink: 0,
+                                                        fontSize: 12,
+                                                        fontWeight: 700,
+                                                        color: "var(--color-text-primary)",
+                                                    }}
+                                                >
+                                                    {t("table", "keyword")}:
+                                                </Typography>
+
+                                                <Chip
+                                                    size="small"
+                                                    label={search.trim()}
+                                                    onDelete={() =>
+                                                        setSearch("")
+                                                    }
+                                                    deleteIcon={<X size={13} />}
+                                                    sx={{
+                                                        ...chipBaseSx,
+                                                        height: 24,
+                                                        maxWidth: {
+                                                            xs: 180,
+                                                            sm: 260,
+                                                        },
+                                                        bgcolor:
+                                                            "var(--color-surface-active)",
+                                                        "& .MuiChip-label": {
+                                                            px: 1,
+                                                            overflow: "hidden",
+                                                            textOverflow:
+                                                                "ellipsis",
+                                                            whiteSpace:
+                                                                "nowrap",
+                                                        },
+                                                        "& .MuiChip-deleteIcon":
+                                                            {
+                                                                mr: 0.5,
+                                                                ml: 0.25,
+                                                                fontSize: 14,
+                                                                color: "var(--color-text-muted)",
+                                                                "&:hover": {
+                                                                    color: "var(--color-text-primary)",
+                                                                },
+                                                            },
+                                                    }}
+                                                />
+                                            </Stack>
+                                        )}
+
+                                        {hasStatusFilter &&
+                                            statusFilterLabel && (
+                                                <Stack
+                                                    sx={{
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                        flexWrap: "nowrap",
+                                                        gap: 0.75,
+                                                        px: 1,
+                                                        py: 0.75,
+                                                        border: "1px dashed var(--color-border)",
+                                                        borderRadius: "9px",
+                                                        bgcolor:
+                                                            "var(--color-surface)",
+                                                    }}
+                                                >
+                                                    <Typography
+                                                        sx={{
+                                                            flexShrink: 0,
+                                                            fontSize: 12,
+                                                            fontWeight: 700,
+                                                            color: "var(--color-text-primary)",
+                                                        }}
+                                                    >
+                                                        {t("table", "status")}:
+                                                    </Typography>
+
+                                                    <Chip
+                                                        size="small"
+                                                        label={t(
+                                                            "table",
+                                                            statusFilterLabel.labelKey,
+                                                        )}
+                                                        onDelete={() =>
+                                                            setStatusFilter(
+                                                                "all",
+                                                            )
+                                                        }
+                                                        deleteIcon={
+                                                            <X size={13} />
+                                                        }
+                                                        sx={{
+                                                            ...chipBaseSx,
+                                                            height: 24,
+                                                            bgcolor:
+                                                                "var(--color-surface-active)",
+                                                            "& .MuiChip-deleteIcon":
+                                                                {
+                                                                    mr: 0.5,
+                                                                    ml: 0.25,
+                                                                    fontSize: 14,
+                                                                    color: "var(--color-text-muted)",
+                                                                    "&:hover": {
+                                                                        color: "var(--color-text-primary)",
+                                                                    },
+                                                                },
+                                                        }}
+                                                    />
+                                                </Stack>
+                                            )}
+
+                                        <ClearFiltersButton
+                                            onClick={resetFilters}
+                                            label={t("table", "clearFilters")}
+                                        />
+                                    </Stack>
                                 )}
+                            </Stack>
+                        </Box>
+
+                        {filteredTables.length > 0 && (
+                            <TableHeader
+                                canManageTables={canManageTables}
+                                t={t}
+                            />
+                        )}
+                    </Box>
+                )}
+
+                {data.length === 0 ? (
+                    <>
+                        <Divider sx={dividerSx} />
+                        <Box
+                            sx={{
+                                px: 2,
+                                py: 7,
+                                textAlign: "center",
+                            }}
+                        >
+                            <Typography
+                                sx={{
+                                    fontSize: 14,
+                                    fontWeight: 600,
+                                    color: "var(--color-text-primary)",
+                                }}
+                            >
+                                {t("table", "noTablesYet")}
+                            </Typography>
+
+                            <Typography
+                                sx={{
+                                    mt: 0.5,
+                                    fontSize: 13,
+                                    color: "var(--color-text-muted)",
+                                }}
+                            >
+                                {t("table", "addFirstTableDescription")}
+                            </Typography>
+                        </Box>
+                    </>
+                ) : filteredTables.length === 0 ? (
+                    <>
+                        <Divider sx={dividerSx} />
+                        <Box
+                            sx={{
+                                px: 2,
+                                py: 7,
+                                textAlign: "center",
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    width: 44,
+                                    height: 44,
+                                    mx: "auto",
+                                    mb: 1.5,
+                                    borderRadius: "50%",
+                                    display: "grid",
+                                    placeItems: "center",
+                                    bgcolor: "var(--color-surface-hover)",
+                                    color: "var(--color-text-muted)",
+                                }}
+                            >
+                                <Search size={20} />
                             </Box>
 
+                            <Typography
+                                sx={{
+                                    fontSize: 14,
+                                    fontWeight: 600,
+                                    color: "var(--color-text-primary)",
+                                }}
+                            >
+                                {t("table", "noMatchingTables")}
+                            </Typography>
+
+                            <Typography
+                                sx={{
+                                    mt: 0.5,
+                                    fontSize: 13,
+                                    color: "var(--color-text-muted)",
+                                }}
+                            >
+                                {t("table", "changeTableSearchDescription")}
+                            </Typography>
+
+                            {hasFilters && (
+                                <Box sx={{ mt: 1.5 }}>
+                                    <ClearFiltersButton
+                                        onClick={resetFilters}
+                                        label={t("table", "clearFilters")}
+                                        variant="outlined"
+                                    />
+                                </Box>
+                            )}
+                        </Box>
+                    </>
+                ) : (
+                    <Box
+                        sx={{
+                            flex: 1,
+                            minHeight: 0,
+                            minWidth: 0,
+                            overflowY: "auto",
+                            overflowX: "hidden",
+                            overscrollBehaviorY: "contain",
+                            WebkitOverflowScrolling: "touch",
+                            scrollbarGutter: "stable",
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: { xs: "none", sm: "block" },
+                                minWidth: 0,
+                            }}
+                        >
                             {filteredTables.map((table, index) => (
                                 <Box key={table.id}>
                                     {index > 0 && <Divider sx={dividerSx} />}
@@ -324,18 +564,20 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                     <Box
                                         sx={{
                                             display: "grid",
-                                            gridTemplateColumns: canManageTables
-                                                ? "minmax(120px, 1.2fr) minmax(150px, 1.5fr) minmax(175px, 1.3fr) 160px"
-                                                : "minmax(120px, 1.2fr) minmax(150px, 1.5fr) minmax(175px, 1.3fr)",
+                                            gridTemplateColumns:
+                                                TABLE_GRID_COLUMNS(
+                                                    canManageTables,
+                                                ),
                                             alignItems: "center",
                                             gap: 2,
                                             px: 2.5,
                                             py: 1.75,
+                                            minHeight: 68,
                                             transition:
                                                 "background-color 150ms ease",
                                             "&:hover": {
-                                                backgroundColor:
-                                                    "var(--color-surface-hover, #F9FAFB)",
+                                                bgcolor:
+                                                    "var(--color-surface-hover)",
                                             },
                                         }}
                                     >
@@ -344,7 +586,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                 minWidth: 0,
                                                 fontSize: 14,
                                                 fontWeight: 600,
-                                                color: "var(--color-text-primary, #193B56)",
+                                                color: "var(--color-text-primary)",
                                                 overflowWrap: "anywhere",
                                             }}
                                         >
@@ -356,7 +598,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                             sx={{
                                                 minWidth: 0,
                                                 fontSize: 12,
-                                                color: "var(--color-text-secondary, #475467)",
+                                                color: "var(--color-text-secondary)",
                                                 overflowWrap: "anywhere",
                                                 wordBreak: "break-word",
                                                 lineHeight: 1.6,
@@ -376,8 +618,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                 sx={{
                                                     flexDirection: "row",
                                                     alignItems: "center",
-                                                    justifyContent:
-                                                        "flex-start",
+                                                    justifyContent: "center",
                                                     gap: 0.5,
                                                 }}
                                             >
@@ -413,17 +654,12 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                 gap: 1.5,
                                             }}
                                         >
-                                            <Box
-                                                sx={{
-                                                    minWidth: 0,
-                                                    flex: 1,
-                                                }}
-                                            >
+                                            <Box sx={{ minWidth: 0, flex: 1 }}>
                                                 <Typography
                                                     sx={{
                                                         fontSize: 15,
                                                         fontWeight: 600,
-                                                        color: "var(--color-text-primary, #193B56)",
+                                                        color: "var(--color-text-primary)",
                                                         overflowWrap:
                                                             "anywhere",
                                                     }}
@@ -436,7 +672,7 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                                     sx={{
                                                         mt: 0.5,
                                                         fontSize: 12,
-                                                        color: "var(--color-text-secondary, #667085)",
+                                                        color: "var(--color-text-secondary)",
                                                         overflow: "hidden",
                                                         textOverflow:
                                                             "ellipsis",
@@ -487,9 +723,9 @@ export default function TablesList({ data, canManageTables }: TablesListProps) {
                                 </Box>
                             ))}
                         </Stack>
-                    </>
+                    </Box>
                 )}
             </Box>
-        </Stack>
+        </Box>
     );
 }

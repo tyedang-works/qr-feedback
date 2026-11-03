@@ -29,7 +29,6 @@ export default function PageHeaderSkeleton({
                     flexShrink: 0,
                 }}
             />
-
             <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Skeleton
                     variant="text"

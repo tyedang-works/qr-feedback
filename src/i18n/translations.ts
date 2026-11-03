@@ -48,7 +48,7 @@ export const translations = {
             staffRole: "Staff",
         },
         dashboard: {
-            totalFeedback: "Total feedback",
+            totalFeedback: "Total",
             today: "Today",
             activeTables: "Active tables",
             inactive: "Inactive",
@@ -193,6 +193,7 @@ export const translations = {
             showing: "Showing",
             of: "of",
             tables: "tables",
+            table: "table",
             clearFilters: "Clear filters",
             tableName: "Table",
             qrIdentifier: "QR identifier",
@@ -248,6 +249,8 @@ export const translations = {
             adding: "Adding...",
             createTableError:
                 "An error occurred while creating the table. Please try again.",
+            status: "Status",
+            keyword: "Keyword",
         },
         qrCode: {
             qrCodes: "QR Codes",
@@ -746,7 +749,7 @@ export const translations = {
             staffRole: "Nhân viên",
         },
         dashboard: {
-            totalFeedback: "Tổng phản hồi",
+            totalFeedback: "Tổng",
             today: "Hôm nay",
             activeTables: "Bàn đang hoạt động",
             inactive: "đã tắt",
@@ -876,7 +879,6 @@ export const translations = {
             tablesManagement: "Quản lý bàn",
             tablesManagementDescription: "Quản lý bàn và mã QR của nhà hàng.",
             addTable: "Thêm bàn",
-
             totalTables: "Tổng số bàn",
             activeTables: "Đang hoạt động",
             inactiveTables: "Đã tắt",
@@ -884,7 +886,6 @@ export const translations = {
             activeTablesDescription: "bàn đang hoạt động",
             inactiveTablesDescription: "bàn đã tắt",
             remaining: "Còn lại",
-
             searchTablePlaceholder: "Tìm theo tên bàn hoặc mã QR...",
             searchTableAriaLabel: "Tìm bàn",
             filterTableStatusAriaLabel: "Lọc trạng thái bàn",
@@ -892,20 +893,18 @@ export const translations = {
             showing: "Hiển thị",
             of: "trên",
             tables: "bàn",
+            table: "bàn",
             clearFilters: "Xóa bộ lọc",
-
             tableName: "Bàn",
             qrIdentifier: "Định danh QR",
             tableActivityStatus: "Trạng thái hoạt động",
             actions: "Thao tác",
-
             noTablesYet: "Chưa có bàn nào",
             addFirstTableDescription:
                 "Hãy thêm bàn đầu tiên cho nhà hàng của bạn.",
             noMatchingTables: "Không tìm thấy bàn phù hợp",
             changeTableSearchDescription:
                 "Thử thay đổi từ khóa hoặc bộ lọc trạng thái.",
-
             tableStatusActive: "Đang hoạt động",
             tableStatusInactive: "Đã tắt",
             editTable: "Chỉnh sửa",
@@ -947,6 +946,8 @@ export const translations = {
             addTableTitle: "Thêm bàn",
             adding: "Đang thêm...",
             createTableError: "Đã xảy ra lỗi khi tạo bàn. Vui lòng thử lại.",
+            status: "Trạng thái",
+            keyword: "Từ khóa",
         },
         qrCode: {
             qrCodes: "Mã QR",

@@ -1,138 +1,213 @@
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Skeleton, Stack } from "@mui/material";
 
-const SUMMARY_ITEMS = [
-    {
-        titleWidth: 100,
-        valueWidth: 54,
-        descriptionWidth: 145,
-    },
-    {
-        titleWidth: 110,
-        valueWidth: 42,
-        descriptionWidth: 155,
-    },
-    {
-        titleWidth: 65,
-        valueWidth: 42,
-        descriptionWidth: 130,
-    },
-] as const;
-
 function DonutSkeleton() {
     return (
         <Box
             sx={{
                 position: "relative",
-                width: 60,
-                height: 60,
+                width: { xs: 132, sm: 148 },
+                height: { xs: 132, sm: 148 },
                 flexShrink: 0,
             }}
         >
             <Skeleton
                 variant="circular"
-                width={60}
-                height={60}
                 animation="wave"
                 sx={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
                     bgcolor: "var(--color-donut-skeleton)",
                 }}
             />
+
+            <Box
+                sx={{
+                    position: "absolute",
+                    inset: "9%",
+                    borderRadius: "50%",
+                    bgcolor: "var(--color-surface)",
+                }}
+            />
+
+            <Skeleton
+                variant="circular"
+                animation="wave"
+                sx={{
+                    position: "absolute",
+                    inset: "17%",
+                    width: "66%",
+                    height: "66%",
+                    bgcolor: "var(--color-donut-skeleton)",
+                }}
+            />
+
+            <Stack
+                sx={{
+                    position: "absolute",
+                    inset: "25%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "50%",
+                    bgcolor: "var(--color-surface)",
+                    gap: 0.25,
+                }}
+            >
+                <Skeleton
+                    variant="text"
+                    animation="wave"
+                    width={48}
+                    height={14}
+                    sx={{
+                        transform: "none",
+                    }}
+                />
+
+                <Skeleton
+                    variant="text"
+                    animation="wave"
+                    width={32}
+                    height={30}
+                    sx={{
+                        transform: "none",
+                    }}
+                />
+            </Stack>
         </Box>
     );
 }
 
-function TablesSummaryCardSkeleton({ index }: { index: number }) {
-    const item = SUMMARY_ITEMS[index];
-
+function SummaryLegendSkeleton() {
     return (
-        <Card elevation={0} sx={{ ...cardSx, p: { xs: 1.75, sm: 2.5 } }}>
-            <Stack
-                sx={{
-                    height: "100%",
-                    minWidth: 0,
-                    justifyContent: "space-between",
-                    gap: 0.5,
-                }}
-            >
-                <Stack
-                    sx={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: 1.5,
-                        minWidth: 0,
-                    }}
-                >
-                    <Skeleton
-                        variant="text"
-                        width={item.titleWidth}
-                        height={23}
-                        animation="wave"
+        <Stack
+            sx={{
+                width: "100%",
+                maxWidth: {
+                    xs: "100%",
+                    sm: 320,
+                },
+                minWidth: 0,
+            }}
+        >
+            {[0, 1].map((item) => (
+                <Box key={item}>
+                    <Stack
                         sx={{
-                            transform: "none",
-                            maxWidth: "100%",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: 2,
+                            py: 1.5,
                         }}
-                    />
-                    <DonutSkeleton />
-                </Stack>
+                    >
+                        <Stack
+                            sx={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 1,
+                                minWidth: 0,
+                            }}
+                        >
+                            <Skeleton
+                                variant="circular"
+                                width={10}
+                                height={10}
+                                animation="wave"
+                                sx={{
+                                    flexShrink: 0,
+                                    bgcolor: "var(--color-donut-skeleton)",
+                                }}
+                            />
 
-                <Stack
-                    sx={{
-                        flexDirection: "row",
-                        alignItems: "baseline",
-                        minWidth: 0,
-                    }}
-                >
-                    <Skeleton
-                        variant="text"
-                        width={item.valueWidth}
-                        height={36}
-                        animation="wave"
-                        sx={{
-                            transform: "none",
-                        }}
-                    />
-                </Stack>
+                            <Stack sx={{ gap: 0.25 }}>
+                                <Skeleton
+                                    variant="text"
+                                    width={75}
+                                    height={19}
+                                    animation="wave"
+                                    sx={{
+                                        transform: "none",
+                                    }}
+                                />
 
-                <Skeleton
-                    variant="text"
-                    width={item.descriptionWidth}
-                    height={18}
-                    animation="wave"
-                    sx={{
-                        transform: "none",
-                        maxWidth: "100%",
-                    }}
-                />
-            </Stack>
-        </Card>
+                                <Skeleton
+                                    variant="text"
+                                    width={65}
+                                    height={17}
+                                    animation="wave"
+                                    sx={{
+                                        transform: "none",
+                                    }}
+                                />
+                            </Stack>
+                        </Stack>
+
+                        <Skeleton
+                            variant="text"
+                            width={34}
+                            height={22}
+                            animation="wave"
+                            sx={{
+                                transform: "none",
+                            }}
+                        />
+                    </Stack>
+
+                    {item === 0 && (
+                        <Box
+                            sx={{
+                                borderTop: "1px solid var(--color-border)",
+                            }}
+                        />
+                    )}
+                </Box>
+            ))}
+        </Stack>
     );
 }
 
 export default function TablesSummarySkeleton() {
     return (
-        <Box
+        <Card
+            elevation={0}
             aria-label="Đang tải thống kê bàn"
             role="status"
             sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                    xs: "repeat(2, minmax(0, 1fr))",
-                    md: "repeat(3, minmax(0, 1fr))",
+                ...cardSx,
+                p: {
+                    xs: 2,
+                    sm: 2.5,
                 },
-                gap: { xs: 1.25, sm: 2 },
-                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 minWidth: 0,
-                alignItems: "stretch",
             }}
         >
-            {SUMMARY_ITEMS.map((item, index) => (
-                <TablesSummaryCardSkeleton
-                    key={item.titleWidth}
-                    index={index}
-                />
-            ))}
-        </Box>
+            <Stack
+                sx={{
+                    width: "100%",
+                    maxWidth: {
+                        xs: "100%",
+                        sm: 540,
+                    },
+                    flexDirection: {
+                        xs: "column",
+                        sm: "row",
+                    },
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: {
+                        xs: 2.5,
+                        sm: 5,
+                    },
+                }}
+            >
+                <DonutSkeleton />
+                <SummaryLegendSkeleton />
+            </Stack>
+        </Card>
     );
 }

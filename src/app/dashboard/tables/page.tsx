@@ -14,6 +14,7 @@ import { Table2 } from "lucide-react";
 import { cookies } from "next/headers";
 
 export default async function TablesPage() {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     const cookieStore = await cookies();
     const locale: Locale =
         cookieStore.get("qr-locale")?.value === "en" ? "en" : "vi";
@@ -35,7 +36,7 @@ export default async function TablesPage() {
     return (
         <Stack
             sx={{
-                gap: 2,
+                gap: 1,
                 width: "100%",
                 minWidth: 0,
             }}
@@ -52,6 +53,7 @@ export default async function TablesPage() {
                     },
                     justifyContent: "space-between",
                     gap: 2,
+                    mb: 1.5,
                 }}
             >
                 <PageHeader

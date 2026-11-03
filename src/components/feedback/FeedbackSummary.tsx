@@ -5,6 +5,7 @@ import type { FeedbackSummary as FeedbackSummaryData } from "@/lib/feedback/type
 import { cardSx } from "@/styles/card.styles";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import MiniDonutChart from "../common/charts/MiniDonutChart";
+import SummaryCardDecoration from "./SummaryCardDecoration";
 
 type FeedbackSummaryProps = {
     data: FeedbackSummaryData;
@@ -23,6 +24,7 @@ type DonutSegment = {
 };
 
 const STATUS_COLORS = {
+    total: "#193B56",
     new: "#EF4444",
     inProgress: "#3B82F6",
     resolved: "#10B981",
@@ -33,9 +35,7 @@ function formatNumber(value: number, locale: string): string {
 }
 
 function getPercentage(value: number, total: number): number {
-    if (total <= 0) {
-        return 0;
-    }
+    if (total <= 0) return 0;
 
     return Math.round((value / total) * 100);
 }
@@ -97,21 +97,56 @@ type SummaryCardProps = {
 
 function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
     const { t, locale } = useTranslation();
+
     const isTotal = item.key === "total";
     const percentage = getPercentage(value, total);
+
     const numberLocale = locale === "en" ? "en-US" : "vi-VN";
     const formattedValue = formatNumber(value, numberLocale);
     const formattedTotal = formatNumber(total, numberLocale);
 
+    const description = isTotal
+        ? t("dashboard", "totalFeedbackPercentage").replace(
+              "{percentage}",
+              String(percentage),
+          )
+        : t("dashboard", "feedbackCountOfTotal")
+              .replace("{value}", formattedValue)
+              .replace("{total}", formattedTotal);
+
     return (
-        <Card elevation={0} sx={cardSx}>
+        <Card
+            elevation={0}
+            sx={{
+                ...cardSx,
+                position: "relative",
+                overflow: "hidden",
+                isolation: "isolate",
+                p: { xs: 2, sm: 2.5 },
+                background: "var(--color-surface)",
+                transition:
+                    "transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease",
+                "@media (prefers-reduced-motion: reduce)": {
+                    transition: "none",
+                    "&:hover": {
+                        transform: "none",
+                    },
+                },
+                minHeight: { xs: 170, sm: 190 },
+                height: "100%",
+            }}
+        >
+            <SummaryCardDecoration color={item.color} />
+
             <Stack
                 sx={{
+                    position: "relative",
+                    zIndex: 1,
                     minWidth: 0,
-                    minHeight: 112,
+                    minHeight: { xs: 125, sm: 135 },
                     height: "100%",
                     justifyContent: "space-between",
-                    gap: 1,
+                    gap: 1.5,
                 }}
             >
                 <Stack
@@ -119,24 +154,33 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        gap: 1.25,
+                        gap: 1,
                         minWidth: 0,
                     }}
                 >
-                    <Typography
+                    <Stack
                         sx={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 1,
                             minWidth: 0,
-                            fontSize: { xs: 13, sm: 15 },
-                            lineHeight: 1.45,
-                            fontWeight: 600,
-                            color: "var(--color-text-primary)",
                         }}
                     >
-                        {item.label}
-                    </Typography>
+                        <Typography
+                            sx={{
+                                minWidth: 0,
+                                fontSize: { xs: "16px", sm: "18px" },
+                                lineHeight: 1.45,
+                                fontWeight: 650,
+                                color: "var(--color-text-primary)",
+                            }}
+                        >
+                            {item.label}
+                        </Typography>
+                    </Stack>
 
                     <MiniDonutChart
-                        size={60}
+                        size={76}
                         centerLabel={`${percentage}%`}
                         data={chartData}
                     />
@@ -145,10 +189,10 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
                 <Typography
                     sx={{
                         minWidth: 0,
-                        fontSize: { xs: 26, sm: 29 },
+                        fontSize: { xs: 28, sm: 30, xl: 32 },
                         lineHeight: 1.15,
-                        fontWeight: 700,
-                        letterSpacing: "-0.7px",
+                        fontWeight: 750,
+                        letterSpacing: "-1px",
                         color: "var(--color-text-primary)",
                         fontVariantNumeric: "tabular-nums",
                     }}
@@ -158,19 +202,13 @@ function SummaryCard({ item, value, total, chartData }: SummaryCardProps) {
 
                 <Typography
                     sx={{
-                        fontSize: 12,
+                        fontSize: 11.5,
                         lineHeight: 1.5,
                         color: "var(--color-text-secondary)",
+                        fontWeight: 500,
                     }}
                 >
-                    {isTotal
-                        ? t("dashboard", "totalFeedbackPercentage").replace(
-                              "{percentage}",
-                              String(percentage),
-                          )
-                        : t("dashboard", "feedbackCountOfTotal")
-                              .replace("{value}", formattedValue)
-                              .replace("{total}", formattedTotal)}
+                    {description}
                 </Typography>
             </Stack>
         </Card>
@@ -191,22 +229,22 @@ export default function FeedbackSummary({ data }: FeedbackSummaryProps) {
         {
             key: "total",
             label: t("dashboard", "totalFeedback"),
-            color: "#193B56",
+            color: STATUS_COLORS.total,
         },
         {
             key: "new",
             label: labels.new,
-            color: "#EF4444",
+            color: STATUS_COLORS.new,
         },
         {
             key: "inProgress",
             label: labels.inProgress,
-            color: "#3B82F6",
+            color: STATUS_COLORS.inProgress,
         },
         {
             key: "resolved",
             label: labels.resolved,
-            color: "#10B981",
+            color: STATUS_COLORS.resolved,
         },
     ];
 
@@ -222,10 +260,11 @@ export default function FeedbackSummary({ data }: FeedbackSummaryProps) {
             sx={{
                 display: "grid",
                 gridTemplateColumns: {
-                    xs: "repeat(2, minmax(0, 1fr))",
-                    md: "repeat(4, minmax(0, 1fr))",
+                    xs: "minmax(0, 1fr)",
+                    sm: "repeat(2, minmax(0, 1fr))",
+                    xl: "repeat(4, minmax(0, 1fr))",
                 },
-                gap: { xs: 1.25, sm: 1.5 },
+                gap: { xs: 1.5, sm: 2 },
                 width: "100%",
                 minWidth: 0,
                 alignItems: "stretch",

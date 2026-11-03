@@ -15,7 +15,7 @@ export default function TablesLoading() {
                 <Skeleton
                     variant="rounded"
                     sx={{
-                        width: { xs: "100%", sm: 110 },
+                        width: 114,
                         height: 34,
                         borderRadius: 1.5,
                         flexShrink: 0,
@@ -24,9 +24,11 @@ export default function TablesLoading() {
             }
         >
             <TablesSummarySkeleton />
-            <TablesFilterSkeleton />
-            <TablesDesktopSkeleton />
-            <TablesMobileSkeleton />
+
+            <TablesFilterSkeleton>
+                <TablesDesktopSkeleton />
+                <TablesMobileSkeleton />
+            </TablesFilterSkeleton>
         </PageLoadingSkeleton>
     );
 }

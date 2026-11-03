@@ -39,6 +39,7 @@ export default function PageLoadingSkeleton({
                     },
                     justifyContent: "space-between",
                     gap: 2,
+                    mb: 1.5,
                 }}
             >
                 <Box sx={{ flex: 1, minWidth: 0 }}>

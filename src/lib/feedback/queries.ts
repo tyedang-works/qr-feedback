@@ -10,17 +10,28 @@ import type {
 } from "./types";
 
 const EXPORT_BATCH_SIZE = 500;
+const VIETNAM_TIMEZONE_OFFSET = "+07:00";
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
 type FeedbackSearchFilters = Pick<
     FeedbackFilters,
-    "keyword" | "issues" | "tableId" | "status"
+    | "keyword"
+    | "issues"
+    | "tableIds"
+    | "status"
+    | "startDate"
+    | "endDate"
+    | "sort"
 >;
 
 type NormalizedFeedbackFilters = {
     keyword: string;
     issues: string[];
-    tableId: string | null;
+    tableIds: string[];
     status: string | null;
+    startDate: string | null;
+    endDateExclusive: string | null;
+    sort: "newest" | "oldest";
 };
 
 type FeedbackRow = {
@@ -32,12 +43,19 @@ type FeedbackRow = {
     phone: string;
     status: string;
     internal_note: string | null;
+    resolved_by: string | null;
+    resolved_at: string | null;
     created_at: string;
 };
 
 type FeedbackTable = {
     id: string;
     name: string;
+};
+
+type FeedbackProfile = {
+    id: string;
+    full_name: string | null;
 };
 
 function normalizeFeedbackKeyword(value: string): string {
@@ -49,30 +67,63 @@ function normalizeFeedbackKeyword(value: string): string {
         .trim();
 }
 
+function parseVietnameseDateStart(value?: string): Date | null {
+    if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        return null;
+    }
+
+    const date = new Date(`${value}T00:00:00${VIETNAM_TIMEZONE_OFFSET}`);
+
+    if (
+        Number.isNaN(date.getTime()) ||
+        date.toLocaleDateString("en-CA", {
+            timeZone: "Asia/Ho_Chi_Minh",
+        }) !== value
+    ) {
+        return null;
+    }
+
+    return date;
+}
+
 function normalizeFeedbackFilters(
     filters: FeedbackSearchFilters,
 ): NormalizedFeedbackFilters {
+    const startDateValue = parseVietnameseDateStart(filters.startDate);
+    const endDateValue = parseVietnameseDateStart(filters.endDate);
+
+    const endDateExclusive = endDateValue
+        ? new Date(endDateValue.getTime() + MILLISECONDS_PER_DAY).toISOString()
+        : null;
+
     return {
         keyword: normalizeFeedbackKeyword(filters.keyword ?? ""),
         issues: [
             ...new Set(
                 (filters.issues ?? []).filter(
-                    (issue: string) => issue !== "" && issue !== "all",
+                    (issue) => issue !== "" && issue !== "all",
                 ),
             ),
         ],
-        tableId:
-            filters.tableId && filters.tableId !== "all"
-                ? filters.tableId
-                : null,
+        tableIds: [
+            ...new Set(
+                (filters.tableIds ?? []).filter(
+                    (id) => id !== "" && id !== "all",
+                ),
+            ),
+        ],
         status:
             filters.status && filters.status !== "all" ? filters.status : null,
+        startDate: startDateValue?.toISOString() ?? null,
+        endDateExclusive,
+        sort: filters.sort === "oldest" ? "oldest" : "newest",
     };
 }
 
 function mapFeedbackRow(
     item: FeedbackRow,
     tableNameMap: Map<string, string>,
+    resolvedByNameMap: Map<string, string | null>,
 ): FeedbackListItem {
     return {
         id: item.id,
@@ -84,6 +135,10 @@ function mapFeedbackRow(
         phone: item.phone,
         status: item.status as FeedbackStatus,
         internalNote: item.internal_note,
+        resolvedByName: item.resolved_by
+            ? (resolvedByNameMap.get(item.resolved_by) ?? null)
+            : null,
+        resolvedAt: item.resolved_at,
         createdAt: item.created_at,
     };
 }
@@ -119,6 +174,35 @@ async function getTableNameMap(
     );
 }
 
+async function getResolvedByNameMap(
+    profileIds: string[],
+    restaurantId: string,
+): Promise<Map<string, string | null>> {
+    if (profileIds.length === 0) {
+        return new Map();
+    }
+
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", profileIds)
+        .eq("restaurant_id", restaurantId);
+
+    if (error) {
+        console.error("Failed to get feedback resolver profiles:", error);
+        throw new Error("Không thể tải thông tin người xử lý phản hồi.");
+    }
+
+    return new Map(
+        ((data ?? []) as FeedbackProfile[]).map((profile) => [
+            profile.id,
+            profile.full_name,
+        ]),
+    );
+}
+
 export async function getFeedbackList(
     restaurantId: string,
     filters: FeedbackFilters,
@@ -139,8 +223,8 @@ export async function getFeedbackList(
         );
     }
 
-    if (normalizedFilters.tableId) {
-        countQuery = countQuery.eq("table_id", normalizedFilters.tableId);
+    if (normalizedFilters.tableIds.length > 0) {
+        countQuery = countQuery.in("table_id", normalizedFilters.tableIds);
     }
 
     if (normalizedFilters.issues.length > 0) {
@@ -152,6 +236,17 @@ export async function getFeedbackList(
 
     if (normalizedFilters.status) {
         countQuery = countQuery.eq("status", normalizedFilters.status);
+    }
+
+    if (normalizedFilters.startDate) {
+        countQuery = countQuery.gte("created_at", normalizedFilters.startDate);
+    }
+
+    if (normalizedFilters.endDateExclusive) {
+        countQuery = countQuery.lt(
+            "created_at",
+            normalizedFilters.endDateExclusive,
+        );
     }
 
     const { count, error: countError } = await countQuery;
@@ -190,6 +285,8 @@ export async function getFeedbackList(
             phone,
             status,
             internal_note,
+            resolved_by,
+            resolved_at,
             created_at
         `,
         )
@@ -202,8 +299,11 @@ export async function getFeedbackList(
         );
     }
 
-    if (normalizedFilters.tableId) {
-        feedbackQuery = feedbackQuery.eq("table_id", normalizedFilters.tableId);
+    if (normalizedFilters.tableIds.length > 0) {
+        feedbackQuery = feedbackQuery.in(
+            "table_id",
+            normalizedFilters.tableIds,
+        );
     }
 
     if (normalizedFilters.issues.length > 0) {
@@ -217,8 +317,25 @@ export async function getFeedbackList(
         feedbackQuery = feedbackQuery.eq("status", normalizedFilters.status);
     }
 
+    if (normalizedFilters.startDate) {
+        feedbackQuery = feedbackQuery.gte(
+            "created_at",
+            normalizedFilters.startDate,
+        );
+    }
+
+    if (normalizedFilters.endDateExclusive) {
+        feedbackQuery = feedbackQuery.lt(
+            "created_at",
+            normalizedFilters.endDateExclusive,
+        );
+    }
+
     const { data, error } = await feedbackQuery
-        .order("created_at", { ascending: false })
+        .order("created_at", {
+            ascending: normalizedFilters.sort === "oldest",
+        })
+        .order("id", { ascending: true })
         .range(from, to);
 
     if (error) {
@@ -240,10 +357,23 @@ export async function getFeedbackList(
 
     const tableIds = [...new Set(feedbackRows.map((item) => item.table_id))];
 
-    const tableNameMap = await getTableNameMap(tableIds, restaurantId);
+    const resolvedByIds = [
+        ...new Set(
+            feedbackRows
+                .map((item) => item.resolved_by)
+                .filter((id): id is string => Boolean(id)),
+        ),
+    ];
+
+    const [tableNameMap, resolvedByNameMap] = await Promise.all([
+        getTableNameMap(tableIds, restaurantId),
+        getResolvedByNameMap(resolvedByIds, restaurantId),
+    ]);
 
     return {
-        data: feedbackRows.map((item) => mapFeedbackRow(item, tableNameMap)),
+        data: feedbackRows.map((item) =>
+            mapFeedbackRow(item, tableNameMap, resolvedByNameMap),
+        ),
         total,
         page: safePage,
         pageSize,
@@ -269,6 +399,8 @@ export async function getFeedbackDetail(
             phone,
             status,
             internal_note,
+            resolved_by,
+            resolved_at,
             created_at
         `,
         )
@@ -297,6 +429,11 @@ export async function getFeedbackDetail(
         throw new Error("Không thể tải thông tin bàn.");
     }
 
+    const resolvedByNameMap = await getResolvedByNameMap(
+        feedback.resolved_by ? [feedback.resolved_by] : [],
+        restaurantId,
+    );
+
     return {
         id: feedback.id,
         publicId: feedback.public_id,
@@ -307,6 +444,10 @@ export async function getFeedbackDetail(
         phone: feedback.phone,
         status: feedback.status as FeedbackStatus,
         internalNote: feedback.internal_note,
+        resolvedByName: feedback.resolved_by
+            ? (resolvedByNameMap.get(feedback.resolved_by) ?? null)
+            : null,
+        resolvedAt: feedback.resolved_at,
         createdAt: feedback.created_at,
     };
 }
@@ -316,8 +457,9 @@ export async function getFeedbackExport(
     filters: FeedbackSearchFilters,
 ): Promise<FeedbackListItem[]> {
     const supabase = await createClient();
-    const result: FeedbackListItem[] = [];
     const normalizedFilters = normalizeFeedbackFilters(filters);
+
+    const feedbackRows: FeedbackRow[] = [];
 
     let from = 0;
 
@@ -334,6 +476,8 @@ export async function getFeedbackExport(
                 phone,
                 status,
                 internal_note,
+                resolved_by,
+                resolved_at,
                 created_at
             `,
             )
@@ -346,8 +490,8 @@ export async function getFeedbackExport(
             );
         }
 
-        if (normalizedFilters.tableId) {
-            query = query.eq("table_id", normalizedFilters.tableId);
+        if (normalizedFilters.tableIds.length > 0) {
+            query = query.in("table_id", normalizedFilters.tableIds);
         }
 
         if (normalizedFilters.issues.length > 0) {
@@ -361,8 +505,19 @@ export async function getFeedbackExport(
             query = query.eq("status", normalizedFilters.status);
         }
 
+        if (normalizedFilters.startDate) {
+            query = query.gte("created_at", normalizedFilters.startDate);
+        }
+
+        if (normalizedFilters.endDateExclusive) {
+            query = query.lt("created_at", normalizedFilters.endDateExclusive);
+        }
+
         const { data, error } = await query
-            .order("created_at", { ascending: false })
+            .order("created_at", {
+                ascending: normalizedFilters.sort === "oldest",
+            })
+            .order("id", { ascending: true })
             .range(from, from + EXPORT_BATCH_SIZE - 1);
 
         if (error) {
@@ -370,30 +525,43 @@ export async function getFeedbackExport(
             throw new Error("Không thể tải dữ liệu phản hồi để xuất báo cáo.");
         }
 
-        const feedbackRows = (data ?? []) as FeedbackRow[];
+        const batch = (data ?? []) as FeedbackRow[];
 
-        if (feedbackRows.length === 0) {
+        if (batch.length === 0) {
             break;
         }
 
-        const tableIds = [
-            ...new Set(feedbackRows.map((item) => item.table_id)),
-        ];
+        feedbackRows.push(...batch);
 
-        const tableNameMap = await getTableNameMap(tableIds, restaurantId);
-
-        result.push(
-            ...feedbackRows.map((item) => mapFeedbackRow(item, tableNameMap)),
-        );
-
-        if (feedbackRows.length < EXPORT_BATCH_SIZE) {
+        if (batch.length < EXPORT_BATCH_SIZE) {
             break;
         }
 
         from += EXPORT_BATCH_SIZE;
     }
 
-    return result;
+    if (feedbackRows.length === 0) {
+        return [];
+    }
+
+    const tableIds = [...new Set(feedbackRows.map((item) => item.table_id))];
+
+    const resolvedByIds = [
+        ...new Set(
+            feedbackRows
+                .map((item) => item.resolved_by)
+                .filter((id): id is string => Boolean(id)),
+        ),
+    ];
+
+    const [tableNameMap, resolvedByNameMap] = await Promise.all([
+        getTableNameMap(tableIds, restaurantId),
+        getResolvedByNameMap(resolvedByIds, restaurantId),
+    ]);
+
+    return feedbackRows.map((item) =>
+        mapFeedbackRow(item, tableNameMap, resolvedByNameMap),
+    );
 }
 
 export async function getFeedbackSummary(

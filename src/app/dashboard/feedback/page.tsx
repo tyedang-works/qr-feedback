@@ -1,26 +1,27 @@
 import PageHeader from "@/components/common/layout/PageHeader";
-import ExportFeedbackButton from "@/components/feedback/ExportFeedbackButton";
 import FeedbackList from "@/components/feedback/FeedbackList";
 import FeedbackPagination from "@/components/feedback/FeedbackPagination";
-import FeedbackSummary from "@/components/feedback/FeedbackSummary";
 import FeedbackToolbar from "@/components/feedback/FeedbackToolbar";
+import { translations, type Locale } from "@/i18n/translations";
 import { USER_ROLES } from "@/lib/auth/constants";
 import { getUserContext } from "@/lib/auth/queries";
 import { FEEDBACK_ISSUES, FEEDBACK_PAGE_SIZE } from "@/lib/feedback/constants";
 import { getFeedbackList, getFeedbackSummary } from "@/lib/feedback/queries";
 import { getRestaurantTables } from "@/lib/tables/queries";
-import { translations, type Locale } from "@/i18n/translations";
 import { Stack } from "@mui/material";
-import { cookies } from "next/headers";
 import { MessageCircle } from "lucide-react";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 type FeedbackPageProps = {
     searchParams: Promise<{
         keyword?: string;
         issue?: string | string[];
-        tableId?: string;
+        tableId?: string | string[];
         status?: string;
+        startDate?: string;
+        endDate?: string;
+        sort?: string;
         page?: string;
     }>;
 };
@@ -38,6 +39,7 @@ export default async function FeedbackPage({
             : "vi";
 
     const keyword = params.keyword ?? "";
+
     const rawIssues = params.issue
         ? Array.isArray(params.issue)
             ? params.issue
@@ -53,10 +55,22 @@ export default async function FeedbackPage({
             ),
         ),
     ];
-    const tableId =
-        params.tableId && params.tableId !== "all" ? params.tableId : "";
+
+    const rawTableIds = params.tableId
+        ? Array.isArray(params.tableId)
+            ? params.tableId
+            : [params.tableId]
+        : [];
+
+    const tableIds = [...new Set(rawTableIds.filter(Boolean))];
+
     const status =
         params.status && params.status !== "all" ? params.status : "";
+
+    const startDate = params.startDate ?? "";
+    const endDate = params.endDate ?? "";
+
+    const sort = params.sort === "oldest" ? "oldest" : "newest";
 
     const parsedPage = Number(params.page);
     const page =
@@ -78,15 +92,21 @@ export default async function FeedbackPage({
             pageSize: FEEDBACK_PAGE_SIZE,
             keyword,
             issues,
-            tableId,
+            tableIds,
             status,
+            startDate,
+            endDate,
+            sort,
         }),
         getRestaurantTables(userContext.restaurantId),
         getFeedbackSummary(userContext.restaurantId),
     ]);
 
-    const exportParams = new URLSearchParams();
+    console.log("FeedbackPage: feedback", feedback);
+    console.log("FeedbackPage: tables", tables);
 
+    const exportParams = new URLSearchParams();
+    exportParams.set("locale", locale);
     if (keyword) {
         exportParams.set("keyword", keyword);
     }
@@ -95,12 +115,24 @@ export default async function FeedbackPage({
         exportParams.append("issue", value);
     });
 
-    if (tableId) {
-        exportParams.set("tableId", tableId);
-    }
+    tableIds.forEach((value) => {
+        exportParams.append("tableId", value);
+    });
 
     if (status) {
         exportParams.set("status", status);
+    }
+
+    if (startDate) {
+        exportParams.set("startDate", startDate);
+    }
+
+    if (endDate) {
+        exportParams.set("endDate", endDate);
+    }
+
+    if (sort !== "newest") {
+        exportParams.set("sort", sort);
     }
 
     const exportQuery = exportParams.toString();
@@ -125,32 +157,29 @@ export default async function FeedbackPage({
                 icon={MessageCircle}
             />
 
-            <FeedbackSummary data={summary} />
-
             <FeedbackToolbar
-                key={`${keyword}-${issues}-${tableId}-${status}`}
+                key={JSON.stringify({
+                    keyword,
+                    issues,
+                    tableIds,
+                    status,
+                    startDate,
+                    endDate,
+                    sort,
+                })}
                 keyword={keyword}
                 issues={issues}
-                tableId={tableId}
-                tables={tables}
+                tableIds={tableIds}
                 status={status}
+                startDate={startDate}
+                endDate={endDate}
+                sort={sort}
+                tables={tables}
+                total={feedback.total}
+                exportUrl={exportUrl}
+                exportDisabled={feedback.total === 0}
                 summary={summary}
             />
-
-            <Stack
-                sx={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    flexWrap: "wrap",
-                    gap: 1.5,
-                }}
-            >
-                <ExportFeedbackButton
-                    href={exportUrl}
-                    disabled={feedback.total === 0}
-                />
-            </Stack>
 
             <FeedbackList data={feedback.data} />
 

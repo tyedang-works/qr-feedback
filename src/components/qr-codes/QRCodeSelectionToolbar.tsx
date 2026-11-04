@@ -39,7 +39,7 @@ export default function QRCodeSelectionToolbar({
                 px: 2,
                 py: 1,
                 border: "1px solid var(--color-border)",
-                borderRadius: 2,
+                borderRadius: "12px",
                 backgroundColor: "var(--color-surface)",
                 flexDirection: "row",
                 "@media (max-width: 767px)": {

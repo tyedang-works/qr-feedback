@@ -9,6 +9,7 @@ import {
     DialogTitle,
     IconButton,
     Slide,
+    Stack,
     type DialogProps,
     type SlideProps,
 } from "@mui/material";
@@ -19,6 +20,7 @@ type QRDialogProps = Omit<DialogProps, "title" | "children"> & {
     title: string;
     children: ReactNode;
     actions?: ReactNode;
+    titleAdornment?: ReactNode;
 };
 
 const DialogTransition = forwardRef<HTMLDivElement, SlideProps>(
@@ -41,6 +43,7 @@ export default function QRDialog({
     open,
     onClose,
     title,
+    titleAdornment,
     children,
     actions,
     fullWidth = true,
@@ -94,18 +97,41 @@ export default function QRDialog({
                     borderBottom: "1px solid var(--color-border)",
                 }}
             >
-                <Box
-                    component="span"
+                <Stack
                     sx={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        flex: 1,
                         minWidth: 0,
-                        fontSize: 18,
-                        lineHeight: 1.5,
-                        fontWeight: 700,
-                        color: "var(--color-text-primary)",
+                        gap: 1.5,
+
+                        "& > .MuiBox-root:last-child": {
+                            display: "flex",
+                            alignItems: "center",
+                            alignSelf: "center",
+                            transform: "translateY(0px)",
+                        },
                     }}
                 >
-                    {title}
-                </Box>
+                    <Box
+                        component="span"
+                        sx={{
+                            display: "block",
+                            minWidth: 0,
+                            fontSize: 18,
+                            lineHeight: "27px",
+                            fontWeight: 700,
+                            color: "var(--color-text-primary)",
+                        }}
+                    >
+                        {title}
+                    </Box>
+
+                    {titleAdornment && (
+                        <Box sx={{ flexShrink: 0 }}>{titleAdornment}</Box>
+                    )}
+                </Stack>
 
                 <IconButton
                     type="button"

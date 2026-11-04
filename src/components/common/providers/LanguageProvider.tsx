@@ -15,10 +15,15 @@ import {
     type TranslationKey,
 } from "@/i18n/translations";
 
+import {
+    feedbackToolbarTranslations,
+    type FeedbackToolbarTranslationKey,
+} from "@/i18n/feedback-toolbar.translations";
+
 type LanguageContextValue = {
     locale: Locale;
     setLocale: (locale: Locale) => void;
-    t: (section: TranslationKey, key: string) => string;
+    t: (section: TranslationKey | "feedbackToolbar", key: string) => string;
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
@@ -54,7 +59,15 @@ export default function LanguageProvider({
     );
 
     const t = useCallback(
-        (section: TranslationKey, key: string): string => {
+        (section: TranslationKey | "feedbackToolbar", key: string): string => {
+            if (section === "feedbackToolbar") {
+                const dictionary = feedbackToolbarTranslations[
+                    locale
+                ] as Record<FeedbackToolbarTranslationKey, string>;
+
+                return dictionary[key as FeedbackToolbarTranslationKey] ?? key;
+            }
+
             const dictionary: Record<string, string> =
                 translations[locale][section];
 

@@ -3,7 +3,7 @@ import type { SxProps, Theme } from "@mui/material/styles";
 export const buttonBaseSx: SxProps<Theme> = {
     minWidth: 100,
     minHeight: 40,
-    borderRadius: 1.5,
+    borderRadius: "6px",
     backgroundColor: "var(--color-button-primary-bg)",
     color: "var(--color-button-primary-text)",
     fontSize: 14,
@@ -36,7 +36,7 @@ export const buttonBaseCancelSx: SxProps<Theme> = {
     minHeight: 40,
     border: "1px solid var(--color-border)",
     borderColor: "var(--color-border)",
-    borderRadius: 1.5,
+    borderRadius: "6px",
     backgroundColor: "transparent",
     color: "var(--color-text-secondary)",
     fontSize: 14,
@@ -92,7 +92,7 @@ export const chipBaseSx: SxProps<Theme> = {
 const tableActionButtonBaseSx: SxProps<Theme> = {
     height: "32px",
     px: 1,
-    borderRadius: 1.5,
+    borderRadius: "6px",
     fontSize: 13,
     fontWeight: 600,
     textTransform: "none",

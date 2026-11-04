@@ -14,12 +14,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import * as Yup from "yup";
 
-type FeedbackManagementFormProps = {
-    feedbackPublicId: string;
-    initialStatus: FeedbackStatus;
-    initialInternalNote: string | null;
-};
-
 type FeedbackManagementFormValues = {
     status: FeedbackStatus;
     internalNote: string;
@@ -37,10 +31,18 @@ const STATUS_TRANSLATION_KEYS: Record<FeedbackStatus, string> = {
     resolved: "resolved",
 };
 
+type FeedbackManagementFormProps = {
+    feedbackPublicId: string;
+    initialStatus: FeedbackStatus;
+    initialInternalNote: string | null;
+    onSuccess?: () => void;
+};
+
 export default function FeedbackManagementForm({
     feedbackPublicId,
     initialStatus,
     initialInternalNote,
+    onSuccess,
 }: FeedbackManagementFormProps) {
     const { t } = useTranslation();
     const router = useRouter();
@@ -103,6 +105,7 @@ export default function FeedbackManagementForm({
 
                 if (result.success) {
                     router.refresh();
+                    onSuccess?.();
                 }
             } catch {
                 setSnackbar({
@@ -114,7 +117,7 @@ export default function FeedbackManagementForm({
                 setSubmitting(false);
             }
         },
-        [feedbackPublicId, router, t],
+        [feedbackPublicId, onSuccess, router, t],
     );
 
     return (

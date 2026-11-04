@@ -1,62 +1,89 @@
 "use client";
 
-import { useTranslation } from "@/components/common/providers/useTranslation";
-import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";
-import {
-    FEEDBACK_ISSUES,
-    FEEDBACK_STATUS,
-    STATUS_CONFIG,
-} from "@/lib/feedback/constants";
-import type { FeedbackSummary } from "@/lib/feedback/types";
-import type { RestaurantTableOption } from "@/lib/tables/queries";
-import {
-    buttonBaseCancelSx,
-    buttonBaseSx,
-    chipBaseSx,
-} from "@/styles/button.styles";
-import { cardSx } from "@/styles/card.styles";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { useDashboardLoading } from "@/components/dashboard/DashboardLoadingProvider";
+import FeedbackFilterDrawer from "@/components/feedback/FeedbackFilterDrawer";
+import { FEEDBACK_ISSUES, FEEDBACK_STATUS } from "@/lib/feedback/constants";
+import type { RestaurantTableOption } from "@/lib/tables/queries";
+import { cardSx } from "@/styles/card.styles";
+import type { ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
+
 import {
     Box,
     Button,
     Card,
-    Checkbox,
     Chip,
     Divider,
     IconButton,
-    ListItemText,
+    InputAdornment,
+    Menu,
     MenuItem,
-    CircularProgress as MuiCircularProgress,
-    Popover,
     Stack,
     Typography,
 } from "@mui/material";
+
 import {
-    ChevronDown,
-    CircleCheckBig,
-    Funnel,
-    RotateCcw,
+    ArrowDownWideNarrow,
+    CalendarDays,
+    ListFilterPlus,
     Search,
+    Trash2,
     X,
 } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
-type FeedbackToolbarProps = {
-    keyword: string;
-    issues: string[];
-    tableId: string;
-    status: string;
-    tables: RestaurantTableOption[];
-    summary: FeedbackSummary;
+import dayjs from "@/lib/dayjs";
+import { FeedbackSummary } from "@/lib/feedback/types";
+import { usePathname, useRouter } from "next/navigation";
+import TabBar, { TabBarItem } from "../common/tab/TabBar";
+import ExportFeedbackButton from "./ExportFeedbackButton";
+
+const formatFilterDate = (date: string) => {
+    const parsedDate = dayjs(date, "YYYY-MM-DD", true);
+
+    return parsedDate.isValid() ? parsedDate.format("DD/MM/YYYY") : date;
 };
 
-type FilterKey = "keyword" | "issue" | "tableId" | "status";
+type SortOption = "newest" | "oldest";
 
-type FilterOverrides = Partial<Record<FilterKey, string | string[] | null>>;
+type UpdateParams = Partial<{
+    keyword: string | null;
+    issues: string[];
+    tableIds: string[];
+    status: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    sort: SortOption;
+}>;
 
 const SEARCH_DEBOUNCE_MS = 400;
+
+const STATUS_OPTIONS = [
+    { value: "all" },
+    { value: FEEDBACK_STATUS.NEW },
+    { value: FEEDBACK_STATUS.IN_PROGRESS },
+    { value: FEEDBACK_STATUS.RESOLVED },
+] as const;
+
+const STATUS_BADGE_COLORS: Record<string, { bg: string; text: string }> = {
+    all: {
+        bg: "var(--color-badge-all-bg)",
+        text: "var(--color-badge-all-text)",
+    },
+    [FEEDBACK_STATUS.NEW]: {
+        bg: "var(--color-badge-new-bg)",
+        text: "var(--color-badge-new-text)",
+    },
+    [FEEDBACK_STATUS.IN_PROGRESS]: {
+        bg: "var(--color-badge-in-progress-bg)",
+        text: "var(--color-badge-in-progress-text)",
+    },
+    [FEEDBACK_STATUS.RESOLVED]: {
+        bg: "var(--color-badge-resolved-bg)",
+        text: "var(--color-badge-resolved-text)",
+    },
+};
 
 const ISSUE_TRANSLATION_KEYS: Record<string, string> = {
     food_quality: "foodQuality",
@@ -66,29 +93,97 @@ const ISSUE_TRANSLATION_KEYS: Record<string, string> = {
     service_time: "serviceTime",
 };
 
+const activeChipSx = {
+    height: 28,
+    borderRadius: "8px",
+    bgcolor: "var(--color-surface-active)",
+    color: "var(--color-text-primary)",
+    border: "1px solid var(--color-border)",
+    fontSize: 12,
+    fontWeight: 400,
+
+    "& .MuiChip-label": {
+        px: 1,
+    },
+
+    "& .MuiChip-deleteIcon": {
+        width: 16,
+        height: 16,
+        p: "2px",
+        ml: 0.5,
+        mr: 0.5,
+        borderRadius: "50%",
+        bgcolor: "var(--color-text-muted)",
+        color: "var(--color-surface)",
+        fontSize: 12,
+        transition: "background-color 150ms ease",
+
+        "&:hover": {
+            bgcolor: "var(--color-text-secondary)",
+            color: "var(--color-surface)",
+        },
+    },
+};
+
+type FeedbackToolbarProps = {
+    keyword: string;
+    issues: string[];
+    tableIds: string[];
+    status: string;
+    startDate: string;
+    endDate: string;
+    sort: SortOption;
+    tables: RestaurantTableOption[];
+    total: number;
+    exportUrl: string;
+    exportDisabled: boolean;
+    summary: FeedbackSummary;
+};
+
 export default function FeedbackToolbar({
     keyword,
     issues,
-    tableId,
+    tableIds,
     status,
+    startDate,
+    endDate,
+    sort,
     tables,
+    total,
+    exportUrl,
+    exportDisabled,
     summary,
 }: FeedbackToolbarProps) {
     const { t } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
-
-    const [filterAnchorEl, setFilterAnchorEl] =
-        useState<HTMLButtonElement | null>(null);
+    const { startNavigation } = useDashboardLoading();
 
     const [keywordValue, setKeywordValue] = useState(keyword);
     const [filterOpen, setFilterOpen] = useState(false);
+    const [sortAnchorEl, setSortAnchorEl] = useState<HTMLElement | null>(null);
 
-    const [draftIssues, setDraftIssues] = useState<string[]>(issues);
-    const [draftTableId, setDraftTableId] = useState(tableId || "all");
+    const isSearching = keywordValue.trim() !== keyword.trim();
 
-    const { startNavigation } = useDashboardLoading();
-    const isLoading = keywordValue.trim() !== keyword.trim();
+    const activeFilterCount = [
+        issues.length > 0,
+        tableIds.length > 0,
+        Boolean(startDate || endDate),
+    ].filter(Boolean).length;
+
+    const hasActiveFilters = activeFilterCount > 0;
+    const activeStatus = status || "all";
+
+    const selectedIssues = FEEDBACK_ISSUES.filter(({ option }) =>
+        issues.includes(option),
+    );
+
+    const selectedTables = tables.filter(({ id }) => tableIds.includes(id));
+
+    const sortLabel =
+        sort === "oldest"
+            ? t("feedback", "oldestFirst")
+            : t("feedback", "newestFirst");
 
     const getIssueLabel = (option: string, fallbackLabel: string) => {
         const translationKey = ISSUE_TRANSLATION_KEYS[option];
@@ -96,41 +191,101 @@ export default function FeedbackToolbar({
         return translationKey ? t("dashboard", translationKey) : fallbackLabel;
     };
 
-    const selectedIssues = FEEDBACK_ISSUES.filter(({ option }) =>
-        issues.includes(option),
-    ).map((issue) => ({
-        ...issue,
-        label: getIssueLabel(issue.option, issue.label),
-    }));
+    const STATUS_COUNTS: Record<string, number> = {
+        all: summary.total,
+        [FEEDBACK_STATUS.NEW]: summary.new,
+        [FEEDBACK_STATUS.IN_PROGRESS]: summary.inProgress,
+        [FEEDBACK_STATUS.RESOLVED]: summary.resolved,
+    };
 
-    const tableLabel = tables.find((table) => table.id === tableId)?.name;
+    const dateRangeLabel =
+        startDate && endDate
+            ? `${formatFilterDate(startDate)} – ${formatFilterDate(endDate)}`
+            : startDate
+              ? `${t("feedbackToolbar", "startDate")}: ${formatFilterDate(startDate)}`
+              : `${t("feedbackToolbar", "endDate")}: ${formatFilterDate(endDate)}`;
 
-    const activeFilterCount = [issues.length > 0, Boolean(tableId)].filter(
-        Boolean,
-    ).length;
+    const navigateTo = useCallback(
+        (params: URLSearchParams) => {
+            params.delete("page");
 
-    const statusOptions = [
-        {
-            value: "all",
-            label: t("dashboard", "all"),
-            getCount: (summary: FeedbackSummary) => summary.total,
+            const query = params.toString();
+            const href = query ? `${pathname}?${query}` : pathname;
+
+            if (href === `${pathname}${window.location.search}`) {
+                return;
+            }
+
+            startNavigation();
+            router.replace(href, { scroll: false });
         },
-        {
-            value: FEEDBACK_STATUS.NEW,
-            label: t("dashboard", "new"),
-            getCount: (summary: FeedbackSummary) => summary.new,
+        [pathname, router, startNavigation],
+    );
+
+    const updateParams = useCallback(
+        (updates: UpdateParams) => {
+            const params = new URLSearchParams(window.location.search);
+
+            if ("keyword" in updates) {
+                if (updates.keyword) {
+                    params.set("keyword", updates.keyword);
+                } else {
+                    params.delete("keyword");
+                }
+            }
+
+            if ("issues" in updates) {
+                params.delete("issue");
+
+                updates.issues?.forEach((issue) => {
+                    params.append("issue", issue);
+                });
+            }
+
+            if ("tableIds" in updates) {
+                params.delete("tableId");
+
+                updates.tableIds?.forEach((id) => {
+                    params.append("tableId", id);
+                });
+            }
+
+            if ("status" in updates) {
+                if (updates.status && updates.status !== "all") {
+                    params.set("status", updates.status);
+                } else {
+                    params.delete("status");
+                }
+            }
+
+            if ("startDate" in updates) {
+                if (updates.startDate) {
+                    params.set("startDate", updates.startDate);
+                } else {
+                    params.delete("startDate");
+                }
+            }
+
+            if ("endDate" in updates) {
+                if (updates.endDate) {
+                    params.set("endDate", updates.endDate);
+                } else {
+                    params.delete("endDate");
+                }
+            }
+
+            if ("sort" in updates) {
+                if (updates.sort && updates.sort !== "newest") {
+                    params.set("sort", updates.sort);
+                } else {
+                    params.delete("sort");
+                }
+            }
+
+            navigateTo(params);
         },
-        {
-            value: FEEDBACK_STATUS.IN_PROGRESS,
-            label: t("dashboard", "inProgress"),
-            getCount: (summary: FeedbackSummary) => summary.inProgress,
-        },
-        {
-            value: FEEDBACK_STATUS.RESOLVED,
-            label: t("dashboard", "resolved"),
-            getCount: (summary: FeedbackSummary) => summary.resolved,
-        },
-    ] as const;
+        [navigateTo],
+    );
 
     useEffect(() => {
         const nextKeyword = keywordValue.trim();
@@ -142,673 +297,549 @@ export default function FeedbackToolbar({
         }
 
         const timeoutId = window.setTimeout(() => {
-            const params = new URLSearchParams(window.location.search);
-
-            if (nextKeyword) {
-                params.set("keyword", nextKeyword);
-            } else {
-                params.delete("keyword");
-            }
-
-            params.delete("page");
-
-            const query = params.toString();
-            const href = query ? `${pathname}?${query}` : pathname;
-            startNavigation();
-            router.replace(href, { scroll: false });
+            updateParams({ keyword: nextKeyword || null });
         }, SEARCH_DEBOUNCE_MS);
 
-        return () => {
-            window.clearTimeout(timeoutId);
-        };
-    }, [keywordValue, pathname, router, startNavigation]);
-
-    const navigateTo = (href: string) => {
-        if (href === `${pathname}${window.location.search}`) {
-            return;
-        }
-        startNavigation();
-        router.replace(href, { scroll: false });
-    };
-
-    const buildHref = (overrides: FilterOverrides = {}) => {
-        const params = new URLSearchParams();
-
-        const values: Record<FilterKey, string | string[] | null> = {
-            keyword: keywordValue.trim() || null,
-            issue: issues,
-            tableId: tableId || null,
-            status: status || null,
-            ...overrides,
-        };
-
-        (Object.keys(values) as FilterKey[]).forEach((key) => {
-            const value = values[key];
-
-            if (key === "issue") {
-                const issueValues = Array.isArray(value)
-                    ? value
-                    : typeof value === "string" && value !== "all"
-                      ? [value]
-                      : [];
-
-                issueValues.forEach((issue) => {
-                    if (issue && issue !== "all") {
-                        params.append("issue", issue);
-                    }
-                });
-
-                return;
-            }
-
-            if (Array.isArray(value)) {
-                value.forEach((item) => {
-                    if (item && item !== "all") {
-                        params.append(key, item);
-                    }
-                });
-
-                return;
-            }
-
-            if (value && value !== "all") {
-                params.set(key, value);
-            }
-        });
-
-        params.delete("page");
-
-        const query = params.toString();
-
-        return query ? `${pathname}?${query}` : pathname;
-    };
-
-    const applyFilters = () => {
-        const params = new URLSearchParams(window.location.search);
-        const normalizedKeyword = keywordValue.trim();
-
-        if (normalizedKeyword) {
-            params.set("keyword", normalizedKeyword);
-        } else {
-            params.delete("keyword");
-        }
-
-        params.delete("issue");
-
-        [...new Set(draftIssues)].forEach((issue) => {
-            params.append("issue", issue);
-        });
-
-        if (draftTableId && draftTableId !== "all") {
-            params.set("tableId", draftTableId);
-        } else {
-            params.delete("tableId");
-        }
-
-        params.delete("page");
-
-        const query = params.toString();
-
-        setFilterOpen(false);
-        navigateTo(query ? `${pathname}?${query}` : pathname);
-    };
-
-    const clearDraftFilters = () => {
-        setDraftIssues([]);
-        setDraftTableId("all");
-    };
+        return () => window.clearTimeout(timeoutId);
+    }, [keywordValue, updateParams]);
 
     const clearAllFilters = () => {
         setKeywordValue("");
-        setDraftIssues([]);
-        setDraftTableId("all");
-        setFilterOpen(false);
 
-        navigateTo(pathname);
+        const params = new URLSearchParams(window.location.search);
+
+        params.delete("keyword");
+        params.delete("issue");
+        params.delete("tableId");
+        params.delete("startDate");
+        params.delete("endDate");
+
+        navigateTo(params);
     };
 
-    const removeFilter = (key: FilterKey) => {
-        if (key === "keyword") {
-            setKeywordValue("");
-            return;
-        }
-
-        navigateTo(buildHref({ [key]: null }));
+    const removeIssue = (issue: string) => {
+        updateParams({
+            issues: issues.filter((item) => item !== issue),
+        });
     };
 
-    const openFilters = () => {
-        setDraftIssues([...issues]);
-        setDraftTableId(tableId || "all");
-        setFilterOpen(true);
+    const removeTable = (tableId: string) => {
+        updateParams({
+            tableIds: tableIds.filter((item) => item !== tableId),
+        });
     };
 
-    const isFilterUnchanged = () => {
-        const currentIssues = [...new Set(issues)].sort();
-        const nextIssues = [...new Set(draftIssues)].sort();
-
-        return (
-            currentIssues.length === nextIssues.length &&
-            currentIssues.every(
-                (issue, index) => issue === nextIssues[index],
-            ) &&
-            draftTableId === (tableId || "all")
-        );
+    const removeDateFilter = () => {
+        updateParams({
+            startDate: null,
+            endDate: null,
+        });
     };
+
+    const renderFilterGroup = (label: string, children: ReactNode) => (
+        <Stack
+            sx={{
+                flexDirection: "row",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 0.75,
+                px: 1,
+                py: 0.75,
+                border: "1px dashed var(--color-border)",
+                borderRadius: 1.5,
+                minHeight: 40,
+                bgcolor: "var(--color-surface)",
+            }}
+        >
+            <Typography
+                sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "var(--color-text-primary)",
+                    whiteSpace: "nowrap",
+                }}
+            >
+                {label}:
+            </Typography>
+
+            {children}
+        </Stack>
+    );
+
+    const statusTabs: TabBarItem[] = STATUS_OPTIONS.map((option) => {
+        const badgeColor = STATUS_BADGE_COLORS[option.value];
+
+        return {
+            value: option.value,
+            label:
+                option.value === "all"
+                    ? t("dashboard", "all")
+                    : option.value === FEEDBACK_STATUS.NEW
+                      ? t("dashboard", "new")
+                      : option.value === FEEDBACK_STATUS.IN_PROGRESS
+                        ? t("dashboard", "inProgress")
+                        : t("dashboard", "resolved"),
+            count: STATUS_COUNTS[option.value] ?? 0,
+            badgeColor: badgeColor.bg,
+            badgeTextColor: badgeColor.text,
+        };
+    });
 
     return (
         <Card elevation={0} sx={cardSx}>
-            <Stack
-                sx={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 1.25,
-                    width: "100%",
-                    minWidth: 0,
-                }}
-            >
-                <Box
-                    sx={{
-                        flex: 1,
-                        minWidth: 0,
-                        position: "relative",
-                        "& .MuiFormControl-root": {
-                            width: "100%",
-                        },
-                    }}
-                >
-                    <QRTextField
-                        name="keyword"
-                        placeholder={t(
-                            "dashboard",
-                            "searchFeedbackPlaceholder",
-                        )}
-                        value={keywordValue}
-                        onChange={(event) =>
-                            setKeywordValue(event.target.value)
-                        }
-                        sx={{
-                            "& .MuiOutlinedInput-input": {
-                                paddingRight: "44px",
-                            },
+            <Stack sx={{ gap: 2 }}>
+                <Box sx={{ pb: 1 }}>
+                    <TabBar
+                        items={statusTabs}
+                        value={activeStatus}
+                        onChange={(value) => {
+                            updateParams({
+                                status: value === "all" ? null : String(value),
+                            });
                         }}
-                        slotProps={{
-                            htmlInput: {
-                                "aria-label": t(
-                                    "dashboard",
-                                    "searchFeedbackAriaLabel",
-                                ),
-                                "aria-busy": isLoading,
-                            },
-                            input: {
-                                startAdornment: (
-                                    <Box
-                                        component="span"
-                                        sx={{
-                                            display: "inline-flex",
-                                            alignItems: "center",
-                                            color: "var(--color-text-muted)",
-                                        }}
-                                    >
-                                        <Search size={16} />
-                                    </Box>
-                                ),
-                            },
-                        }}
+                        ariaLabel="Feedback status"
+                        variant="scrollable"
+                        scrollButtons="auto"
                     />
-
-                    {isLoading && (
-                        <MuiCircularProgress
-                            size={18}
-                            thickness={5}
-                            aria-label={t("dashboard", "searchingFeedback")}
-                            sx={{
-                                position: "absolute",
-                                right: 14,
-                                top: "30%",
-                                transform: "translateY(-50%)",
-                                color: "var(--color-input-focus)",
-                                pointerEvents: "none",
-                            }}
-                        />
-                    )}
                 </Box>
 
-                <Button
-                    ref={setFilterAnchorEl}
-                    type="button"
-                    variant="outlined"
-                    onClick={() => {
-                        if (filterOpen) {
-                            setFilterOpen(false);
-                        } else {
-                            openFilters();
-                        }
+                <Stack
+                    sx={{
+                        flexDirection: { xs: "column", sm: "row" },
+                        alignItems: { xs: "stretch", sm: "center" },
+                        gap: 1,
+                        width: "100%",
+                        minWidth: 0,
                     }}
-                    startIcon={<Funnel size={16} />}
-                    endIcon={
-                        <ChevronDown
-                            size={16}
-                            style={{
-                                transform: filterOpen
-                                    ? "rotate(180deg)"
-                                    : "none",
-                                transition: "transform 180ms ease",
+                >
+                    <Box
+                        sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            position: "relative",
+                            "& .MuiFormControl-root": {
+                                width: "100%",
+                            },
+                        }}
+                    >
+                        <QRTextField
+                            name="keyword"
+                            placeholder={t(
+                                "dashboard",
+                                "searchFeedbackPlaceholder",
+                            )}
+                            value={keywordValue}
+                            onChange={(event) =>
+                                setKeywordValue(event.target.value)
+                            }
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    pl: 1.5,
+                                },
+                                "& .MuiOutlinedInput-input": {
+                                    pl: 0,
+                                    pr: 1,
+                                },
+                                "& .MuiInputAdornment-positionStart": {
+                                    mr: 1,
+                                },
+                                "& .MuiInputAdornment-positionEnd": {
+                                    ml: 0.5,
+                                },
+                            }}
+                            slotProps={{
+                                htmlInput: {
+                                    "aria-label": t(
+                                        "dashboard",
+                                        "searchFeedbackAriaLabel",
+                                    ),
+                                    "aria-busy": isSearching,
+                                },
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Search
+                                                size={17}
+                                                strokeWidth={1.8}
+                                            />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: keywordValue ? (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() =>
+                                                    setKeywordValue("")
+                                                }
+                                                aria-label={t(
+                                                    "dashboard",
+                                                    "clearSearch",
+                                                )}
+                                                edge="end"
+                                                sx={{
+                                                    width: 24,
+                                                    height: 24,
+                                                    color: "var(--color-text-muted)",
+                                                    "&:hover": {
+                                                        color: "var(--color-text-primary)",
+                                                        backgroundColor:
+                                                            "var(--color-surface-hover)",
+                                                    },
+                                                }}
+                                            >
+                                                <X size={15} />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ) : null,
+                                },
                             }}
                         />
-                    }
-                    sx={{
-                        height: 40,
-                        px: 1.5,
-                        borderRadius: 1.5,
-                        borderColor: filterOpen
-                            ? "var(--color-input-focus)"
-                            : "var(--color-input-border)",
-                        color: "var(--color-text-secondary)",
-                        bgcolor: filterOpen
-                            ? "var(--color-surface-active)"
-                            : "transparent",
-                        fontSize: 13,
-                        fontWeight: 600,
-                        textTransform: "none",
-                        whiteSpace: "nowrap",
-                        flexShrink: 0,
-                        "&:hover": {
-                            borderColor: "var(--color-input-border-hover)",
-                            bgcolor: "var(--color-surface-hover)",
-                        },
-                    }}
-                >
-                    {t("dashboard", "filter")}
-                    {activeFilterCount > 0 && (
-                        <Box
-                            component="span"
-                            sx={{
-                                ml: 0.75,
-                                width: 20,
-                                height: 20,
-                                borderRadius: "50%",
-                                bgcolor: "var(--color-button-primary-bg)",
-                                color: "var(--color-button-primary-text)",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontSize: 11,
-                            }}
-                        >
-                            {activeFilterCount}
-                        </Box>
-                    )}
-                </Button>
-            </Stack>
 
-            <Popover
-                open={filterOpen}
-                anchorEl={filterAnchorEl}
-                onClose={() => setFilterOpen(false)}
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                }}
-                transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                }}
-                slotProps={{
-                    paper: {
-                        sx: {
-                            mt: 1,
-                            width: {
-                                xs: "calc(100vw - 32px)",
-                                sm: 320,
-                            },
-                            maxWidth: 320,
-                            p: 2.5,
-                            border: "1px solid var(--color-border)",
-                            borderRadius: 2,
-                            bgcolor: "var(--color-surface)",
-                            color: "var(--color-text-primary)",
-                            boxShadow: "var(--shadow-card)",
-                            backgroundImage: "none",
-                        },
-                    },
-                }}
-            >
-                <Stack
-                    sx={{
-                        mb: 2,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                    }}
-                >
-                    <Box>
-                        <Typography
-                            sx={{
-                                fontSize: 15,
-                                fontWeight: 700,
-                                color: "var(--color-text-primary)",
-                            }}
-                        >
-                            {t("dashboard", "feedbackFilters")}
-                        </Typography>
-
-                        <Typography
-                            sx={{
-                                mt: 0.25,
-                                fontSize: 12,
-                                color: "var(--color-text-secondary)",
-                            }}
-                        >
-                            {t("dashboard", "filterDescription")}
-                        </Typography>
-                    </Box>
-
-                    <IconButton
-                        size="small"
-                        aria-label={t("dashboard", "closeFilters")}
-                        onClick={() => setFilterOpen(false)}
-                        sx={{
-                            color: "var(--color-text-secondary)",
-                        }}
-                    >
-                        <X size={20} />
-                    </IconButton>
-                </Stack>
-
-                <Divider
-                    sx={{
-                        mb: 2.5,
-                        borderColor: "var(--color-border)",
-                    }}
-                />
-
-                <Stack sx={{ gap: 2 }}>
-                    <QRSelect<string[]>
-                        label={t("dashboard", "issue")}
-                        multiple
-                        value={draftIssues}
-                        onChange={(event) => {
-                            const value = event.target.value;
-
-                            setDraftIssues(
-                                typeof value === "string"
-                                    ? value.split(",")
-                                    : value,
-                            );
-                        }}
-                        displayEmpty
-                        renderValue={(selected) =>
-                            selected.length === 0
-                                ? t("dashboard", "allIssues")
-                                : t("dashboard", "selectedIssuesCount").replace(
-                                      "{count}",
-                                      String(selected.length),
-                                  )
-                        }
-                        sx={{
-                            "& .MuiSelect-select": {
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                            },
-                        }}
-                    >
-                        {FEEDBACK_ISSUES.map(({ option, label }) => (
-                            <MenuItem key={option} value={option}>
-                                <Checkbox
-                                    checked={draftIssues.includes(option)}
-                                    size="small"
-                                    sx={{
-                                        p: 0.5,
-                                        mr: 1,
-                                        color: "var(--color-text-muted)",
-                                        "&.Mui-checked": {
-                                            color: "var(--color-input-focus)",
-                                        },
-                                    }}
-                                />
-
-                                <ListItemText
-                                    primary={getIssueLabel(option, label)}
-                                    slotProps={{
-                                        primary: {
-                                            sx: {
-                                                fontSize: 14,
-                                                whiteSpace: "normal",
-                                            },
-                                        },
-                                    }}
-                                />
-                            </MenuItem>
-                        ))}
-                    </QRSelect>
-
-                    <QRSelect
-                        label={t("dashboard", "table")}
-                        value={draftTableId}
-                        onChange={(event) =>
-                            setDraftTableId(event.target.value)
-                        }
-                    >
-                        <MenuItem value="all">
-                            {t("dashboard", "allTables")}
-                        </MenuItem>
-
-                        {tables.map(({ id, name }) => (
-                            <MenuItem key={id} value={id}>
-                                {name}
-                            </MenuItem>
-                        ))}
-                    </QRSelect>
-                </Stack>
-
-                <Divider
-                    sx={{
-                        my: 2.5,
-                        borderColor: "var(--color-border)",
-                    }}
-                />
-
-                <Stack
-                    sx={{
-                        flexDirection: "row",
-                        gap: 1,
-                    }}
-                >
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        onClick={clearDraftFilters}
-                        disabled={isFilterUnchanged()}
-                        startIcon={<RotateCcw size={14} />}
-                        sx={buttonBaseCancelSx}
-                    >
-                        {t("dashboard", "clearFilters")}
-                    </Button>
-
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        onClick={applyFilters}
-                        disabled={isFilterUnchanged()}
-                        startIcon={<CircleCheckBig size={16} />}
-                        sx={buttonBaseSx}
-                    >
-                        {t("dashboard", "applyFilters")}
-                    </Button>
-                </Stack>
-            </Popover>
-
-            <Box sx={{ mt: 2 }}>
-                <Typography
-                    sx={{
-                        mb: 1,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: "var(--color-text-secondary)",
-                    }}
-                >
-                    {t("dashboard", "feedbackStatus")}
-                </Typography>
-
-                <Stack
-                    sx={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        gap: 1,
-                    }}
-                >
-                    {statusOptions.map((option) => {
-                        const selected =
-                            option.value === "all"
-                                ? !status
-                                : status === option.value;
-
-                        const count = option.getCount(summary);
-
-                        const colors =
-                            option.value === "all"
-                                ? undefined
-                                : STATUS_CONFIG[option.value];
-
-                        return (
-                            <Chip
-                                key={option.value}
-                                clickable
-                                onClick={() =>
-                                    navigateTo(
-                                        buildHref({
-                                            status:
-                                                option.value === "all"
-                                                    ? null
-                                                    : option.value,
-                                        }),
-                                    )
-                                }
-                                label={`${option.label} · ${count}`}
-                                size="small"
+                        {isSearching && (
+                            <Box
                                 sx={{
-                                    height: 32,
-                                    borderRadius: 1.5,
-                                    fontSize: 12,
-                                    fontWeight: selected ? 600 : 500,
-                                    border: "1px solid",
-                                    borderColor: selected
-                                        ? (colors?.borderColor ??
-                                          "var(--color-border)")
-                                        : "var(--color-border)",
-                                    color: selected
-                                        ? (colors?.color ??
-                                          "var(--color-text-primary)")
-                                        : "var(--color-text-secondary)",
-                                    bgcolor: selected
-                                        ? (colors?.backgroundColor ??
-                                          "var(--color-surface-active)")
-                                        : "transparent",
-                                    transition:
-                                        "background-color 150ms ease, border-color 150ms ease, color 150ms ease",
-                                    "&:hover": {
-                                        borderColor: selected
-                                            ? (colors?.borderColor ??
-                                              "var(--color-border)")
-                                            : "var(--color-text-muted)",
-                                        bgcolor: selected
-                                            ? (colors?.backgroundColor ??
-                                              "var(--color-surface-active)")
-                                            : "var(--color-surface-hover)",
-                                    },
-                                    "& .MuiChip-label": {
-                                        px: 1.5,
+                                    position: "absolute",
+                                    right: 14,
+                                    top: "50%",
+                                    transform: "translateY(-50%)",
+                                    width: 15,
+                                    height: 15,
+                                    border: "2px solid var(--color-border)",
+                                    borderTopColor: "var(--color-input-focus)",
+                                    borderRadius: "50%",
+                                    animation:
+                                        "feedback-search-spin 0.7s linear infinite",
+                                    "@keyframes feedback-search-spin": {
+                                        to: {
+                                            transform:
+                                                "translateY(-50%) rotate(360deg)",
+                                        },
                                     },
                                 }}
                             />
-                        );
-                    })}
-                </Stack>
-            </Box>
-
-            {(keywordValue.trim() || issues.length > 0 || tableId) && (
-                <>
-                    <Divider
-                        sx={{
-                            my: 1.75,
-                            borderColor: "var(--color-border)",
-                        }}
-                    />
+                        )}
+                    </Box>
 
                     <Stack
                         sx={{
                             flexDirection: "row",
-                            flexWrap: "wrap",
                             alignItems: "center",
                             gap: 1,
+                            flexShrink: 0,
+                            minWidth: 0,
                         }}
                     >
-                        <Typography
-                            sx={{
-                                fontSize: 12,
-                                color: "var(--color-text-secondary)",
-                            }}
-                        >
-                            {t("dashboard", "currentlyFiltering")}
-                        </Typography>
-
-                        {keywordValue.trim() && (
-                            <Chip
-                                size="small"
-                                label={`${t("dashboard", "keyword")}: ${keywordValue.trim()}`}
-                                onDelete={() => removeFilter("keyword")}
-                                deleteIcon={<X size={16} />}
-                                sx={chipBaseSx}
-                            />
-                        )}
-
-                        {issues.length > 0 && (
-                            <Chip
-                                size="small"
-                                label={`${t("dashboard", "issue")}: ${
-                                    selectedIssues
-                                        .map(({ label }) => label)
-                                        .join(", ") ||
-                                    t("dashboard", "selectedCount").replace(
-                                        "{count}",
-                                        String(issues.length),
-                                    )
-                                }`}
-                                onDelete={() => removeFilter("issue")}
-                                deleteIcon={<X size={16} />}
-                                sx={chipBaseSx}
-                            />
-                        )}
-
-                        {tableId && (
-                            <Chip
-                                size="small"
-                                label={`${t("dashboard", "table")}: ${tableLabel ?? t("dashboard", "selected")}`}
-                                onDelete={() => removeFilter("tableId")}
-                                deleteIcon={<X size={16} />}
-                                sx={chipBaseSx}
-                            />
-                        )}
-
                         <Button
-                            size="small"
-                            onClick={clearAllFilters}
-                            startIcon={<RotateCcw size={12} />}
+                            variant="outlined"
+                            onClick={() => setFilterOpen(true)}
+                            startIcon={
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        position: "relative",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <ListFilterPlus size={16} />
+
+                                    {activeFilterCount > 0 && (
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                position: "absolute",
+                                                top: -5,
+                                                right: -5,
+                                                width: 7,
+                                                height: 7,
+                                                borderRadius: "50%",
+                                                bgcolor:
+                                                    "var(--color-table-delete)",
+                                                border: "1px solid var(--color-surface)",
+                                            }}
+                                        />
+                                    )}
+                                </Box>
+                            }
                             sx={{
-                                ml: { xs: 0, sm: "auto" },
+                                height: 42,
+                                px: { xs: 1, sm: 1.5 },
+                                flex: { xs: 1, sm: "initial" },
                                 minWidth: 0,
-                                fontSize: 12,
+                                borderRadius: 1.5,
+                                borderColor: "var(--color-input-border)",
+                                color: "var(--color-text-primary)",
+                                fontSize: 13,
                                 fontWeight: 600,
                                 textTransform: "none",
-                                color: "var(--color-text-secondary)",
+                                whiteSpace: "nowrap",
+                                "&:hover": {
+                                    borderColor:
+                                        "var(--color-input-border-hover)",
+                                    bgcolor: "var(--color-surface-hover)",
+                                },
                             }}
                         >
-                            {t("dashboard", "clearAll")}
+                            {t("dashboard", "filter")}
                         </Button>
+
+                        <Button
+                            variant="outlined"
+                            onClick={(event) =>
+                                setSortAnchorEl(event.currentTarget)
+                            }
+                            startIcon={<ArrowDownWideNarrow size={16} />}
+                            sx={{
+                                height: 42,
+                                px: { xs: 1, sm: 1.5 },
+                                flex: { xs: 1, sm: "initial" },
+                                minWidth: 0,
+                                borderRadius: 1.5,
+                                borderColor: "var(--color-input-border)",
+                                color: "var(--color-text-primary)",
+                                fontSize: 13,
+                                fontWeight: 500,
+                                textTransform: "none",
+                                whiteSpace: "nowrap",
+                                "&:hover": {
+                                    borderColor:
+                                        "var(--color-input-border-hover)",
+                                    bgcolor: "var(--color-surface-hover)",
+                                },
+                            }}
+                        >
+                            <Box
+                                component="span"
+                                sx={{ display: { xs: "none", sm: "inline" } }}
+                            >
+                                {t("feedback", "sortBy")}: {sortLabel}
+                            </Box>
+
+                            <Box
+                                component="span"
+                                sx={{ display: { xs: "inline", sm: "none" } }}
+                            >
+                                {t("feedback", "sortBy")}
+                            </Box>
+                        </Button>
+
+                        <Box
+                            sx={{
+                                flex: { xs: 1, sm: "initial" },
+                                minWidth: 0,
+                                "& > button": {
+                                    width: { xs: "100%", sm: "auto" },
+                                    minWidth: { xs: 0, sm: 132 },
+                                    px: { xs: 1, sm: 2 },
+                                },
+                            }}
+                        >
+                            <ExportFeedbackButton
+                                href={exportUrl}
+                                disabled={exportDisabled}
+                            />
+                        </Box>
+
+                        <Menu
+                            anchorEl={sortAnchorEl}
+                            open={Boolean(sortAnchorEl)}
+                            onClose={() => setSortAnchorEl(null)}
+                            slotProps={{
+                                paper: {
+                                    sx: {
+                                        mt: 1,
+                                        minWidth: 150,
+                                        border: "1px solid var(--color-border)",
+                                        borderRadius: 1.5,
+                                        bgcolor: "var(--color-surface)",
+                                        color: "var(--color-text-primary)",
+                                        boxShadow: "var(--shadow-card)",
+                                        "& .MuiMenuItem-root": {
+                                            minHeight: 36,
+                                            px: 1.5,
+                                            fontSize: 13,
+                                            color: "var(--color-text-primary)",
+                                        },
+                                        "& .MuiMenuItem-root:hover": {
+                                            bgcolor:
+                                                "var(--color-surface-hover)",
+                                        },
+                                        "& .MuiMenuItem-root.Mui-selected": {
+                                            bgcolor:
+                                                "var(--color-surface-active)",
+                                            fontWeight: 600,
+                                        },
+                                        "& .MuiMenuItem-root.Mui-selected:hover":
+                                            {
+                                                bgcolor:
+                                                    "var(--color-surface-active)",
+                                            },
+                                    },
+                                },
+                            }}
+                        >
+                            <MenuItem
+                                selected={sort === "newest"}
+                                onClick={() => {
+                                    setSortAnchorEl(null);
+                                    updateParams({ sort: "newest" });
+                                }}
+                            >
+                                {t("feedback", "newestFirst")}
+                            </MenuItem>
+
+                            <MenuItem
+                                selected={sort === "oldest"}
+                                onClick={() => {
+                                    setSortAnchorEl(null);
+                                    updateParams({ sort: "oldest" });
+                                }}
+                            >
+                                {t("feedback", "oldestFirst")}
+                            </MenuItem>
+                        </Menu>
                     </Stack>
-                </>
-            )}
+                </Stack>
+
+                <Typography
+                    sx={{ fontSize: 13, color: "var(--color-text-secondary)" }}
+                >
+                    <Box
+                        component="span"
+                        sx={{
+                            fontWeight: 700,
+                            color: "var(--color-text-primary)",
+                        }}
+                    >
+                        {total}
+                    </Box>{" "}
+                    {t(
+                        "feedbackToolbar",
+                        total === 1 ? "resultFound" : "resultsFound",
+                    ).replace("{count}", "")}
+                </Typography>
+
+                {hasActiveFilters && (
+                    <>
+                        <Divider sx={{ borderColor: "var(--color-border)" }} />
+
+                        <Stack
+                            sx={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                flexWrap: "wrap",
+                                gap: 1.5,
+                            }}
+                        >
+                            {issues.length > 0 &&
+                                renderFilterGroup(
+                                    t("dashboard", "issue"),
+                                    selectedIssues.map((issue) => (
+                                        <Chip
+                                            key={issue.option}
+                                            size="small"
+                                            label={getIssueLabel(
+                                                issue.option,
+                                                issue.label,
+                                            )}
+                                            onDelete={() =>
+                                                removeIssue(issue.option)
+                                            }
+                                            deleteIcon={<X size={14} />}
+                                            sx={activeChipSx}
+                                        />
+                                    )),
+                                )}
+
+                            {tableIds.length > 0 &&
+                                renderFilterGroup(
+                                    t("dashboard", "table"),
+                                    selectedTables.map((table) => (
+                                        <Chip
+                                            key={table.id}
+                                            size="small"
+                                            label={table.name}
+                                            onDelete={() =>
+                                                removeTable(table.id)
+                                            }
+                                            deleteIcon={<X size={14} />}
+                                            sx={activeChipSx}
+                                        />
+                                    )),
+                                )}
+                            {(startDate || endDate) &&
+                                renderFilterGroup(
+                                    t("feedbackToolbar", "dateRange"),
+                                    <Chip
+                                        size="small"
+                                        icon={<CalendarDays size={14} />}
+                                        label={dateRangeLabel}
+                                        onDelete={removeDateFilter}
+                                        deleteIcon={<X size={14} />}
+                                        sx={activeChipSx}
+                                    />,
+                                )}
+
+                            <Button
+                                size="small"
+                                onClick={clearAllFilters}
+                                startIcon={<Trash2 size={14} />}
+                                sx={{
+                                    ml: { xs: 0, sm: "auto" },
+                                    minWidth: 0,
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    textTransform: "none",
+                                    color: "var(--color-table-delete)",
+                                    "&:hover": {
+                                        bgcolor: "var(--bg-table-delete-hover)",
+                                    },
+                                }}
+                            >
+                                {t("dashboard", "clearAll")}
+                            </Button>
+                        </Stack>
+                    </>
+                )}
+            </Stack>
+
+            <FeedbackFilterDrawer
+                open={filterOpen}
+                issues={issues}
+                tableIds={tableIds}
+                startDate={startDate}
+                endDate={endDate}
+                tables={tables}
+                onClose={() => setFilterOpen(false)}
+                onApply={(filters) => {
+                    const params = new URLSearchParams(window.location.search);
+
+                    params.delete("issue");
+                    [...new Set(filters.issues)].forEach((issue) => {
+                        params.append("issue", issue);
+                    });
+
+                    params.delete("tableId");
+                    [...new Set(filters.tableIds)].forEach((id) => {
+                        params.append("tableId", id);
+                    });
+
+                    if (filters.startDate) {
+                        params.set("startDate", filters.startDate);
+                    } else {
+                        params.delete("startDate");
+                    }
+
+                    if (filters.endDate) {
+                        params.set("endDate", filters.endDate);
+                    } else {
+                        params.delete("endDate");
+                    }
+
+                    setFilterOpen(false);
+                    navigateTo(params);
+                }}
+            />
         </Card>
     );
 }

@@ -14,7 +14,8 @@ export type UpdateFeedbackMessageKey =
     | "internalNoteMaxLength"
     | "findFeedbackFailed"
     | "updateFeedbackFailed"
-    | "updateFeedbackSuccess";
+    | "updateFeedbackSuccess"
+    | "feedbackAlreadyResolved";
 
 type UpdateFeedbackInput = {
     feedbackPublicId: string;
@@ -78,7 +79,7 @@ export async function updateFeedback(
 
     const { data: feedback, error: feedbackError } = await supabase
         .from("feedback")
-        .select("id")
+        .select("id, status")
         .eq("public_id", feedbackPublicId)
         .eq("restaurant_id", userContext.restaurantId)
         .maybeSingle();
@@ -98,15 +99,28 @@ export async function updateFeedback(
             message: "feedbackNotFound",
         };
     }
+    if (feedback.status === FEEDBACK_STATUS.RESOLVED) {
+        return {
+            success: false,
+            message: "feedbackAlreadyResolved",
+        };
+    }
 
-    const { error: updateError } = await supabase
+    const isResolving = input.status === FEEDBACK_STATUS.RESOLVED;
+
+    const { data: updatedFeedback, error: updateError } = await supabase
         .from("feedback")
         .update({
             status: input.status,
             internal_note: internalNote || null,
+            resolved_by: isResolving ? userContext.userId : null,
+            resolved_at: isResolving ? new Date().toISOString() : null,
         })
         .eq("id", feedback.id)
-        .eq("restaurant_id", userContext.restaurantId);
+        .eq("restaurant_id", userContext.restaurantId)
+        .neq("status", FEEDBACK_STATUS.RESOLVED)
+        .select("id")
+        .maybeSingle();
 
     if (updateError) {
         console.error("Failed to update feedback:", updateError);
@@ -114,6 +128,13 @@ export async function updateFeedback(
         return {
             success: false,
             message: "updateFeedbackFailed",
+        };
+    }
+
+    if (!updatedFeedback) {
+        return {
+            success: false,
+            message: "feedbackAlreadyResolved",
         };
     }
 

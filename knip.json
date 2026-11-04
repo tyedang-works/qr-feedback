@@ -1,0 +1,7 @@
+{
+    "$schema": "https://unpkg.com/knip@latest/schema.json",
+    "next": true,
+    "entry": ["src/app/**/*.{ts,tsx}", "src/middleware.ts"],
+    "project": ["src/**/*.{ts,tsx}"],
+    "ignore": ["src/**/*.d.ts"]
+}

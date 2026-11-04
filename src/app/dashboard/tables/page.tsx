@@ -14,7 +14,6 @@ import { Table2 } from "lucide-react";
 import { cookies } from "next/headers";
 
 export default async function TablesPage() {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
     const cookieStore = await cookies();
     const locale: Locale =
         cookieStore.get("qr-locale")?.value === "en" ? "en" : "vi";

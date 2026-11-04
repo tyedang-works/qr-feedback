@@ -5,6 +5,7 @@ import { buttonBaseSx } from "@/styles/button.styles";
 import { Button, CircularProgress as MuiCircularProgress } from "@mui/material";
 import { FileSpreadsheet } from "lucide-react";
 import { useState } from "react";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 type ExportFeedbackButtonProps = {
     href: string;
@@ -16,12 +17,13 @@ export default function ExportFeedbackButton({
     disabled = false,
 }: ExportFeedbackButtonProps) {
     const { t } = useTranslation();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
     const [isLoading, setIsLoading] = useState(false);
 
     const handleExport = async () => {
-        if (disabled || isLoading) {
-            return;
-        }
+        if (disabled || isLoading) return;
 
         setIsLoading(true);
 
@@ -48,7 +50,6 @@ export default function ExportFeedbackButton({
             }, 1000);
         } catch (error) {
             console.error("Failed to export feedback:", error);
-            window.alert(t("dashboard", "exportFeedbackError"));
         } finally {
             setIsLoading(false);
         }
@@ -59,27 +60,40 @@ export default function ExportFeedbackButton({
             variant="contained"
             disabled={disabled || isLoading}
             onClick={handleExport}
+            aria-label={t("dashboard", "exportExcel")}
+            title={t("dashboard", "exportExcel")}
             startIcon={
                 isLoading ? (
                     <MuiCircularProgress
-                        size={18}
+                        size={16}
                         thickness={5}
                         color="inherit"
-                        aria-label={t("dashboard", "exportingFeedback")}
                     />
                 ) : (
-                    <FileSpreadsheet size={18} strokeWidth={1.8} />
+                    <FileSpreadsheet size={17} strokeWidth={1.8} />
                 )
             }
             sx={{
                 ...buttonBaseSx,
-                minWidth: 132,
+                height: 42,
+                minHeight: 42,
+                fontSize: "13px",
+                fontWeight: 500,
+                minWidth: { xs: 42, sm: 100 },
+                width: { xs: 42, sm: "auto" },
+                px: { xs: 0, sm: 2 },
+                flexShrink: 0,
                 whiteSpace: "nowrap",
+                "& .MuiButton-startIcon": {
+                    mr: { xs: 0, sm: 0.75 },
+                    ml: 0,
+                },
             }}
         >
-            {isLoading
-                ? t("dashboard", "exporting")
-                : t("dashboard", "exportExcel")}
+            {!isMobile &&
+                (isLoading
+                    ? t("dashboard", "exporting")
+                    : t("dashboard", "exportExcel"))}
         </Button>
     );
 }
@@ -87,14 +101,16 @@ export default function ExportFeedbackButton({
 function getFilename(headers: Headers): string | null {
     const disposition = headers.get("content-disposition");
 
-    if (!disposition) {
-        return null;
-    }
+    if (!disposition) return null;
 
     const encodedFilename = disposition.match(/filename\*=UTF-8''([^;]+)/i);
 
     if (encodedFilename?.[1]) {
-        return decodeURIComponent(encodedFilename[1]);
+        try {
+            return decodeURIComponent(encodedFilename[1]);
+        } catch {
+            return encodedFilename[1];
+        }
     }
 
     const filename = disposition.match(/filename="?([^";]+)"?/i);

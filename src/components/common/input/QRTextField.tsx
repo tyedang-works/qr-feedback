@@ -49,13 +49,12 @@ export default function QRTextField({
                 sx={[
                     {
                         "& .MuiOutlinedInput-root": {
-                            borderRadius: multiline ? 2 : 1,
+                            borderRadius: "6px",
                             backgroundColor:
                                 "var(--color-input-background, var(--color-surface, #FFFFFF))",
                             color: "var(--color-text-primary, #111827)",
                             transition:
                                 "background-color 150ms ease, border-color 150ms ease",
-
                             ...(multiline && {
                                 padding: 0,
                             }),

@@ -359,7 +359,7 @@ export default function QRCodeList({
 
     return (
         <>
-            <Stack sx={{ gap: 2 }}>
+            <Stack sx={{ gap: 1 }}>
                 <QRCodeSelectionToolbar
                     selectedCount={selectedCount}
                     selectableTotal={selectableTotal}
@@ -379,7 +379,7 @@ export default function QRCodeList({
                             md: "block",
                         },
                         border: "1px solid var(--color-border)",
-                        borderRadius: 2,
+                        borderRadius: "16px",
                         backgroundColor: "var(--color-surface)",
                     }}
                 >

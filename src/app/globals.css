@@ -100,8 +100,8 @@ body {
     --color-button-delete-hover: #b42318;
 
     /* tab indicator */
-    --color-tab-selected: #193b56;
-    --color-tab-indicator: #193b56;
+    --color-tab-selected: #111827;
+    --color-tab-indicator: #111827;
 
     /* pagination */
     --color-pagination-text: #52525b;
@@ -180,6 +180,16 @@ body {
     --color-switch-track-disabled: #c4c9d1;
     --color-switch-track-disabled-border: #c4c9d1;
     --shadow-switch-thumb: 0 1px 3px rgba(0, 0, 0, 0.25);
+
+    /* tab status badges */
+    --color-badge-all-bg: #1f2937;
+    --color-badge-all-text: #ffffff;
+    --color-badge-new-bg: #fef0c7;
+    --color-badge-new-text: #b54708;
+    --color-badge-in-progress-bg: #d1e9ff;
+    --color-badge-in-progress-text: #175cd3;
+    --color-badge-resolved-bg: #d1fadf;
+    --color-badge-resolved-text: #027a48;
 }
 
 :root[data-theme="dark"] {
@@ -343,6 +353,16 @@ body {
     --color-switch-track-disabled: #4b5563;
     --color-switch-track-disabled-border: #4b5563;
     --shadow-switch-thumb: 0 1px 3px rgba(0, 0, 0, 0.35);
+
+    /* tab status badges */
+    --color-badge-all-bg: #344054;
+    --color-badge-all-text: #f9fafb;
+    --color-badge-new-bg: #493b24;
+    --color-badge-new-text: #f5c77e;
+    --color-badge-in-progress-bg: #1e3a52;
+    --color-badge-in-progress-text: #93c5fd;
+    --color-badge-resolved-bg: #1e4032;
+    --color-badge-resolved-text: #86efac;
 }
 
 @media print {

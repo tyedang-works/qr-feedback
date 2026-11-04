@@ -10,6 +10,8 @@ export type FeedbackListItem = {
     phone: string;
     status: FeedbackStatus;
     internalNote: string | null;
+    resolvedByName: string | null;
+    resolvedAt: string | null;
     createdAt: string;
 };
 
@@ -18,8 +20,11 @@ export type FeedbackFilters = {
     pageSize: number;
     keyword: string;
     issues: string[];
-    tableId: string;
+    tableIds: string[];
     status?: string;
+    startDate?: string;
+    endDate?: string;
+    sort?: "newest" | "oldest";
 };
 
 export type FeedbackListResult = {
@@ -40,6 +45,8 @@ export type FeedbackDetail = {
     phone: string;
     status: FeedbackStatus;
     internalNote: string | null;
+    resolvedByName: string | null;
+    resolvedAt: string | null;
     createdAt: string;
 };
 

@@ -43,7 +43,7 @@ export default async function SurveyPage({ params }: SurveyPageProps) {
     return (
         <SurveyForm
             tableToken={token}
-            restaurantName={restaurant?.name ?? "Nhà hàng"}
+            restaurantName={restaurant?.name ?? "Restaurant"}
             restaurantLogoUrl={restaurant?.logo_url ?? null}
             locale={locale}
         />

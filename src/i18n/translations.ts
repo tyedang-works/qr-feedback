@@ -296,6 +296,16 @@ export const translations = {
             printQRCodes: "Print QR codes",
             restaurantContextNotFound:
                 "Restaurant information could not be found.",
+            restaurantFallback: "Restaurant",
+            scanInstruction: "Scan the QR code to share your feedback.",
+            downloadPrintDescription:
+                "Download or print this QR code and place it on your table.",
+            downloadPng: "Download PNG",
+            downloadSvg: "Download SVG",
+            printQr: "Print QR",
+            notFoundTitle: "QR code not found",
+            notFoundDescription:
+                "This QR code does not exist or is no longer valid. Please check the link or contact the restaurant for assistance.",
         },
         survey: {
             notFoundTitle: "Table not found",
@@ -704,6 +714,36 @@ export const translations = {
             resolvedBy: "Resolved by",
             resolvedAt: "Resolved at",
         },
+        login: {
+            welcomeBack: "Welcome back",
+            description: "Sign in to manage your restaurant feedback.",
+            email: "Email",
+            emailPlaceholder: "Enter your email",
+            password: "Password",
+            passwordPlaceholder: "Enter your password",
+            showPassword: "Show password",
+            hidePassword: "Hide password",
+            forgotPassword: "Forgot password?",
+            login: "Sign in",
+            loggingIn: "Signing in...",
+            invalidEmailOrPassword: "Email or password is incorrect.",
+            loginError: "Unable to sign in. Please try again.",
+            emailInvalid: "Invalid email address.",
+        },
+        loginBrandPanel: {
+            restaurantInterior: "Restaurant interior",
+            restaurantSpace: "Restaurant space",
+            diningArea: "Dining area",
+            restaurantKitchen: "Restaurant kitchen",
+            restaurantDecoration: "Restaurant decoration",
+            restaurantFurniture: "Restaurant furniture",
+            restaurantWorkspace: "Restaurant workspace",
+            coffee: "Coffee",
+            returningCustomers:
+                "of customers are more likely to return after a great dining experience.",
+            serviceQuality:
+                "of customers say service quality influences their restaurant choice.",
+        },
     },
     vi: {
         common: {
@@ -997,6 +1037,16 @@ export const translations = {
             back: "Quay lại",
             printQRCodes: "In mã QR",
             restaurantContextNotFound: "Không tìm thấy thông tin nhà hàng.",
+            restaurantFallback: "Nhà hàng",
+            scanInstruction: "Quét mã để gửi phản hồi",
+            downloadPrintDescription:
+                "Có thể tải xuống hoặc in mã QR này để đặt trên bàn.",
+            downloadPng: "Tải PNG",
+            downloadSvg: "Tải SVG",
+            printQr: "In QR",
+            notFoundTitle: "Không tìm thấy mã QR",
+            notFoundDescription:
+                "Mã QR này không tồn tại hoặc không còn hợp lệ. Vui lòng kiểm tra lại đường dẫn hoặc liên hệ nhà hàng để được hỗ trợ.",
         },
         survey: {
             notFoundTitle: "Không tìm thấy bàn",
@@ -1406,6 +1456,36 @@ export const translations = {
             viewDetails: "Xem chi tiết",
             resolvedBy: "Người xử lý",
             resolvedAt: "Thời gian xử lý",
+        },
+        login: {
+            welcomeBack: "Chào mừng bạn trở lại",
+            description: "Đăng nhập để quản lý phản hồi của nhà hàng.",
+            email: "Email",
+            emailPlaceholder: "Nhập email",
+            password: "Mật khẩu",
+            passwordPlaceholder: "Nhập mật khẩu",
+            showPassword: "Hiện mật khẩu",
+            hidePassword: "Ẩn mật khẩu",
+            forgotPassword: "Quên mật khẩu?",
+            login: "Đăng nhập",
+            loggingIn: "Đang đăng nhập...",
+            invalidEmailOrPassword: "Email hoặc mật khẩu không chính xác.",
+            loginError: "Không thể đăng nhập. Vui lòng thử lại.",
+            emailInvalid: "Email không hợp lệ.",
+        },
+        loginBrandPanel: {
+            restaurantInterior: "Không gian nhà hàng",
+            restaurantSpace: "Không gian phục vụ",
+            diningArea: "Khu vực dùng bữa",
+            restaurantKitchen: "Khu vực bếp nhà hàng",
+            restaurantDecoration: "Trang trí nhà hàng",
+            restaurantFurniture: "Nội thất nhà hàng",
+            restaurantWorkspace: "Không gian làm việc",
+            coffee: "Cà phê",
+            returningCustomers:
+                "khách hàng có xu hướng quay lại sau một trải nghiệm dùng bữa tuyệt vời.",
+            serviceQuality:
+                "khách hàng cho biết chất lượng phục vụ ảnh hưởng đến lựa chọn nhà hàng của họ.",
         },
     },
 } as const;

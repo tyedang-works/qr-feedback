@@ -1,8 +1,11 @@
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { cookies } from "next/headers";
 
 import MuiThemeProvider from "@/components/common/providers/MuiThemeProvider";
+import LanguageProvider from "@/components/common/providers/LanguageProvider";
+import type { Locale } from "@/i18n/translations";
 
 import { momoTrustSans } from "./fonts";
 import "./globals.css";
@@ -29,13 +32,18 @@ const themeInitScript = `
 })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const cookieStore = await cookies();
+    const savedLocale = cookieStore.get("qr-locale")?.value;
+
+    const locale: Locale = savedLocale === "en" ? "en" : "vi";
+
     return (
-        <html lang="vi" suppressHydrationWarning>
+        <html lang={locale} suppressHydrationWarning>
             <body className={momoTrustSans.variable}>
                 <Script
                     id="qr-feedback-theme-init"
@@ -46,7 +54,11 @@ export default function RootLayout({
                 />
 
                 <AppRouterCacheProvider>
-                    <MuiThemeProvider>{children}</MuiThemeProvider>
+                    <MuiThemeProvider>
+                        <LanguageProvider initialLocale={locale}>
+                            {children}
+                        </LanguageProvider>
+                    </MuiThemeProvider>
                 </AppRouterCacheProvider>
             </body>
         </html>

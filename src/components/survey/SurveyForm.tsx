@@ -19,6 +19,7 @@ import { animatedAvatarRingSx } from "@/styles/avatar.styles";
 import { formErrorSx } from "@/styles/form.styles";
 
 import Logo from "../common/Logo";
+import LanguageToggle from "../common/language/LanguageToggle";
 import FeedbackSuccess from "./FeedbackSuccess";
 
 type SurveyFormProps = {
@@ -250,25 +251,48 @@ export default function SurveyForm({
                     <Box
                         sx={{
                             ...lightSurveyTokens,
-                            minHeight: "100vh",
+                            position: "relative",
+                            minHeight: "100dvh",
                             bgcolor: "#F4F7FA",
                             color: "#172033",
                             px: { xs: 1.5, sm: 2.5 },
-                            py: { xs: 2, sm: 4, md: 5 },
+                            py: { xs: 1.5, sm: 4, md: 5 },
                             display: "flex",
-                            alignItems: {
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: {
                                 xs: "flex-start",
                                 sm: "center",
                             },
-                            justifyContent: "center",
+                            gap: { xs: 1.5, sm: 0 },
                         }}
                     >
+                        {/* language toggle */}
+                        <Box
+                            sx={{
+                                position: {
+                                    xs: "static",
+                                    sm: "absolute",
+                                },
+                                top: { sm: 20 },
+                                right: { sm: 24 },
+                                zIndex: 10,
+                                width: "100%",
+                                maxWidth: 500,
+                                display: "flex",
+                                justifyContent: "flex-end",
+                            }}
+                        >
+                            <LanguageToggle forceLight />
+                        </Box>
+
                         <Container
                             maxWidth="sm"
                             sx={{
                                 p: "0 !important",
                                 display: "flex",
                                 justifyContent: "center",
+                                width: "100%",
                             }}
                         >
                             <Paper
@@ -282,17 +306,19 @@ export default function SurveyForm({
                                     bgcolor: "#FFFFFF",
                                     color: "#172033",
                                     border: "1px solid #E5EAF0",
-                                    borderRadius: { xs: 3, sm: 4 },
-                                    boxShadow:
-                                        "0 16px 48px rgba(15, 23, 42, 0.07)",
+                                    borderRadius: { xs: 2.5, sm: 4 },
+                                    boxShadow: {
+                                        xs: "0 4px 16px rgba(15, 23, 42, 0.04)",
+                                        sm: "0 12px 36px rgba(15, 23, 42, 0.06)",
+                                    },
                                 }}
                             >
                                 {/* header */}
                                 <Box
                                     sx={{
-                                        px: { xs: 2.5, sm: 4 },
-                                        pt: { xs: 3, sm: 4 },
-                                        pb: 2.5,
+                                        px: { xs: 2, sm: 4 },
+                                        pt: { xs: 2, sm: 4 },
+                                        pb: { xs: 2, sm: 2.5 },
                                         textAlign: "center",
                                         borderBottom: "1px solid #EEF2F6",
                                     }}
@@ -300,10 +326,10 @@ export default function SurveyForm({
                                     <Box
                                         sx={{
                                             ...animatedAvatarRingSx,
-                                            width: 86,
-                                            height: 86,
+                                            width: { xs: 76, sm: 86 },
+                                            height: { xs: 76, sm: 86 },
                                             mx: "auto",
-                                            mb: 1.5,
+                                            mb: { xs: 1.25, sm: 1.5 },
                                             display: "grid",
                                             placeItems: "center",
                                             flexShrink: 0,
@@ -315,8 +341,8 @@ export default function SurveyForm({
                                                 src={restaurantLogoUrl}
                                                 alt={`Logo ${restaurantName}`}
                                                 sx={{
-                                                    width: 78,
-                                                    height: 78,
+                                                    width: { xs: 68, sm: 78 },
+                                                    height: { xs: 68, sm: 78 },
                                                     objectFit: "cover",
                                                     borderRadius: "50%",
                                                     bgcolor: "#FFFFFF",
@@ -375,6 +401,7 @@ export default function SurveyForm({
                                         mb: 2,
                                     }}
                                 >
+                                    {/* issues */}
                                     <Box
                                         sx={{
                                             mb: 3,
@@ -477,7 +504,13 @@ export default function SurveyForm({
                                         )}
                                     </Box>
 
-                                    <Box sx={{ mb: 3, mt: "36px" }}>
+                                    {/* additional feedback */}
+                                    <Box
+                                        sx={{
+                                            mb: 3,
+                                            mt: { xs: 3, sm: "36px" },
+                                        }}
+                                    >
                                         <Typography
                                             component="h2"
                                             sx={sectionTitleSx}
@@ -516,7 +549,13 @@ export default function SurveyForm({
                                         />
                                     </Box>
 
-                                    <Box sx={{ mb: 3, mt: "36px" }}>
+                                    {/* phone field */}
+                                    <Box
+                                        sx={{
+                                            mb: 3,
+                                            mt: { xs: 3, sm: "36px" },
+                                        }}
+                                    >
                                         <Typography
                                             component="h2"
                                             sx={sectionTitleSx}
@@ -562,6 +601,7 @@ export default function SurveyForm({
                                         />
                                     </Box>
 
+                                    {/* notice */}
                                     <Box
                                         sx={{
                                             display: "flex",
@@ -599,6 +639,7 @@ export default function SurveyForm({
                                         </Typography>
                                     </Box>
 
+                                    {/* error message */}
                                     {submitError && (
                                         <Box
                                             role="alert"

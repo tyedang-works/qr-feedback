@@ -4,6 +4,8 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 import { useRef } from "react";
 
+import { useTranslation } from "@/components/common/providers/useTranslation";
+
 type TableQRCodeProps = {
     token: string;
     size?: number;
@@ -11,58 +13,56 @@ type TableQRCodeProps = {
 
 export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
     const qrRef = useRef<HTMLDivElement>(null);
+    const { t } = useTranslation();
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-
     const feedbackUrl = `${siteUrl}/s/${token}`;
 
-    const downloadSvg = () => {
-        const svg = qrRef.current?.querySelector("svg");
-
-        if (!svg) {
-            return;
-        }
-
-        const serializer = new XMLSerializer();
-        const svgString = serializer.serializeToString(svg);
-
-        const blob = new Blob([svgString], {
-            type: "image/svg+xml;charset=utf-8",
-        });
-
+    const downloadBlob = (blob: Blob, filename: string) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
 
         link.href = url;
-        link.download = `${token}-qr.svg`;
+        link.download = filename;
 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
-        URL.revokeObjectURL(url);
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
-    const downloadPng = () => {
+    const getSvgBlob = () => {
         const svg = qrRef.current?.querySelector("svg");
 
-        if (!svg) {
-            return;
-        }
+        if (!svg) return null;
 
         const serializer = new XMLSerializer();
         const svgString = serializer.serializeToString(svg);
 
-        const blob = new Blob([svgString], {
+        return new Blob([svgString], {
             type: "image/svg+xml;charset=utf-8",
         });
+    };
+
+    const downloadSvg = () => {
+        const blob = getSvgBlob();
+
+        if (!blob) return;
+
+        downloadBlob(blob, `${token}-qr.svg`);
+    };
+
+    const downloadPng = () => {
+        const blob = getSvgBlob();
+
+        if (!blob) return;
 
         const url = URL.createObjectURL(blob);
         const image = new Image();
 
         image.onload = () => {
             const scale = 4;
-
             const canvas = document.createElement("canvas");
 
             canvas.width = size * scale;
@@ -75,8 +75,7 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
                 return;
             }
 
-            context.fillStyle = "#ffffff";
-
+            context.fillStyle = "#FFFFFF";
             context.fillRect(0, 0, canvas.width, canvas.height);
 
             context.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -84,25 +83,13 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
             URL.revokeObjectURL(url);
 
             canvas.toBlob((pngBlob) => {
-                if (!pngBlob) {
-                    return;
-                }
+                if (!pngBlob) return;
 
-                const pngUrl = URL.createObjectURL(pngBlob);
-
-                const link = document.createElement("a");
-
-                link.href = pngUrl;
-                link.download = `${token}-qr.png`;
-
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                URL.revokeObjectURL(pngUrl);
+                downloadBlob(pngBlob, `${token}-qr.png`);
             }, "image/png");
         };
 
+        image.onerror = () => URL.revokeObjectURL(url);
         image.src = url;
     };
 
@@ -119,9 +106,39 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    p: 0,
-                    backgroundColor: "#fff",
+                    width: "100%",
+                    p: { xs: 1.5, sm: 2 },
+                    mt: 0.5,
+                    backgroundColor: "#FFFFFF",
                     borderRadius: 2,
+                    overflow: "hidden",
+
+                    "& svg": {
+                        display: "block",
+                        width: "100%",
+                        maxWidth: size,
+                        height: "auto",
+                    },
+
+                    "@media print": {
+                        width: "fit-content !important",
+                        maxWidth: "100% !important",
+                        mx: "auto",
+                        mt: "16px",
+                        p: "12px",
+                        backgroundColor: "#FFFFFF !important",
+                        borderRadius: "8px",
+                        overflow: "visible",
+                        breakInside: "avoid",
+                        pageBreakInside: "avoid",
+
+                        "& svg": {
+                            display: "block",
+                            width: `${size}px !important`,
+                            height: `${size}px !important`,
+                            maxWidth: "100%",
+                        },
+                    },
                 }}
             >
                 <QRCodeSVG
@@ -137,8 +154,9 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
                 className="qr-print-url"
                 sx={{
                     mt: 1,
-                    color: "text.secondary",
+                    color: "#D1D5DB",
                     fontSize: 12,
+                    lineHeight: 1.5,
                     wordBreak: "break-all",
                 }}
             >
@@ -146,6 +164,7 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
             </Typography>
 
             <Stack
+                className="qr-actions"
                 sx={{
                     flexDirection: "row",
                     flexWrap: "wrap",
@@ -153,6 +172,10 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
                     gap: 1,
                     mt: 2,
                     mb: 2,
+
+                    "@media print": {
+                        display: "none !important",
+                    },
                 }}
             >
                 <Button
@@ -160,10 +183,18 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
                     size="small"
                     onClick={downloadPng}
                     sx={{
+                        px: 1.75,
+                        minWidth: 0,
                         textTransform: "none",
+                        fontWeight: 600,
+                        color: "#1F2937",
+                        backgroundColor: "#FFFFFF",
+                        "&:hover": {
+                            backgroundColor: "#E5E7EB",
+                        },
                     }}
                 >
-                    Tải PNG
+                    {t("qrCode", "downloadPng")}
                 </Button>
 
                 <Button
@@ -171,10 +202,19 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
                     size="small"
                     onClick={downloadSvg}
                     sx={{
+                        px: 1.75,
+                        minWidth: 0,
                         textTransform: "none",
+                        fontWeight: 600,
+                        color: "#FFFFFF",
+                        borderColor: "#9CA3AF",
+                        "&:hover": {
+                            backgroundColor: "rgba(255,255,255,0.08)",
+                            borderColor: "#FFFFFF",
+                        },
                     }}
                 >
-                    Tải SVG
+                    {t("qrCode", "downloadSvg")}
                 </Button>
 
                 <Button
@@ -182,10 +222,19 @@ export default function TableQRCode({ token, size = 240 }: TableQRCodeProps) {
                     size="small"
                     onClick={handlePrint}
                     sx={{
+                        px: 1.75,
+                        minWidth: 0,
                         textTransform: "none",
+                        fontWeight: 600,
+                        color: "#FFFFFF",
+                        borderColor: "#9CA3AF",
+                        "&:hover": {
+                            backgroundColor: "rgba(255,255,255,0.08)",
+                            borderColor: "#FFFFFF",
+                        },
                     }}
                 >
-                    In QR
+                    {t("qrCode", "printQr")}
                 </Button>
             </Stack>
         </>

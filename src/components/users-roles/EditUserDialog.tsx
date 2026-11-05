@@ -1,14 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
 import { updateUserAction } from "@/app/dashboard/users-roles/actions";
 import UserForm, {
     type UserFormSubmitResult,
 } from "@/components/users-roles/UserForm";
 import type { UserFormValues } from "@/lib/auth/user-form.schema";
 
-export type EditableUser = {
+type EditableUser = {
     id: string;
     full_name: string;
     email: string;

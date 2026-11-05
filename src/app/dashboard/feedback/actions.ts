@@ -6,7 +6,7 @@ import { FEEDBACK_STATUS } from "@/lib/feedback/constants";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
-export type UpdateFeedbackMessageKey =
+type UpdateFeedbackMessageKey =
     | "loginRequired"
     | "feedbackManagePermissionDenied"
     | "feedbackNotFound"

@@ -121,14 +121,3 @@ export const tableDeleteButtonSx: SxProps<Theme> = {
         backgroundColor: "var(--bg-table-delete-hover)",
     },
 };
-
-export const buttonBaseDeleteSx: SxProps<Theme> = {
-    ...buttonBaseSx,
-    backgroundColor: "var(--color-button-delete-bg)",
-    color: "#ffffff",
-
-    "&:hover": {
-        backgroundColor: "var(--color-button-delete-hover)",
-        boxShadow: "none",
-    },
-};

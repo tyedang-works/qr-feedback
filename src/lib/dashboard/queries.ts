@@ -5,7 +5,6 @@ import type {
     FeedbackTrendItem,
     IssueComparisonPeriod,
     IssueComparisonResult,
-    IssueDistributionItem,
     IssueWeeklyComparisonItem,
     RecentFeedbackItem,
 } from "./types";
@@ -192,61 +191,6 @@ function formatTrendLabel(date: string) {
     const [, month, day] = date.split("-");
 
     return `${day}/${month}`;
-}
-
-export async function getIssueDistribution(
-    restaurantId: string,
-): Promise<IssueDistributionItem[]> {
-    const supabase = await createClient();
-
-    const { data, error } = await supabase
-        .from("feedback")
-        .select("selected_options")
-        .eq("restaurant_id", restaurantId);
-
-    if (error) {
-        console.error("Failed to get issue distribution:", error);
-
-        return FEEDBACK_ISSUES.map((issue) => ({
-            option: issue.option,
-            label: issue.label,
-            count: 0,
-            percentage: 0,
-        }));
-    }
-
-    const countByOption = new Map<string, number>();
-
-    FEEDBACK_ISSUES.forEach((issue) => {
-        countByOption.set(issue.option, 0);
-    });
-
-    data.forEach((feedback) => {
-        feedback.selected_options.forEach((option: string) => {
-            if (countByOption.has(option)) {
-                countByOption.set(option, (countByOption.get(option) ?? 0) + 1);
-            }
-        });
-    });
-
-    const totalSelections = Array.from(countByOption.values()).reduce(
-        (total, count) => total + count,
-        0,
-    );
-
-    return FEEDBACK_ISSUES.map((issue) => {
-        const count = countByOption.get(issue.option) ?? 0;
-
-        return {
-            option: issue.option,
-            label: issue.label,
-            count,
-            percentage:
-                totalSelections > 0
-                    ? Math.round((count / totalSelections) * 100)
-                    : 0,
-        };
-    });
 }
 
 export async function getRecentFeedback(

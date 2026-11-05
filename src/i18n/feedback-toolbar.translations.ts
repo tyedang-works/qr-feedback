@@ -74,7 +74,5 @@ export const feedbackToolbarTranslations = {
     },
 } as const;
 
-export type FeedbackToolbarLocale = keyof typeof feedbackToolbarTranslations;
-
 export type FeedbackToolbarTranslationKey =
     keyof typeof feedbackToolbarTranslations.en;

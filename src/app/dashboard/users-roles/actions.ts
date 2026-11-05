@@ -1,13 +1,13 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
-import { USER_ROLES, type UserRole } from "@/lib/auth/constants";
+import { translations, type Locale } from "@/i18n/translations";
+import { USER_ROLES } from "@/lib/auth/constants";
 import { canManageUsers } from "@/lib/auth/permissions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { translations, type Locale } from "@/i18n/translations";
 
 type UsersRolesMessages = {
     [Key in keyof typeof translations.vi.usersRoles]: string;
@@ -39,11 +39,6 @@ type AddUserResult = {
         role?: string;
         password?: string;
     };
-};
-
-export type ChangeUserRoleActionState = {
-    success: boolean;
-    message: string;
 };
 
 function getAuthErrorMessage(
@@ -443,131 +438,6 @@ export async function deleteUserAction(userId: string): Promise<{
     return {
         success: true,
         message: messages["action.deleteSuccess"],
-    };
-}
-
-export async function changeUserRoleAction(
-    _previousState: ChangeUserRoleActionState,
-    formData: FormData,
-): Promise<ChangeUserRoleActionState> {
-    const messages = await getUsersRolesMessages();
-
-    const supabase = await createClient();
-
-    const {
-        data: { user: currentUser },
-    } = await supabase.auth.getUser();
-
-    if (!currentUser) {
-        return {
-            success: false,
-            message: messages["action.sessionExpired"],
-        };
-    }
-
-    const { data: currentProfile, error: currentProfileError } = await supabase
-        .from("profiles")
-        .select("restaurant_id, role")
-        .eq("id", currentUser.id)
-        .single();
-
-    if (currentProfileError || !currentProfile) {
-        return {
-            success: false,
-            message: messages["action.userContextError"],
-        };
-    }
-
-    if (!canManageUsers(currentProfile.role)) {
-        return {
-            success: false,
-            message: messages["action.changeRolePermissionDenied"],
-        };
-    }
-
-    const userId = String(formData.get("userId") ?? "").trim();
-    const role = String(formData.get("role") ?? "").trim() as UserRole;
-
-    if (!userId) {
-        return {
-            success: false,
-            message: messages["action.userIdRequired"],
-        };
-    }
-
-    if (role !== USER_ROLES.MANAGER && role !== USER_ROLES.STAFF) {
-        return {
-            success: false,
-            message: messages["action.invalidRole"],
-        };
-    }
-
-    if (userId === currentUser.id) {
-        return {
-            success: false,
-            message: messages["action.cannotChangeSelfRole"],
-        };
-    }
-
-    const adminSupabase = createAdminClient();
-
-    const { data: targetProfile, error: targetProfileError } =
-        await adminSupabase
-            .from("profiles")
-            .select("id, restaurant_id, role")
-            .eq("id", userId)
-            .single();
-
-    if (targetProfileError || !targetProfile) {
-        return {
-            success: false,
-            message: messages["action.userNotFound"],
-        };
-    }
-
-    if (targetProfile.restaurant_id !== currentProfile.restaurant_id) {
-        return {
-            success: false,
-            message: messages["action.changeTargetRolePermissionDenied"],
-        };
-    }
-
-    if (targetProfile.role === USER_ROLES.OWNER) {
-        return {
-            success: false,
-            message: messages["action.cannotChangeOwnerRole"],
-        };
-    }
-
-    if (targetProfile.role === role) {
-        return {
-            success: true,
-            message: messages["action.roleUnchanged"],
-        };
-    }
-
-    const { error: updateError } = await adminSupabase
-        .from("profiles")
-        .update({
-            role,
-        })
-        .eq("id", userId)
-        .eq("restaurant_id", currentProfile.restaurant_id);
-
-    if (updateError) {
-        console.error("Failed to update user role:", updateError);
-
-        return {
-            success: false,
-            message: messages["action.updateRoleFailed"],
-        };
-    }
-
-    revalidatePath("/dashboard/users-roles");
-
-    return {
-        success: true,
-        message: messages["action.updateRoleSuccess"],
     };
 }
 

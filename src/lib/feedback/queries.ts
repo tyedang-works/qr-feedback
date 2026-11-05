@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import { FEEDBACK_STATUS, type FeedbackStatus } from "./constants";
 
 import type {
-    FeedbackDetail,
     FeedbackFilters,
     FeedbackListItem,
     FeedbackListResult,
@@ -378,77 +377,6 @@ export async function getFeedbackList(
         page: safePage,
         pageSize,
         totalPages,
-    };
-}
-
-export async function getFeedbackDetail(
-    restaurantId: string,
-    feedbackPublicId: string,
-): Promise<FeedbackDetail | null> {
-    const supabase = await createClient();
-
-    const { data: feedback, error: feedbackError } = await supabase
-        .from("feedback")
-        .select(
-            `
-            id,
-            public_id,
-            table_id,
-            selected_options,
-            feedback,
-            phone,
-            status,
-            internal_note,
-            resolved_by,
-            resolved_at,
-            created_at
-        `,
-        )
-        .eq("public_id", feedbackPublicId)
-        .eq("restaurant_id", restaurantId)
-        .maybeSingle();
-
-    if (feedbackError) {
-        console.error("Failed to get feedback detail:", feedbackError);
-        throw new Error("Không thể tải chi tiết phản hồi.");
-    }
-
-    if (!feedback) {
-        return null;
-    }
-
-    const { data: table, error: tableError } = await supabase
-        .from("tables")
-        .select("id, name")
-        .eq("id", feedback.table_id)
-        .eq("restaurant_id", restaurantId)
-        .maybeSingle();
-
-    if (tableError) {
-        console.error("Failed to get feedback table:", tableError);
-        throw new Error("Không thể tải thông tin bàn.");
-    }
-
-    const resolvedByNameMap = await getResolvedByNameMap(
-        feedback.resolved_by ? [feedback.resolved_by] : [],
-        restaurantId,
-    );
-
-    return {
-        id: feedback.id,
-        publicId: feedback.public_id,
-        tableId: feedback.table_id,
-        tableName: table?.name ?? "Không xác định",
-        selectedOptions: feedback.selected_options ?? [],
-        feedback: feedback.feedback ?? "",
-        phone: feedback.phone,
-        status: feedback.status as FeedbackStatus,
-        internalNote: feedback.internal_note,
-        resolvedByName: feedback.resolved_by
-            ? (resolvedByNameMap.get(feedback.resolved_by) ?? null)
-            : null,
-        resolvedAt: feedback.resolved_at,
-        createdAt: feedback.created_at,
     };
 }
 

@@ -1,14 +1,14 @@
 import { USER_ROLES, type UserRole } from "./constants";
 
-export function isOwner(role: UserRole) {
+function isOwner(role: UserRole) {
     return role === USER_ROLES.OWNER;
 }
 
-export function isManager(role: UserRole) {
+function isManager(role: UserRole) {
     return role === USER_ROLES.MANAGER;
 }
 
-export function isStaff(role: UserRole) {
+function isStaff(role: UserRole) {
     return role === USER_ROLES.STAFF;
 }
 
@@ -30,8 +30,4 @@ export function canManageSettings(role: UserRole) {
 
 export function canManageUsers(role: UserRole) {
     return isOwner(role);
-}
-
-export function canViewQRCodes(role: UserRole) {
-    return isOwner(role) || isManager(role) || isStaff(role);
 }

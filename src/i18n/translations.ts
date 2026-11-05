@@ -1412,7 +1412,3 @@ export const translations = {
 
 export type Locale = keyof typeof translations;
 export type TranslationKey = keyof typeof translations.en;
-
-export function getTranslation(locale: Locale, section: TranslationKey) {
-    return translations[locale][section];
-}

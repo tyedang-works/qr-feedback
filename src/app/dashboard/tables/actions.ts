@@ -10,7 +10,7 @@ import {
 } from "@/lib/tables/queries";
 import { revalidatePath } from "next/cache";
 
-export type TableActionMessageKey =
+type TableActionMessageKey =
     | "loginRequired"
     | "tableManagePermissionDenied"
     | "tableNameRequired"

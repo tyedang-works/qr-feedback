@@ -99,7 +99,6 @@ export default function FeedbackCard({ item, onClick }: FeedbackCardProps) {
                         textAlign: "left",
                     }}
                 >
-                    {/* Header */}
                     <Stack
                         sx={{
                             flexDirection: "row",
@@ -111,7 +110,7 @@ export default function FeedbackCard({ item, onClick }: FeedbackCardProps) {
                         <Typography
                             sx={{
                                 minWidth: 0,
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: 700,
                                 color: "var(--color-text-primary)",
                                 overflow: "hidden",
@@ -125,7 +124,6 @@ export default function FeedbackCard({ item, onClick }: FeedbackCardProps) {
                         <FeedbackStatusChip status={item.status} />
                     </Stack>
 
-                    {/* Submitted date */}
                     <Typography
                         sx={{
                             fontSize: 11,
@@ -139,7 +137,6 @@ export default function FeedbackCard({ item, onClick }: FeedbackCardProps) {
                         )}
                     </Typography>
 
-                    {/* Issues */}
                     <Stack
                         sx={{
                             flexDirection: "row",
@@ -205,7 +202,6 @@ export default function FeedbackCard({ item, onClick }: FeedbackCardProps) {
                         )}
                     </Stack>
 
-                    {/* Feedback content */}
                     <Typography
                         sx={{
                             minHeight: 62,
@@ -226,7 +222,6 @@ export default function FeedbackCard({ item, onClick }: FeedbackCardProps) {
                             t("dashboard", "noAdditionalFeedback")}
                     </Typography>
 
-                    {/* Footer */}
                     <Box
                         sx={{
                             mt: "auto",

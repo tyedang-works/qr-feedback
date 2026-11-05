@@ -29,7 +29,7 @@ Main workflow:
 - `qrcode.react` `^4.2.0` for QR code rendering
 - Recharts `^3.10.1` for charts
 - `xlsx` `^0.18.5` for spreadsheet operations
-- ESLint `^9`, `eslint-config-next` `16.3.6`, `eslint-config-prettier` `^10.1.8`, Prettier `^3.9.9`, `dotenv` `^18.0.5`, and `babel-plugin-react-compiler` `1.0.0` are development dependencies.
+- ESLint `^9`, `eslint-config-next` `16.3.6`, `eslint-config-prettier` `^10.1.8`, Prettier `^3.9.9` and `babel-plugin-react-compiler` `1.0.0` are development dependencies.
 - Node type definitions `^20`; React and React DOM type definitions `^19`.
 - Deployment target previously used: Vercel
 

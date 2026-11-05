@@ -1,6 +1,6 @@
 "use client";
 
-import { updateFeedback } from "@/app/dashboard/feedback/[id]/actions";
+import { updateFeedback } from "@/app/dashboard/feedback/actions";
 import QRSnackbar from "@/components/common/feedback/QRSnackbar";
 import QRSelect from "@/components/common/input/QRSelect";
 import QRTextField from "@/components/common/input/QRTextField";

@@ -6,13 +6,6 @@ export type FeedbackTrendItem = {
     count: number;
 };
 
-export type IssueDistributionItem = {
-    option: string;
-    label: string;
-    count: number;
-    percentage: number;
-};
-
 export type FeedbackStatusDistributionItem = {
     status: FeedbackStatus;
     label: string;

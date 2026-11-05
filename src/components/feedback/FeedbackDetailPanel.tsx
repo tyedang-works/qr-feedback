@@ -68,8 +68,6 @@ export default function FeedbackDetailPanel({
     const numberLocale = locale === "en" ? "en-US" : "vi-VN";
     const isResolved = data.status === FEEDBACK_STATUS.RESOLVED;
 
-    console.log(data, ":data");
-
     return (
         <Stack sx={{ gap: 2 }}>
             <Box

@@ -1,8 +1,8 @@
 "use client";
 
-import { useId } from "react";
 import { useTranslation } from "@/components/common/providers/useTranslation";
 import { Box, Stack, Typography } from "@mui/material";
+import { useId } from "react";
 
 export default function FluidLoader() {
     const id = useId().replace(/:/g, "");
@@ -28,7 +28,6 @@ export default function FluidLoader() {
                     "--color-three": "#ffbf4780",
                     "--color-four": "#bf4a1d80",
                     "--color-five": "#ffbf4740",
-                    "--time-animation": "2s",
                     "--size": 1,
 
                     position: "relative",
@@ -39,8 +38,7 @@ export default function FluidLoader() {
                     transform: "scale(var(--size))",
                     boxShadow:
                         "0 0 25px 0 var(--color-three), 0 20px 50px 0 var(--color-four)",
-                    animation:
-                        "qrLoaderColorize calc(var(--time-animation) * 3) ease-in-out infinite",
+                    animation: "qrLoaderColorize 6s ease-in-out infinite",
 
                     "&::before": {
                         content: '""',
@@ -66,12 +64,12 @@ export default function FluidLoader() {
 
                     "& .qr-loader-mask": {
                         filter: "contrast(15)",
-                        animation:
-                            "qrLoaderRoundness calc(var(--time-animation) / 2) linear infinite",
+                        animation: "qrLoaderRoundness 1s linear infinite",
                     },
 
                     "& .qr-loader-mask polygon": {
                         filter: "blur(7px)",
+                        transformBox: "view-box",
                     },
 
                     "& .qr-loader-mask polygon:nth-of-type(1)": {
@@ -82,65 +80,82 @@ export default function FluidLoader() {
                     "& .qr-loader-mask polygon:nth-of-type(2)": {
                         transformOrigin: "50% 50%",
                         animation:
-                            "qrLoaderRotation var(--time-animation) linear infinite reverse",
+                            "qrLoaderRotation 2s linear infinite reverse",
                     },
 
                     "& .qr-loader-mask polygon:nth-of-type(3)": {
                         transformOrigin: "50% 60%",
-                        animation:
-                            "qrLoaderRotation var(--time-animation) linear infinite",
-                        animationDelay: "calc(var(--time-animation) / -3)",
+                        animation: "qrLoaderRotation 2s linear infinite",
+                        animationDelay: "-0.667s",
                     },
 
                     "& .qr-loader-mask polygon:nth-of-type(4)": {
                         transformOrigin: "40% 40%",
                         animation:
-                            "qrLoaderRotation var(--time-animation) linear infinite reverse",
+                            "qrLoaderRotation 2s linear infinite reverse",
                     },
 
                     "& .qr-loader-mask polygon:nth-of-type(5)": {
                         transformOrigin: "40% 40%",
                         animation:
-                            "qrLoaderRotation var(--time-animation) linear infinite reverse",
-                        animationDelay: "calc(var(--time-animation) / -2)",
+                            "qrLoaderRotation 2s linear infinite reverse",
+                        animationDelay: "-1s",
                     },
 
                     "& .qr-loader-mask polygon:nth-of-type(6)": {
                         transformOrigin: "60% 40%",
-                        animation:
-                            "qrLoaderRotation var(--time-animation) linear infinite",
+                        animation: "qrLoaderRotation 2s linear infinite",
                     },
 
                     "& .qr-loader-mask polygon:nth-of-type(7)": {
                         transformOrigin: "60% 40%",
-                        animation:
-                            "qrLoaderRotation var(--time-animation) linear infinite",
-                        animationDelay: "calc(var(--time-animation) / -1.5)",
+                        animation: "qrLoaderRotation 2s linear infinite",
+                        animationDelay: "-1.333s",
                     },
 
                     "@keyframes qrLoaderRotation": {
-                        "0%": { transform: "rotate(0deg)" },
-                        "100%": { transform: "rotate(360deg)" },
+                        "0%": {
+                            transform: "rotate(0deg)",
+                        },
+                        "100%": {
+                            transform: "rotate(360deg)",
+                        },
                     },
 
                     "@keyframes qrLoaderRoundness": {
-                        "0%, 60%, 100%": { filter: "contrast(15)" },
-                        "20%, 40%": { filter: "contrast(3)" },
+                        "0%, 60%, 100%": {
+                            filter: "contrast(15)",
+                        },
+                        "20%, 40%": {
+                            filter: "contrast(3)",
+                        },
                     },
 
                     "@keyframes qrLoaderColorize": {
-                        "0%, 100%": { filter: "hue-rotate(0deg)" },
-                        "20%": { filter: "hue-rotate(-30deg)" },
-                        "40%": { filter: "hue-rotate(-60deg)" },
-                        "60%": { filter: "hue-rotate(-90deg)" },
-                        "80%": { filter: "hue-rotate(-45deg)" },
+                        "0%, 100%": {
+                            filter: "hue-rotate(0deg)",
+                        },
+                        "20%": {
+                            filter: "hue-rotate(-30deg)",
+                        },
+                        "40%": {
+                            filter: "hue-rotate(-60deg)",
+                        },
+                        "60%": {
+                            filter: "hue-rotate(-90deg)",
+                        },
+                        "80%": {
+                            filter: "hue-rotate(-45deg)",
+                        },
                     },
 
                     "@media (prefers-reduced-motion: reduce)": {
                         animation: "none",
+
                         "& .qr-loader-mask": {
                             animation: "none",
                         },
+
                         "& .qr-loader-mask polygon": {
                             animation: "none",
                             filter: "blur(7px)",
@@ -159,11 +174,17 @@ export default function FluidLoader() {
                                 points="0,0 100,0 100,100 0,100"
                                 fill="black"
                             />
+
                             <polygon points="25,25 75,25 50,75" fill="white" />
+
                             <polygon points="50,25 75,75 25,75" fill="white" />
+
                             <polygon points="35,35 65,35 50,65" fill="white" />
+
                             <polygon points="35,35 65,35 50,65" fill="white" />
+
                             <polygon points="35,35 65,35 50,65" fill="white" />
+
                             <polygon points="35,35 65,35 50,65" fill="white" />
                         </mask>
                     </defs>

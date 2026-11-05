@@ -376,7 +376,8 @@ body {
     }
 
     body:has(.qr-page) .dashboard-sidebar,
-    body:has(.qr-page) .dashboard-mobile-header {
+    body:has(.qr-page) .dashboard-mobile-header,
+    body:has(.qr-page) .dashboard-navbar {
         display: none !important;
     }
 

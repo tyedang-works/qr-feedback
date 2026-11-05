@@ -28,7 +28,7 @@ import {
     UserRound,
     X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import ChangePasswordDialog from "../account/ChangePasswordDialog";
 import LanguageToggle from "../common/language/LanguageToggle";
@@ -47,6 +47,7 @@ export default function DashboardLayout({
     userContext,
     feedbackEmail,
 }: DashboardLayoutProps) {
+    const pathname = usePathname();
     const router = useRouter();
     const { t } = useTranslation();
 
@@ -89,6 +90,11 @@ export default function DashboardLayout({
 
     const handleProfileNavigation = (href: string) => {
         handleCloseProfile();
+
+        if (href === pathname) {
+            return;
+        }
+
         startNavigation();
         router.push(href);
     };

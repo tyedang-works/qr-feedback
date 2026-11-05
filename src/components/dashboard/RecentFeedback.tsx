@@ -51,7 +51,9 @@ function formatRelativeTime(dateString: string, locale: string) {
     return new Intl.RelativeTimeFormat(locale, {
         numeric: "auto",
         style: "long",
-    }).format(value, selectedUnit.unit);
+    })
+        .format(value, selectedUnit.unit)
+        .toLocaleLowerCase(locale);
 }
 
 function getStatusTranslationKey(
@@ -246,8 +248,6 @@ export default function RecentFeedback({ data }: RecentFeedbackProps) {
                                             userSelect: "none",
                                             transition:
                                                 "filter 200ms ease, opacity 200ms ease",
-
-                                            // Dark mode
                                             '[data-theme="dark"] &': {
                                                 filter: "brightness(0) invert(1)",
                                                 opacity: 0.95,

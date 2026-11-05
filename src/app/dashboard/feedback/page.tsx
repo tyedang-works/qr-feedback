@@ -102,9 +102,6 @@ export default async function FeedbackPage({
         getFeedbackSummary(userContext.restaurantId),
     ]);
 
-    console.log("FeedbackPage: feedback", feedback);
-    console.log("FeedbackPage: tables", tables);
-
     const exportParams = new URLSearchParams();
     exportParams.set("locale", locale);
     if (keyword) {

@@ -9,27 +9,32 @@ const skeletonSx = {
     },
 };
 
-const dividerColor = "var(--color-border)";
-
-export default function FeedbackListSkeleton() {
+const FeedbackSkeletonCard = ({ index }: { index: number }) => {
     return (
         <Card
+            elevation={0}
             sx={{
                 ...cardSx,
-                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                minWidth: 0,
+                minHeight: 244,
+                p: 2,
                 boxShadow: "none",
+                overflow: "hidden",
             }}
         >
-            <Box
+            <Stack
                 sx={{
-                    px: 2,
-                    py: 1.75,
-                    borderBottom: `1px solid ${dividerColor}`,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 1,
                 }}
             >
                 <Skeleton
                     variant="text"
-                    width={150}
+                    width={index % 3 === 0 ? 75 : 68}
                     height={22}
                     animation="wave"
                     sx={{
@@ -39,135 +44,171 @@ export default function FeedbackListSkeleton() {
                 />
 
                 <Skeleton
-                    variant="text"
-                    width={200}
-                    height={19}
+                    variant="rounded"
+                    width={index % 2 === 0 ? 88 : 78}
+                    height={23}
                     animation="wave"
                     sx={{
                         ...skeletonSx,
-                        mt: 0.25,
+                        borderRadius: 1,
+                        flexShrink: 0,
+                    }}
+                />
+            </Stack>
+
+            <Skeleton
+                variant="text"
+                width={95}
+                height={19}
+                animation="wave"
+                sx={{
+                    ...skeletonSx,
+                    mt: 0.75,
+                    transform: "none",
+                }}
+            />
+
+            <Stack
+                sx={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 0.75,
+                    mt: 1.25,
+                }}
+            >
+                <Skeleton
+                    variant="rounded"
+                    width={index % 2 === 0 ? 132 : 118}
+                    height={28}
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        borderRadius: 1,
+                    }}
+                />
+
+                <Skeleton
+                    variant="rounded"
+                    width={index % 3 === 0 ? 142 : 126}
+                    height={28}
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        borderRadius: 1,
+                    }}
+                />
+
+                <Skeleton
+                    variant="rounded"
+                    width={28}
+                    height={24}
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        borderRadius: 1,
+                    }}
+                />
+            </Stack>
+
+            <Stack sx={{ gap: 0.25, mt: 1.25 }}>
+                <Skeleton
+                    variant="text"
+                    width={index % 2 === 0 ? "95%" : "75%"}
+                    height={21}
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
                         transform: "none",
                     }}
                 />
-            </Box>
 
-            {[1, 2, 3, 4].map((item) => (
-                <Box
-                    key={item}
+                <Skeleton
+                    variant="text"
+                    width={index % 3 === 0 ? "65%" : "40%"}
+                    height={21}
+                    animation="wave"
                     sx={{
-                        px: 2,
-                        py: 1.75,
-                        borderBottom:
-                            item < 4 ? `1px solid ${dividerColor}` : "none",
-                        bgcolor:
-                            item === 1
-                                ? "var(--color-surface-active)"
-                                : "transparent",
-                        borderLeft:
-                            item === 1
-                                ? "2px solid var(--color-text-secondary)"
-                                : "2px solid transparent",
+                        ...skeletonSx,
+                        transform: "none",
+                    }}
+                />
+            </Stack>
+
+            <Stack
+                sx={{
+                    mt: "auto",
+                    pt: 1.25,
+                    borderTop: "1px solid var(--color-border)",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 1,
+                }}
+            >
+                <Stack
+                    sx={{
+                        minWidth: 0,
+                        flex: 1,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 0.75,
                     }}
                 >
-                    <Stack sx={{ gap: 1 }}>
-                        <Stack
-                            sx={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                gap: 1,
-                            }}
-                        >
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Skeleton
-                                    variant="text"
-                                    width={70}
-                                    height={21}
-                                    animation="wave"
-                                    sx={{
-                                        ...skeletonSx,
-                                        transform: "none",
-                                    }}
-                                />
-                            </Box>
+                    <Skeleton
+                        variant="circular"
+                        width={15}
+                        height={15}
+                        animation="wave"
+                        sx={skeletonSx}
+                    />
 
-                            <Skeleton
-                                variant="text"
-                                width={90}
-                                height={18}
-                                animation="wave"
-                                sx={{
-                                    ...skeletonSx,
-                                    transform: "none",
-                                }}
-                            />
-                        </Stack>
+                    <Skeleton
+                        variant="text"
+                        width={index % 2 === 0 ? 105 : 115}
+                        height={19}
+                        animation="wave"
+                        sx={{
+                            ...skeletonSx,
+                            transform: "none",
+                        }}
+                    />
+                </Stack>
 
-                        <Stack
-                            sx={{
-                                flexDirection: "row",
-                                flexWrap: "wrap",
-                                gap: 0.75,
-                            }}
-                        >
-                            <Skeleton
-                                variant="rounded"
-                                width={item === 2 ? 88 : 42}
-                                height={22}
-                                animation="wave"
-                                sx={{
-                                    ...skeletonSx,
-                                    borderRadius: 1,
-                                }}
-                            />
-
-                            <Skeleton
-                                variant="rounded"
-                                width={125}
-                                height={22}
-                                animation="wave"
-                                sx={{
-                                    ...skeletonSx,
-                                    borderRadius: 1,
-                                }}
-                            />
-
-                            <Skeleton
-                                variant="rounded"
-                                width={100}
-                                height={22}
-                                animation="wave"
-                                sx={{
-                                    ...skeletonSx,
-                                    borderRadius: 1,
-                                }}
-                            />
-                        </Stack>
-
-                        <Skeleton
-                            variant="text"
-                            width={item === 2 ? "75%" : "45%"}
-                            height={20}
-                            animation="wave"
-                            sx={{
-                                ...skeletonSx,
-                                transform: "none",
-                            }}
-                        />
-
-                        <Skeleton
-                            variant="text"
-                            width={135}
-                            height={19}
-                            animation="wave"
-                            sx={{
-                                ...skeletonSx,
-                                transform: "none",
-                            }}
-                        />
-                    </Stack>
-                </Box>
-            ))}
+                <Skeleton
+                    variant="text"
+                    width={112}
+                    height={20}
+                    animation="wave"
+                    sx={{
+                        ...skeletonSx,
+                        flexShrink: 0,
+                        transform: "none",
+                    }}
+                />
+            </Stack>
         </Card>
+    );
+};
+
+export default function FeedbackListSkeleton() {
+    return (
+        <Box
+            sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                    xs: "minmax(0, 1fr)",
+                    md: "repeat(2, minmax(0, 1fr))",
+                    xl: "repeat(3, minmax(0, 1fr))",
+                },
+                gap: { xs: 2, md: 2.5 },
+                alignItems: "stretch",
+                minWidth: 0,
+            }}
+        >
+            {Array.from({ length: 6 }, (_, index) => (
+                <FeedbackSkeletonCard key={index} index={index} />
+            ))}
+        </Box>
     );
 }

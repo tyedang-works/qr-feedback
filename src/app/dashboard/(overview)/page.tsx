@@ -173,7 +173,7 @@ export default async function DashboardPage() {
                     display: "grid",
                     gridTemplateColumns: {
                         xs: "minmax(0, 1fr)",
-                        md: "minmax(0, 7fr) minmax(0, 5fr)",
+                        md: "minmax(0, 6fr) minmax(0, 5fr)",
                     },
                     gap: 2,
                     alignItems: "stretch",

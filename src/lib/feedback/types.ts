@@ -35,21 +35,6 @@ export type FeedbackListResult = {
     totalPages: number;
 };
 
-export type FeedbackDetail = {
-    id: string;
-    publicId: string;
-    tableId: string;
-    tableName: string;
-    selectedOptions: string[];
-    feedback: string;
-    phone: string;
-    status: FeedbackStatus;
-    internalNote: string | null;
-    resolvedByName: string | null;
-    resolvedAt: string | null;
-    createdAt: string;
-};
-
 export type FeedbackSummary = {
     total: number;
     new: number;

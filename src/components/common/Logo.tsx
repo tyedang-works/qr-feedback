@@ -10,7 +10,7 @@ export default function Logo({ size = 68, width, height }: LogoProps) {
     return (
         <Box
             component="img"
-            src="/assets/logo.svg"
+            src="/assets/restaurant-default-logo.svg"
             alt="QR Feedback"
             sx={{
                 width: width ?? size,

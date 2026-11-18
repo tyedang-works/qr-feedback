@@ -1,6 +1,7 @@
 "use client";
 
 import { useDashboardLoading } from "@/components/dashboard/DashboardLoadingProvider";
+import { useTranslation } from "@/components/common/providers/useTranslation";
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ChangeEvent } from "react";
@@ -21,7 +22,9 @@ export default function FeedbackPagination({
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+
     const { startNavigation } = useDashboardLoading();
+    const { t } = useTranslation();
 
     if (total === 0 || totalPages <= 1) {
         return null;
@@ -69,7 +72,7 @@ export default function FeedbackPagination({
                         whiteSpace: "nowrap",
                     }}
                 >
-                    Hiển thị{" "}
+                    {t("feedback", "showing")}{" "}
                     <Box
                         component="span"
                         sx={{
@@ -79,7 +82,7 @@ export default function FeedbackPagination({
                     >
                         {from}–{to}
                     </Box>{" "}
-                    trong{" "}
+                    {t("feedback", "of")}{" "}
                     <Box
                         component="span"
                         sx={{
@@ -89,13 +92,37 @@ export default function FeedbackPagination({
                     >
                         {total}
                     </Box>{" "}
-                    phản hồi
+                    {t("feedback", "responses")}
                 </Typography>
 
                 <Pagination
+                    aria-label={t("feedback", "pagination")}
                     page={page}
                     count={totalPages}
                     onChange={handlePageChange}
+                    getItemAriaLabel={(type, pageNumber, selected) => {
+                        switch (type) {
+                            case "page":
+                                return selected
+                                    ? `${t("feedback", "page")} ${pageNumber}`
+                                    : `${t("feedback", "goToPage")} ${pageNumber}`;
+
+                            case "previous":
+                                return t("feedback", "previousPage");
+
+                            case "next":
+                                return t("feedback", "nextPage");
+
+                            case "first":
+                                return t("feedback", "firstPage");
+
+                            case "last":
+                                return t("feedback", "lastPage");
+
+                            default:
+                                return "";
+                        }
+                    }}
                     siblingCount={0}
                     boundaryCount={1}
                     size="small"

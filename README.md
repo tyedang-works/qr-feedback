@@ -1,12 +1,29 @@
 # QR Feedback
 
 ## Project Introduction
-**QR Feedback** is a customer feedback management system designed for restaurants. It streamlines the process of collecting, monitoring, and evaluating customer experiences through QR codes placed at individual dining tables.
+# QR Feedback
+QR Feedback is a restaurant feedback management system that helps restaurants collect, monitor, and analyze customer experiences through table-specific QR codes.
 
-Customers can scan a QR code to submit feedback on various aspects of their dining experience, including food quality, food presentation, service quality, dining area cleanliness, and service time. All feedback is stored centrally and displayed on a management dashboard, allowing restaurant staff to conveniently review, search, filter, and manage customer feedback.
-The goal of QR Feedback goes beyond simply collecting customer opinions. It helps restaurants turn customer feedback into actionable insights to continuously improve service quality. Positive aspects identified through customer feedback can be maintained and further developed, while issues that fall short of customer expectations can be identified, prioritized, and addressed promptly.
-By organizing customer feedback systematically, QR Feedback aims to enhance the overall customer experience, support data-informed decisions, and help restaurants continuously improve their service quality and achieve sustainable growth.
+Customers can scan a QR code and easily submit feedback about food quality, presentation, service, cleanliness, and service time. Restaurant staff can manage, search, and filter all feedback through a centralized dashboard.
 
+**Key Features:**
+- Collect customer feedback via table-specific QR codes.
+- Centralized feedback management dashboard.
+- Search and filter customer feedback.
+- Identify service issues and areas for improvement.
+- Turn customer feedback into actionable insights to improve service quality and customer experience.
+
+## Live Demo
+
+[**View the Demo →**](https://qr-feedback-two.vercel.app/)
+
+## Demo Account
+
+| Field | Value |
+|---|---|
+| Role | Staff |
+| Email | tyedang02@mailinator.com |
+| Password | Abcd@123456 |
 ---
 
 ## Features

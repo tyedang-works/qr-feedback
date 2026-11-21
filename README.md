@@ -1,8 +1,7 @@
 # QR Feedback
 
 ## Project Introduction
-# QR Feedback
-QR Feedback is a restaurant feedback management system that helps restaurants collect, monitor, and analyze customer experiences through table-specific QR codes.
+**QR Feedback** is a restaurant feedback management system that helps restaurants collect, monitor, and analyze customer experiences through table-specific QR codes.
 
 Customers can scan a QR code and easily submit feedback about food quality, presentation, service, cleanliness, and service time. Restaurant staff can manage, search, and filter all feedback through a centralized dashboard.
 
@@ -12,8 +11,10 @@ Customers can scan a QR code and easily submit feedback about food quality, pres
 - Search and filter customer feedback.
 - Identify service issues and areas for improvement.
 - Turn customer feedback into actionable insights to improve service quality and customer experience.
-
-## Live Demo
+- 
+## Screenshots
+### Login Page
+![QR Feedback Login Page](public/screenshots/login-page.png)
 
 [**View the Demo →**](https://qr-feedback-two.vercel.app/)
 
